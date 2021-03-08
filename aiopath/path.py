@@ -330,17 +330,36 @@ class AsyncPath(Path, AsyncPurePath):
     await self._accessor.symlink(target, self, target_is_directory)
 
   async def exists(self) -> bool:
+    """
+    Whether this path exists.
+    """
     try:
-      async with async_open(self._path, 'rb'):
-        pass
+      await self.stat()
 
-      return True
+    except OSError as e:
+      if not _ignore_error(e):
+        raise
 
-    except IsADirectoryError:
-      return True
-
-    except FileNotFoundError:
       return False
+
+    except ValueError:
+      # Non-encodable path
+      return False
+
+    return True
+
+  #async def exists(self) -> bool:
+    #try:
+      #async with async_open(self._path, 'rb'):
+        #pass
+
+      #return True
+
+    #except IsADirectoryError:
+      #return True
+
+    #except FileNotFoundError:
+      #return False
 
   @classmethod
   async def cwd(cls: type) -> str:
