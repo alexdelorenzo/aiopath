@@ -55,8 +55,8 @@ from aiopath import AsyncPath
 home: Path = Path.home()
 ahome: AsyncPath = AsyncPath(home)
 
-assert isinstance(path, Path)
-assert isinstance(apath, AsyncPath)
+assert isinstance(home, Path)
+assert isinstance(ahome, AsyncPath)
 ```
 
 ### Opening a file
