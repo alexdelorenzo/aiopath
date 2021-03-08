@@ -10,12 +10,6 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
 import os
 
 
-# try:
-#   from typing import TypeAlias
-
-# except ImportError:
-#   TypeAlias = type
-
 from aiofile import async_open, AIOFile
 from aiofiles import os as async_os
 from aiofiles.os import wrap as method_as_method_coro, \
@@ -24,10 +18,6 @@ from aiofiles.os import wrap as method_as_method_coro, \
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
-
-
-# _PathBase: TypeAlias = \
-#   WindowsPath if name == 'nt' else PosixPath
 
 
 DEFAULT_ENCODING: str = 'utf-8'
