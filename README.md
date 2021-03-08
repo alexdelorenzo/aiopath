@@ -60,7 +60,7 @@ assert isinstance(apath, AsyncPath)
 ```
 
 ### Opening a file
-You can get a [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers).
+You can get an asynchronous [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers).
 
 ```python3
 import tempfile
