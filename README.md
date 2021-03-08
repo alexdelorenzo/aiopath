@@ -107,13 +107,6 @@ if await downloads.exists():
  - Python 3.7+
  - `requirements.txt`
 
-### Linux
-This library will take advantage of [libaio](https://pagure.io/libaio), which is compatible with Linux 4.18 and up.
-
-```bash
-sudo apt install libaio1
-```
-
 ## PyPI
 ```bash
 $ python3 -m pip install aiopath
@@ -123,6 +116,13 @@ $ python3 -m pip install aiopath
 ```bash
 $ python3 -m pip install -r requirements.txt
 $ python3 setup.py install
+```
+
+### Linux
+This library will take advantage of [libaio](https://pagure.io/libaio), which is compatible with Linux 4.18 and up.
+
+```bash
+sudo apt install libaio1
 ```
 
 # Support
