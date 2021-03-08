@@ -1,14 +1,12 @@
-#!/usr/bin/env python3
 from __future__ import annotations
 
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
 from typing import Optional, AsyncIterable, List, Union
-from os import name, stat_result
+from os import name, stat_result, DirEntry
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
-
 
 from aiofile import async_open, AIOFile
 from aiofiles import os as async_os
@@ -75,10 +73,10 @@ class _AsyncAccessor(_NormalAccessor):
     except ImportError:
       raise NotImplementedError("Path.group() is unsupported on this system")
 
-  def _scandir_results(self, *args, **kwargs) -> List[str]:
+  def _scandir_results(self, *args, **kwargs) -> List[DirEntry]:
     return list(os.scandir(*args, **kwargs))
 
-  async def scandir(self, *args, **kwargs) -> AsyncIterable[str]:
+  async def scandir(self, *args, **kwargs) -> AsyncIterable[DirEntry]:
     results = await to_thread(self._scandir_results, *args, **kwargs)
 
     for result in results:
