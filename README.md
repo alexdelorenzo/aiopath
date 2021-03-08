@@ -16,7 +16,6 @@ import tempfile
 from pathlib import Path
 from aiopath import AsyncPath
 
-
 with tempfile.NamedTemporaryFile() as temp:
   path = Path(temp.name)
   apath = AsyncPath(temp.name)
@@ -46,17 +45,18 @@ assert not path.exists()
 assert not await apath.exists()
 ```
 
-You can convert `pathlib.Path` objects to `aiopath.Path` objects easily:
+You can convert `pathlib.Path` objects to `aiopath.Path` objects, and vice versa:
 ```python3
 from pathlib import Path
 from aiopath import AsyncPath
 
-
 home: Path = Path.home()
 ahome: AsyncPath = AsyncPath(home)
+path: Path = Path(ahome)
 
 assert isinstance(home, Path)
 assert isinstance(ahome, AsyncPath)
+assert isinstance(path, Path)
 ```
 
 ### Opening a file
@@ -65,7 +65,6 @@ You can get an asynchronous [file-like object handle](https://docs.python.org/3/
 ```python3
 import tempfile
 from aiopath import AsyncPath
-
 
 text: str = 'example'
 
@@ -85,7 +84,6 @@ with tempfile.NamedTemporaryFile() as temp:
 ```python3
 from typing import List
 from aiopath import AsyncPath
-
 
 home: AsyncPath = await AsyncPath.home()
 
