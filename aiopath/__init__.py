@@ -1,1 +1,1 @@
-from .path import AsyncPath, AsyncPurePath
+from .path import AsyncPath, AsyncPurePath, AsyncWindowsPath, AsyncPosixPath

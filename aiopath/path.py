@@ -133,6 +133,18 @@ class AsyncPath(Path, AsyncPurePath):
   def _init(self, template: Optional[AsyncPath] = None):
     self._accessor = _async_accessor
 
+  def __new__(cls, *args, **kwargs):
+    if cls is AsyncPath:
+        cls = AsyncWindowsPath if os.name == 'nt' else AsyncPosixPath
+
+    self = cls._from_parts(args, init=False)
+
+    if not self._flavour.is_supported:
+        raise NotImplementedError("cannot instantiate %r on your system"
+                                  % (cls.__name__,))
+    self._init()
+    return self
+
   @property
   def _path(self) -> str:
     return str(self)
@@ -357,15 +369,23 @@ class AsyncPath(Path, AsyncPurePath):
     coro = cls()._flavour.gethomedir(None)
     return cls(await coro)
 
-  async def samefile(self, other_path: AsyncPath) -> bool:
+  async def samefile(self, other_path: Union[AsyncPath, Path]) -> bool:
     """Return whether other_path is the same or not as this file
     (as returned by os.path.samefile()).
     """
-    try:
-      other_st = await other_path.stat()
+    if isinstance(other_path, AsyncPath):
+      try:
+        other_st = await other_path.stat()
 
-    except AttributeError:
-      other_st = await self._accessor.stat(other_path)
+      except AttributeError:
+        other_st = await self._accessor.stat(other_path)
+
+    else:
+      try:
+        other_st = other_path.stat()
+
+      except AttributeError:
+        other_st = self._accessor.stat(other_path)
 
     return os.path.samestat(
       await self.stat(),
