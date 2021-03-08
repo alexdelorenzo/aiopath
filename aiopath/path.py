@@ -154,7 +154,7 @@ class AsyncPath(Path, AsyncPurePath):
     mode: str = 'r',
     buffering: int = -1,
     encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[Exception] = None,
+    errors: Optional[str] = None,
     newline: Optional[str] = None
   ) -> AIOFile:
     return AIOFile(
@@ -166,7 +166,7 @@ class AsyncPath(Path, AsyncPurePath):
   async def read_text(
     self,
     encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[Exception] = None
+    errors: Optional[str] = None
   ) -> str:
     async with self.open('r', encoding=encoding) as file:
       return await file.read()
@@ -174,7 +174,7 @@ class AsyncPath(Path, AsyncPurePath):
   async def read_bytes(
     self,
     encoding: Optional[str] = None,
-    errors: Optional[Exception] = None
+    errors: Optional[str] = None
   ) -> bytes:
     async with self.open(mode='rb') as file:
       return await file.read()
@@ -192,7 +192,7 @@ class AsyncPath(Path, AsyncPurePath):
     self,
     data: str,
     encoding: Optional[str] = 'utf-8',
-    errors: Optional[Exception] = None,
+    errors: Optional[str] = None,
     newline: Optional[str] = None
   ) -> int:
     """
