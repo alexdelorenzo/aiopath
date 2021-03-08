@@ -30,6 +30,6 @@ setup(
   packages=[NAME],
   zip_safe=False,
   install_requires=REQUIREMENTS,
-  python_requires='>=3.8',
+  python_requires='>=3.7',
   include_package_data=True
 )

@@ -104,7 +104,7 @@ if await downloads.exists():
 # Installation
 ## Dependencies
  - A POSIX compliant OS, or Windows
- - Python 3.6+
+ - Python 3.7+
  - `requirements.txt`
 
 ### Linux
