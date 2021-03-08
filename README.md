@@ -126,7 +126,7 @@ sudo apt install libaio1
 ```
 
 # Support
-Want to support more open-source software like this?
+Want to support this project and [other open-source software](https://github.com/alexdelorenzo) like this?
 
 <a href="https://www.buymeacoffee.com/alexdelorenzo" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60px" style="height: 60px !important;width: 217px !important;max-width:25%" ></a>
 
