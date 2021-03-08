@@ -125,6 +125,10 @@ $ python3 -m pip install -r requirements.txt
 $ python3 setup.py install
 ```
 
+# Support
+Want to support more open-source software like this?
+<a href="https://www.buymeacoffee.com/alexdelorenzo" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 # License
 See `LICENSE`. If you'd like to use this project with a different license, please get in touch.
 
