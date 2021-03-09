@@ -3,12 +3,12 @@ from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
 from typing import Optional, AsyncIterable, List, Union
-from os import name, stat_result, DirEntry
+from os import stat_result, DirEntry
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
 
-from aiofile import async_open, AIOFile
+from aiofile import AIOFile
 from aiofiles import os as async_os
 from aiofiles.os import wrap as method_as_method_coro, \
   wrap as func_as_corofunc
@@ -115,7 +115,8 @@ class PureAsyncWindowsPath(AsyncPurePath):
 
 
 class AsyncPath(Path, AsyncPurePath):
-  _flavour = _async_windows_flavour if os.name == 'nt' else _async_posix_flavour
+  _flavour = \
+    _async_windows_flavour if os.name == 'nt' else _async_posix_flavour
   _accessor = _async_accessor
 
   def _init(self, template: Optional[AsyncPath] = None):
@@ -123,13 +124,14 @@ class AsyncPath(Path, AsyncPurePath):
 
   def __new__(cls, *args, **kwargs):
     if cls is AsyncPath:
-        cls = AsyncWindowsPath if os.name == 'nt' else AsyncPosixPath
+      cls = AsyncWindowsPath if os.name == 'nt' else AsyncPosixPath
 
     self = cls._from_parts(args, init=False)
 
     if not self._flavour.is_supported:
-        raise NotImplementedError("cannot instantiate %r on your system"
-                                  % (cls.__name__,))
+      name: str = cls.__name__
+      raise NotImplementedError(f"cannot instantiate {name} on your system")
+
     self._init()
     return self
 
@@ -156,7 +158,7 @@ class AsyncPath(Path, AsyncPurePath):
     encoding: Optional[str] = DEFAULT_ENCODING,
     errors: Optional[str] = None
   ) -> str:
-    async with self.open('r', encoding=encoding) as file:
+    async with self.open('r', encoding=encoding, errors=errors) as file:
       return await file.read()
 
   async def read_bytes(
@@ -164,7 +166,7 @@ class AsyncPath(Path, AsyncPurePath):
     encoding: Optional[str] = None,
     errors: Optional[str] = None
   ) -> bytes:
-    async with self.open(mode='rb') as file:
+    async with self.open('rb', encoding=encoding, errors=errors) as file:
       return await file.read()
 
   async def write_bytes(self, data: bytes) -> int:
@@ -672,11 +674,11 @@ class AsyncPath(Path, AsyncPurePath):
     return self
 
 
-class AsyncPosixPath(AsyncPath, PureAsyncPosixPath):
+class AsyncPosixPath(PosixPath, AsyncPath, PureAsyncPosixPath):
   __slots__ = ()
 
 
-class AsyncWindowsPath(AsyncPath, PureAsyncWindowsPath):
+class AsyncWindowsPath(WindowsPath, AsyncPath, PureAsyncWindowsPath):
   __slots__ = ()
 
   async def is_mount(self) -> int:
