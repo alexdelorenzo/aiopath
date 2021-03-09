@@ -1,7 +1,7 @@
 # 📁 Async pathlib for Python
-`aiopath` is a complete implementation of [`pathlib`](https://docs.python.org/3/library/pathlib.html) from Python 3.4+ that is compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). All I/O performed is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
+`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that is compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). All I/O performed is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
 
-`aiopath` is extensively typed with Python [type annotations](https://docs.python.org/3/library/typing.html). `aiopath` also takes advantage of [libaio](https://pagure.io/libaio) on Linux.
+`aiopath` is extensively typed with Python [type annotations](https://docs.python.org/3/library/typing.html). `aiopath` takes advantage of [`libaio`](https://pagure.io/libaio) on Linux.
 
 ## Usage
 `aiopath.Path` has the same API as `pathlib.Path`, as do `aiopath.AsyncPurePath` and `pathlib.PurePath`. 
@@ -107,6 +107,12 @@ if await downloads.exists():
  - Python 3.7+
  - `requirements.txt`
 
+#### Linux
+If you're using a 4.18 or newer kernel and have [`libaio`](https://pagure.io/libaio) installed, `aiopath` will use it. You can install `libaio` on Debian/Ubuntu like so:
+```bash
+$ sudo apt install libaio1
+```
+
 ## PyPI
 ```bash
 $ python3 -m pip install aiopath
@@ -116,13 +122,6 @@ $ python3 -m pip install aiopath
 ```bash
 $ python3 -m pip install -r requirements.txt
 $ python3 setup.py install
-```
-
-### Linux
-This library will take advantage of [libaio](https://pagure.io/libaio), which is compatible with Linux 4.18 and up.
-
-```bash
-$ sudo apt install libaio1
 ```
 
 # Support
