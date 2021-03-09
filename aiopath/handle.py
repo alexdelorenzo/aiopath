@@ -7,7 +7,6 @@ from aiofile import AIOFile, LineReader
 
 
 BEGINNING: int = 0
-NO_SIZE: int = 0
 CHUNK_SIZE: int = 1_096
 
 SEP: str = '\n'
@@ -47,10 +46,21 @@ async def read_lines(
       offset=offset
     )
 
-    while line := await reader.readline():
+#### Python 3.8+
+#    while line := await reader.readline():
+#      buffer.write(line)
+#      buffer.seek(BEGINNING)
+#
+#      yield wrapper.readline()
+
+    while True:
+      line: bytes = await reader.readline()
+
+      if not line:
+        break
+
       buffer.write(line)
       buffer.seek(BEGINNING)
-
       yield wrapper.readline()
 
 
@@ -71,6 +81,7 @@ async def read_full_file(
     encoding,
     errors
   )
+
   with io.StringIO() as string:
     async for line in lines_gen:
       string.write(line)
