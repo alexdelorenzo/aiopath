@@ -8,11 +8,11 @@ from aiofile import AIOFile, LineReader
 
 BEGINNING: int = 0
 NO_SIZE: int = 0
-CHUNK_SIZE: int = 4_096
+CHUNK_SIZE: int = 1_096
 
 SEP: str = '\n'
 ENCODING: str = 'utf-8'
-ERRORS: str = 'ignore'
+ERRORS: str = 'replace'
 
 
 async def read_lines(
@@ -51,8 +51,7 @@ async def read_lines(
       buffer.write(line)
       buffer.seek(BEGINNING)
 
-      yield next(wrapper)
-      buffer.truncate(NO_SIZE)
+      yield wrapper.readline()
 
 
 async def read_full_file(
@@ -72,7 +71,8 @@ async def read_full_file(
     encoding,
     errors
   )
+  with io.StringIO() as string:
+    async for line in lines_gen:
+      string.write(line)
 
-  lines: List[str] = [line async for line in lines_gen]
-
-  return SEP.join(lines)
+    return string.getvalue()

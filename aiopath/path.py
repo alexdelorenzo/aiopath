@@ -159,7 +159,7 @@ class AsyncPath(Path, AsyncPurePath):
     encoding: Optional[str] = DEFAULT_ENCODING,
     errors: Optional[str] = None
   ) -> str:
-    path = str(await path.resolve())
+    path = str(await self.resolve())
 
     return await read_full_file(
       path,
