@@ -33,17 +33,21 @@ async def read_lines(
   )
 
   if hasattr(path, 'resolve'):
-    path = str(await path.resolve())
+    try:
+      path = str(await path.resolve())
+
+    except:
+      path = str(path.resolve())
 
   async with AIOFile(path, 'rb') as handle:
-    file_reader = LineReader(
+    reader = LineReader(
       handle,
       line_sep=line_sep,
       chunk_size=chunk_size,
       offset=offset
     )
 
-    while line := await file_reader.readline():
+    while line := await reader.readline():
       buffer.write(line)
       buffer.seek(BEGINNING)
 
@@ -60,7 +64,7 @@ async def read_full_file(
   errors: str = ERRORS,
   **kwargs
 ) -> str:
-  lines_gen = await read_lines(
+  lines_gen = read_lines(
     path,
     line_sep,
     chunk_size,
