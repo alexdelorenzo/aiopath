@@ -3,10 +3,13 @@ from typing import Callable, Awaitable, AsyncIterable, Iterable, \
 from os import scandir, DirEntry, stat_result
 from dataclasses import dataclass
 
-from .wrap import coro_as_method_coro, func_as_method_coro, \
-  to_thread, method_as_method_coro, func_as_corofunc
+from .wrap import to_thread
 
-from asyncio import to_thread
+try:
+  from asyncio import to_thread
+
+except ImportError:
+  pass
 
 
 @dataclass
