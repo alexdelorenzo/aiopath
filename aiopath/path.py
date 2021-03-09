@@ -16,6 +16,7 @@ from aiofiles.os import wrap as method_as_method_coro, \
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
+from .handle import read_lines, read_full_file
 
 
 DEFAULT_ENCODING: str = 'utf-8'
@@ -97,21 +98,21 @@ class AsyncPurePath(PurePath):
 
 
 class PureAsyncPosixPath(AsyncPurePath):
-    """PurePath subclass for non-Windows systems.
-    On a POSIX system, instantiating a PurePath should return this object.
-    However, you can also instantiate it directly on any system.
-    """
-    _flavour = _async_posix_flavour
-    __slots__ = ()
+  """PurePath subclass for non-Windows systems.
+  On a POSIX system, instantiating a PurePath should return this object.
+  However, you can also instantiate it directly on any system.
+  """
+  _flavour = _async_posix_flavour
+  __slots__ = ()
 
 
 class PureAsyncWindowsPath(AsyncPurePath):
-    """PurePath subclass for Windows systems.
-    On a Windows system, instantiating a PurePath should return this object.
-    However, you can also instantiate it directly on any system.
-    """
-    _flavour = _async_windows_flavour
-    __slots__ = ()
+  """PurePath subclass for Windows systems.
+  On a Windows system, instantiating a PurePath should return this object.
+  However, you can also instantiate it directly on any system.
+  """
+  _flavour = _async_windows_flavour
+  __slots__ = ()
 
 
 class AsyncPath(Path, AsyncPurePath):
@@ -150,7 +151,7 @@ class AsyncPath(Path, AsyncPurePath):
     return AIOFile(
       self._path,
       mode,
-      encoding=encoding
+      encoding=encoding,
     )
 
   async def read_text(
@@ -158,15 +159,16 @@ class AsyncPath(Path, AsyncPurePath):
     encoding: Optional[str] = DEFAULT_ENCODING,
     errors: Optional[str] = None
   ) -> str:
-    async with self.open('r', encoding=encoding, errors=errors) as file:
-      return await file.read()
+    path = str(await path.resolve())
 
-  async def read_bytes(
-    self,
-    encoding: Optional[str] = None,
-    errors: Optional[str] = None
-  ) -> bytes:
-    async with self.open('rb', encoding=encoding, errors=errors) as file:
+    return await read_full_file(
+      path,
+      encoding=encoding,
+      errors=errors
+    )
+
+  async def read_bytes(self) -> bytes:
+    async with self.open('rb') as file:
       return await file.read()
 
   async def write_bytes(self, data: bytes) -> int:
