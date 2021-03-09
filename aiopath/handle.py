@@ -1,14 +1,17 @@
 from __future__ import annotations
-from typing import AsyncIterable, Union
+from typing import AsyncIterable, Union, TYPE_CHECKING
 from pathlib import Path
 import io
 
 from aiofile import AIOFile, LineReader
 
+if TYPE_CHECKING:  # keep mypy quiet
+  from .path import AsyncPath
+
 
 BEGINNING: int = 0
 NO_SIZE: int = 0
-CHUNK_SIZE: int = 1_096
+CHUNK_SIZE: int = 4_096
 
 SEP: str = '\n'
 ENCODING: str = 'utf-8'
@@ -16,7 +19,7 @@ ERRORS: str = 'replace'
 
 
 async def read_lines(
-  path: Union[Path, str],
+  path: Union['AsyncPath', str],
   line_sep: str = SEP,
   chunk_size: int = CHUNK_SIZE,
   offset: int = BEGINNING,
@@ -53,7 +56,7 @@ async def read_lines(
 
 
 async def read_full_file(
-  path: Union[Path, str],
+  path: Union['AsyncPath', str],
   line_sep: str = SEP,
   chunk_size: int = CHUNK_SIZE,
   offset: int = BEGINNING,
