@@ -40,11 +40,8 @@ async def read_lines(
     )
 
 #    Python 3.8+
-#    while line := await reader.readline():
-#      buffer.write(line)
-#      buffer.seek(BEGINNING)
-#
-#      yield wrapper.readline()
+#    while line := await reader.readline()
+#      yield line.decode(encoding, errors=errors)
 
     while True:
       line: bytes = await reader.readline()
