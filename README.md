@@ -4,7 +4,7 @@
 `aiopath` is extensively typed with Python [type annotations](https://docs.python.org/3/library/typing.html), and `aiopath` takes advantage of [`libaio`](https://pagure.io/libaio) on Linux.
 
 ## Usage
-`aiopath.Path` has the same API as `pathlib.Path`, as do `aiopath.AsyncPurePath` and `pathlib.PurePath`. 
+`aiopath.Path` has the same API as `pathlib.Path`, as does `aiopath.AsyncPurePath` and `pathlib.PurePath`. 
 
 However, with `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that returned iterators now return [async generators](https://www.python.org/dev/peps/pep-0525/).
 
