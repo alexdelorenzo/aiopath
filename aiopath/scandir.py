@@ -28,7 +28,7 @@ class DirWrapper:
   async def is_symlink(self) -> bool:
     return await to_thread(self.entry.is_symlink)
 
-  async def stat(self, *, follow_symlinks: bool = True) -> bool:
+  async def stat(self, *, follow_symlinks: bool = True) -> stat_result:
     return await to_thread(self.entry.stat, follow_symlinks=follow_symlinks)
 
 
