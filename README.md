@@ -1,17 +1,17 @@
 # 📁 Async pathlib for Python
-`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that is compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). All I/O performed is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
+`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that is compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and Python's [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). All I/O performed by `aiopath` is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
 
-`aiopath` is extensively typed with Python [type annotations](https://docs.python.org/3/library/typing.html), and `aiopath` takes advantage of [`libaio`](https://pagure.io/libaio) on Linux.
+`aiopath` takes advantage of Python [type annotations](https://docs.python.org/3/library/typing.html), and it also takes advantage of [`libaio`](https://pagure.io/libaio) on Linux.
 
 ## Usage
-`aiopath.Path` has the same API as `pathlib.Path`, as does `aiopath.AsyncPurePath` and `pathlib.PurePath`. 
+`aiopath.Path` has the same API as `pathlib.Path`, and `aiopath.AsyncPurePath` has the same API as `pathlib.PurePath`. 
 
-However, with `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that returned iterators now return [async generators](https://www.python.org/dev/peps/pep-0525/).
+With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that are overriden from `pathlib` that returned iterators now return [async generators](https://www.python.org/dev/peps/pep-0525/).
 
 To run the following examples with top-level `await` expressions, [launch an asynchronous Python REPL](https://www.integralist.co.uk/posts/python-asyncio/#running-async-code-in-the-repl) using `python3 -m asyncio`.
 
 ### Basic
-All of `pathlib.Path`'s methods that perform synchronous I/O are reimplemented as asynchronous methods.
+All of `pathlib.Path`'s methods that perform synchronous I/O are reimplemented as asynchronous methods. `PurePath` methods are not asynchronous because they don't perform I/O.
 
 ```python3
 import tempfile
@@ -47,7 +47,7 @@ assert not path.exists()
 assert not await apath.exists()
 ```
 
-You can convert `pathlib.Path` objects to `aiopath.Path` objects, and vice versa:
+You can convert `pathlib.Path` objects to `aiopath.AsyncPath` objects, and vice versa:
 ```python3
 from pathlib import Path
 from aiopath import AsyncPath
@@ -59,6 +59,7 @@ path: Path = Path(ahome)
 assert isinstance(home, Path)
 assert isinstance(ahome, AsyncPath)
 assert isinstance(path, Path)
+assert str(home) == str(ahome) == str(path)
 ```
 
 ### Opening a file
@@ -96,7 +97,7 @@ async for path in home.glob('*'):
 downloads: AsyncPath = home / 'Downloads'
 
 if await downloads.exists():
-  # caution! this might take awhile
+  # this might take a while
   paths: List[AsyncPath] = \
     [path async for path in downloads.glob('**/*')]
 ```
@@ -107,8 +108,8 @@ if await downloads.exists():
  - Python 3.7+
  - `requirements.txt`
 
-#### Linux
-If you're using a 4.18 or newer kernel and have [`libaio`](https://pagure.io/libaio) installed, `aiopath` will use it. You can install `libaio` on Debian/Ubuntu like so:
+#### Linux dependencies
+If you're using a 4.18 or newer kernel and have [`libaio`](https://pagure.io/libaio) installed, `aiopath` will use it via `aiofile`. You can install `libaio` on Debian/Ubuntu like so:
 ```bash
 $ sudo apt install libaio1
 ```
