@@ -96,7 +96,7 @@ async for path in home.glob('*'):
 downloads: AsyncPath = home / 'Downloads'
 
 if await downloads.exists():
-  # caution! this might take awhile
+  # this might take a while
   paths: List[AsyncPath] = \
     [path async for path in downloads.glob('**/*')]
 ```
