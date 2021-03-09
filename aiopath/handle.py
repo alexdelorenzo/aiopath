@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import AsyncIterable, Union, List
+from typing import AsyncIterable, Union
 from pathlib import Path
 import io
 
@@ -7,6 +7,7 @@ from aiofile import AIOFile, LineReader
 
 
 BEGINNING: int = 0
+NO_SIZE: int = 0
 CHUNK_SIZE: int = 1_096
 
 SEP: str = '\n'
@@ -23,14 +24,6 @@ async def read_lines(
   errors: str = ERRORS,
   **kwargs
 ) -> AsyncIterable[str]:
-  buffer = io.BytesIO()
-
-  wrapper = io.TextIOWrapper(
-    buffer,
-    encoding=encoding,
-    errors=errors,
-  )
-
   if hasattr(path, 'resolve'):
     try:
       path = str(await path.resolve())
@@ -46,7 +39,7 @@ async def read_lines(
       offset=offset
     )
 
-#### Python 3.8+
+#    Python 3.8+
 #    while line := await reader.readline():
 #      buffer.write(line)
 #      buffer.seek(BEGINNING)
@@ -59,9 +52,7 @@ async def read_lines(
       if not line:
         break
 
-      buffer.write(line)
-      buffer.seek(BEGINNING)
-      yield wrapper.readline()
+      yield line.decode(encoding, errors=errors)
 
 
 async def read_full_file(
@@ -75,11 +66,11 @@ async def read_full_file(
 ) -> str:
   lines_gen = read_lines(
     path,
-    line_sep,
-    chunk_size,
-    offset,
-    encoding,
-    errors
+    line_sep=line_sep,
+    chunk_size=chunk_size,
+    offset=offset,
+    encoding=encoding,
+    errors=errors
   )
 
   with io.StringIO() as string:

@@ -16,10 +16,11 @@ from aiofiles.os import wrap as method_as_method_coro, \
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
-from .handle import read_lines, read_full_file
+from .handle import read_full_file
 
 
 DEFAULT_ENCODING: str = 'utf-8'
+ON_ERRORS: str = 'ignore'
 
 
 getcwd = func_as_corofunc(os.getcwd)
@@ -145,7 +146,7 @@ class AsyncPath(Path, AsyncPurePath):
     mode: str = 'r',
     buffering: int = -1,
     encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[str] = None,
+    errors: Optional[str] = ON_ERRORS,
     newline: Optional[str] = None
   ) -> AIOFile:
     return AIOFile(
@@ -157,7 +158,7 @@ class AsyncPath(Path, AsyncPurePath):
   async def read_text(
     self,
     encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[str] = None
+    errors: Optional[str] = ON_ERRORS
   ) -> str:
     path = str(await self.resolve())
 
@@ -184,7 +185,7 @@ class AsyncPath(Path, AsyncPurePath):
     self,
     data: str,
     encoding: Optional[str] = 'utf-8',
-    errors: Optional[str] = None,
+    errors: Optional[str] = ON_ERRORS,
     newline: Optional[str] = None
   ) -> int:
     """
