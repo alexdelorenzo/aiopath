@@ -3,6 +3,8 @@ from typing import AsyncIterable, Callable, List
 from os import DirEntry
 import functools
 
+from .scandir import DirWrapper
+
 
 class _AsyncSelector:
   """A selector matches a specific glob pattern part against the children
@@ -66,15 +68,13 @@ class _WildcardSelector(_AsyncSelector):
 
   async def _select_from(self, parent_path, is_dir, exists, scandir):
     try:
-      entries: List[DirEntry] = [entry async for entry in scandir(parent_path)]
-
-      for entry in entries:
+      async for entry in scandir(parent_path):
         if self.dironly:
           try:
             # "entry.is_dir()" can raise PermissionError
             # in some cases (see bpo-38894), which is not
             # among the errors ignored by _ignore_error()
-            if not entry.is_dir():
+            if not await entry.is_dir():
               continue
           except OSError as e:
             if not _ignore_error(e):
@@ -100,19 +100,17 @@ class _RecursiveWildcardSelector(_AsyncSelector):
     yield parent_path
 
     try:
-      entries: List[DirEntry] = [entry async for entry in scandir(parent_path)]
-
-      for entry in entries:
+      async for entry in scandir(parent_path):
         entry_is_dir: bool = False
 
         try:
-          entry_is_dir = entry.is_dir()
+          entry_is_dir = await entry.is_dir()
 
         except OSError as e:
           if not _ignore_error(e):
             raise
 
-        if entry_is_dir and not entry.is_symlink():
+        if entry_is_dir and not await entry.is_symlink():
           path = parent_path._make_child_relpath(entry.name)
 
           async for p in self._iterate_directories(path, is_dir, scandir):

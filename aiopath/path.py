@@ -17,6 +17,7 @@ from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
 from .handle import read_full_file
+from .scandir import DirWrapper, scandir_async
 
 
 DEFAULT_ENCODING: str = 'utf-8'
@@ -75,10 +76,10 @@ class _AsyncAccessor(_NormalAccessor):
     except ImportError:
       raise NotImplementedError("Path.group() is unsupported on this system")
 
-  def _scandir_results(self, *args, **kwargs) -> List[DirEntry]:
-    return list(os.scandir(*args, **kwargs))
+  def _scandir_results(self, *args, **kwargs) -> List[DirWrapper]:
+    return list(scandir_async(*args, **kwargs))
 
-  async def scandir(self, *args, **kwargs) -> AsyncIterable[DirEntry]:
+  async def scandir(self, *args, **kwargs) -> AsyncIterable[DirWrapper]:
     results = await to_thread(self._scandir_results, *args, **kwargs)
 
     for result in results:
