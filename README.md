@@ -47,7 +47,7 @@ assert not path.exists()
 assert not await apath.exists()
 ```
 
-You can convert `pathlib.Path` objects to `aiopath.Path` objects, and vice versa:
+You can convert `pathlib.Path` objects to `aiopath.AsyncPath` objects, and vice versa:
 ```python3
 from pathlib import Path
 from aiopath import AsyncPath
@@ -59,6 +59,7 @@ path: Path = Path(ahome)
 assert isinstance(home, Path)
 assert isinstance(ahome, AsyncPath)
 assert isinstance(path, Path)
+assert str(home) == str(ahome) == str(path)
 ```
 
 ### Opening a file
