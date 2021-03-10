@@ -5,7 +5,7 @@ from pathlib import Path
 
 PKG_NAME = "aiopath"
 NAME = 'aiopath'
-VERSION = "0.4.0"
+VERSION = "0.4.1"
 LICENSE = "LGPL-3.0"
 
 DESC = "📁 Async pathlib for Python"
@@ -24,11 +24,11 @@ setup(
   description=DESC,
   long_description=README,
   long_description_content_type="text/markdown",
-  url="https://alexdelorenzo.dev",
+  url='https://github.com/alexdelorenzo/aiopath',
   author=__author__,
   license=LICENSE,
   packages=[NAME],
-  zip_safe=False,
+  zip_safe=True,
   install_requires=REQUIREMENTS,
   python_requires='>=3.7',
   include_package_data=True
