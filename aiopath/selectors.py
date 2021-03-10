@@ -3,8 +3,6 @@ from typing import AsyncIterable, Callable, List
 from os import DirEntry
 import functools
 
-from .scandir import DirWrapper
-
 
 class _AsyncSelector:
   """A selector matches a specific glob pattern part against the children

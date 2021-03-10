@@ -1,5 +1,5 @@
 from typing import Callable, Awaitable, AsyncIterable, Iterable, \
-  Any
+  Any, List
 from os import scandir, DirEntry, stat_result
 from dataclasses import dataclass
 
@@ -12,7 +12,7 @@ except ImportError:
   pass
 
 
-class DirWrapper:
+class EntryWrapper:
   __slots__ = "entry",
 
   def __init__(self, entry: DirEntry):
@@ -41,6 +41,17 @@ class DirWrapper:
     return await to_thread(self.entry.stat, follow_symlinks=follow_symlinks)
 
 
-def scandir_async(*args, **kwargs) -> Iterable[DirWrapper]:
+def wrapped_scandir(*args, **kwargs) -> Iterable[EntryWrapper]:
   entries = scandir(*args, **kwargs)
-  yield from map(DirWrapper, entries)
+  yield from map(EntryWrapper, entries)
+
+
+def _scandir_results(*args, **kwargs) -> List[EntryWrapper]:
+  return list(wrapped_scandir(*args, **kwargs))
+
+
+async def scandir_async(*args, **kwargs) -> AsyncIterable[EntryWrapper]:
+  results = await to_thread(_scandir_results, *args, **kwargs)
+
+  for result in results:
+    yield result
