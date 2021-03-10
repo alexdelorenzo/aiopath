@@ -469,7 +469,7 @@ class AsyncPath(Path, AsyncPurePath):
     normalizing it (for example turning slashes into backslashes under
     Windows).
     """
-    s = await self._flavour.resolve(self, strict=strict)
+    s: Optional[str] = await self._flavour.resolve(self, strict=strict)
 
     if s is None:
       # No symlink resolution => for consistency, raise an error if
@@ -478,7 +478,7 @@ class AsyncPath(Path, AsyncPurePath):
       s = str(await self.absolute())
 
     # Now we have no symlinks in the path, it's safe to normalize it.
-    normed = self._flavour.pathmod.normpath(s)
+    normed: str = self._flavour.pathmod.normpath(s)
     obj = self._from_parts((normed,), init=False)
     obj._init(template=self)
     return obj

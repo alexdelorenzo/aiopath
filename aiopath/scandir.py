@@ -12,12 +12,18 @@ except ImportError:
   pass
 
 
-@dataclass
 class DirWrapper:
-  entry: DirEntry
+  __slots__ = "entry",
+
+  def __init__(self, entry: DirEntry):
+    self.entry = entry
 
   def __getattr__(self, attr: str) -> Any:
     return getattr(self.entry, attr)
+
+  def __repr__(self) -> str:
+    name = type(self).__name__
+    return f"{name}<{self.entry}>"
 
   async def inode(self) -> int:
     return await to_thread(self.entry.inode)
@@ -36,7 +42,5 @@ class DirWrapper:
 
 
 def scandir_async(*args, **kwargs) -> Iterable[DirWrapper]:
-  scandir_iter = scandir(*args, **kwargs)
-
-  for entry in scandir_iter:
-    yield DirWrapper(entry)
+  entries = scandir(*args, **kwargs)
+  yield from map(DirWrapper, entries)

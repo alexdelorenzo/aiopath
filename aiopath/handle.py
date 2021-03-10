@@ -10,8 +10,7 @@ if TYPE_CHECKING:  # keep mypy quiet
 
 
 BEGINNING: int = 0
-NO_SIZE: int = 0
-CHUNK_SIZE: int = 4_096
+CHUNK_SIZE: int = 4 * 1_024
 
 SEP: str = '\n'
 ENCODING: str = 'utf-8'
