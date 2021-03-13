@@ -14,13 +14,14 @@ from asyncio import run, gather, Future
 from aiohttp import ClientSession
 from aiopath import AsyncPath
 
-async def save_page(url:  str, name: str):
+async def save_page(url: str, name: str):
   async with ClientSession() as session:
     response = await session.get(url)
     content: str = await response.text()
 
   path = AsyncPath(name)
-  await path.write_text(content)
+  if not await path.exists():
+    await path.write_text(content)
 
 urls: List[str] = [
   'https://example.com',
