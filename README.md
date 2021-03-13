@@ -9,7 +9,7 @@ If you're writing asynchronous code and want to take advantage of `pathlib`'s co
 As an example, if you're writing an asynchronous scraper, you might want to make several concurrent requests to websites, and then write the results of those requests to secondary storage:
 ```python3
 from typing import List
-from asyncio import run, gather, Future
+from asyncio import run, gather
 
 from aiohttp import ClientSession
 from aiopath import AsyncPath
