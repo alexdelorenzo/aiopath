@@ -31,8 +31,8 @@ urls: List[str] = [
 ]
 
 scrapers = (save_page(url, f"{index}.html") for index, url in enumerate(urls))
-tasks = gather(*scrapers)
-run(main())
+tasks: Future = gather(*scrapers)
+run(tasks)
 ```
 If you used `pathlib` instead of `aiopath` in the example above, tasks would block upon writing to the disk, and tasks that make network connections would be forced to pause while other tasks write to the disk.
 
