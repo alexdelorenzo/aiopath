@@ -20,6 +20,7 @@ async def save_page(url: str, name: str):
     content: str = await response.text()
 
   path = AsyncPath(name)
+
   if not await path.exists():
     await path.write_text(content)
 
