@@ -3,6 +3,39 @@
 
 `aiopath` takes advantage of Python [type annotations](https://docs.python.org/3/library/typing.html), and it also takes advantage of [`libaio`](https://pagure.io/libaio) on Linux.
 
+### Use case
+If you're writing asynchronous code and want to take advantage of `pathlib`'s conveniences, but don't want to mix blocking and non-blocking I/O, then you can reach for `aiopath`.
+
+As an example, if you're writing an asynchronous scraper, you might want to make several concurrent requests to websites, and then write the results of those requests to secondary storage:
+```python3
+from typing import List
+from asyncio import run, gather, Future
+
+from aiohttp import ClientSession
+from aiopath import AsyncPath
+
+async def save_page(url:  str, name: str):
+  async with ClientSession() as session:
+    response = await session.get(url)
+    content: str = await response.text()
+
+  path = AsyncPath(name)
+  await path.write_text(content)
+
+urls: List[str] = [
+  'https://example.com',
+  'https://github.com/alexdelorenzo/aiopath',
+  'https://alexdelorenzo.dev'
+]
+
+scrapers = (save_page(url, f"{index}.html") for index, url in enumerate(urls))
+tasks = gather(*scrapers)
+run(main())
+```
+If you used `pathlib` instead of `aiopath` in the example above, tasks would block upon writing to the disk, and tasks that make network connections would be forced to pause while other tasks write to the disk.
+
+By using `aiopath`, all I/O is non-blocking, and your script can simultaneously write to the disk and perform network operations at once.
+
 ## Usage
 `aiopath.Path` has the same API as `pathlib.Path`, and `aiopath.AsyncPurePath` has the same API as `pathlib.PurePath`. 
 
