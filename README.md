@@ -24,15 +24,17 @@ async def save_page(url: str, name: str):
   if not await path.exists():
     await path.write_text(content)
 
-urls: List[str] = [
-  'https://example.com',
-  'https://github.com/alexdelorenzo/aiopath',
-  'https://alexdelorenzo.dev'
-]
+async def main():
+  urls: List[str] = [
+    'https://example.com',
+    'https://github.com/alexdelorenzo/aiopath',
+    'https://alexdelorenzo.dev'
+  ]
 
-scrapers = (save_page(url, f"{index}.html") for index, url in enumerate(urls))
-tasks: Future = gather(*scrapers)
-run(tasks)
+  scrapers = (save_page(url, f"{index}.html") for index, url in enumerate(urls))
+  return await gather(*scrapers)
+
+run(main())
 ```
 If you used `pathlib` instead of `aiopath` in the example above, tasks would block upon writing to the disk, and tasks that make network connections would be forced to pause while other tasks write to the disk.
 
