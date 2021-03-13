@@ -1,6 +1,6 @@
 from __future__ import annotations
-from pathlib import _PosixFlavour, _WindowsFlavour, PurePath, TYPE_CHECKING
-from typing import Optional, Callable, Awaitable, Dict
+from pathlib import _PosixFlavour, _WindowsFlavour, PurePath
+from typing import Optional, Callable, Awaitable, Dict, TYPE_CHECKING
 from errno import EINVAL
 import os
 
