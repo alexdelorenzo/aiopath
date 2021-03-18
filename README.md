@@ -45,17 +45,21 @@ By using `aiopath`, all I/O is non-blocking, and your script can simultaneously 
 
 With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that are overriden from `pathlib` that returned iterators now return [async generators](https://www.python.org/dev/peps/pep-0525/).
 
+### Examples
+#### Running
 To run the following examples with top-level `await` expressions, [launch an asynchronous Python REPL](https://www.integralist.co.uk/posts/python-asyncio/#running-async-code-in-the-repl) using `python3 -m asyncio`.
+
+You'll also need to install `asynctempfile` via PyPI, like so `python3 -m pip install asynctempfile`
 
 ### Basic
 All of `pathlib.Path`'s methods that perform synchronous I/O are reimplemented as asynchronous methods. `PurePath` methods are not asynchronous because they don't perform I/O.
 
 ```python3
-import tempfile
 from pathlib import Path
+from asynctempfile import NamedTemporaryFile
 from aiopath import AsyncPath
 
-with tempfile.NamedTemporaryFile() as temp:
+async with NamedTemporaryFile() as temp:
   path = Path(temp.name)
   apath = AsyncPath(temp.name)
 
@@ -104,11 +108,12 @@ You can get an asynchronous [file-like object handle](https://docs.python.org/3/
 
 ```python3
 import tempfile
+from asynctempfile import NamedTemporaryFile
 from aiopath import AsyncPath
 
 text: str = 'example'
 
-with tempfile.NamedTemporaryFile() as temp:
+async with NamedTemporaryFile() as temp:
   apath = AsyncPath(temp.name)
 
   async with apath.open(mode='w') as afile:
