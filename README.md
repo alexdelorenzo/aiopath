@@ -46,7 +46,7 @@ By using `aiopath`, all I/O is non-blocking, and your script can simultaneously 
 # Usage
 `aiopath` is a direct reimplementation of [CPython's `pathlib.py`](https://github.com/python/cpython/blob/master/Lib/pathlib.py), and `aiopath`'s class hierarchy [directly matches the one from `pathlib`](https://docs.python.org/3/library/pathlib.html), where `Path` inherits from `PurePath`, `AsyncPath` inherits from `AsyncPurePath`, and so on.
 
-With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that perform I/O and return iterators in `pathlib` now return [async generators](https://www.python.org/dev/peps/pep-0525/). `aiopath` goes one step further, and reimplements [`os.scandir()`](https://docs.python.org/3/library/os.html#os.scandir) and [`DirEntry`](https://docs.python.org/3/library/os.html#os.DirEntry) as asynchronous to make [`AsyncPath.glob()`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) completely asynchronous.
+With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that perform I/O and return iterators in `pathlib` now return [async generators](https://www.python.org/dev/peps/pep-0525/). `aiopath` goes one step further, and implements [`os.scandir()`](https://docs.python.org/3/library/os.html#os.scandir) and [`DirEntry`](https://docs.python.org/3/library/os.html#os.DirEntry) as asynchronous to make [`AsyncPath.glob()`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) completely asynchronous.
 
 ## Examples
 ### Running examples
@@ -91,7 +91,7 @@ async with NamedTemporaryFile() as temp:
   # read and write text
   text: str = "example"
   await apath.write_text(text)
-  assert text == await apath.read_text()
+  assert await apath.read_text() == text
 
 assert not path.exists()
 assert not await apath.exists()
@@ -110,11 +110,18 @@ path: Path = Path(ahome)
 assert isinstance(home, Path)
 assert isinstance(ahome, AsyncPath)
 assert isinstance(path, Path)
+
+# AsyncPath and Path objects can point to the same file
 assert str(home) == str(ahome) == str(path)
+
+# but AsyncPath and Path objects are not equivalent
+assert not home == ahome
 ```
 
 ### Opening a file
-You can get an asynchronous [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers).
+You can get an asynchronous [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers). 
+
+`AsyncPath.open()`'s async context manager yields an [`aiofile.AIOFile`](https://github.com/mosquito/aiofile) object.
 
 ```python3
 from asynctempfile import NamedTemporaryFile
