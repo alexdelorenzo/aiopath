@@ -14,15 +14,17 @@ from asyncio import run, gather
 from aiohttp import ClientSession
 from aiopath import AsyncPath
 
+
 async def save_page(url: str, name: str):
   async with ClientSession() as session:
     response = await session.get(url)
-    content: str = await response.text()
+    content: bytes = await response.read()
 
   path = AsyncPath(name)
 
   if not await path.exists():
-    await path.write_text(content)
+    await path.write_bytes(content)
+
 
 async def main():
   urls: List[str] = [
@@ -33,6 +35,7 @@ async def main():
 
   scrapers = (save_page(url, f"{index}.html") for index, url in enumerate(urls))
   return await gather(*scrapers)
+
 
 run(main())
 ```
@@ -60,6 +63,7 @@ from pathlib import Path
 from asynctempfile import NamedTemporaryFile
 from aiopath import AsyncPath
 
+
 async with NamedTemporaryFile() as temp:
   path = Path(temp.name)
   apath = AsyncPath(temp.name)
@@ -79,9 +83,13 @@ async with NamedTemporaryFile() as temp:
   # touch
   path.touch()
   await apath.touch()
+  
+  # PurePath methods are not async
+  assert path.is_absolute() == apath.is_absolute()
+  assert path.as_uri() == apath.as_uri()
 
   # read and write text
-  text = "example"
+  text: str = "example"
   await apath.write_text(text)
   assert text == await apath.read_text()
 
@@ -93,6 +101,7 @@ You can convert `pathlib.Path` objects to `aiopath.AsyncPath` objects, and vice 
 ```python3
 from pathlib import Path
 from aiopath import AsyncPath
+
 
 home: Path = Path.home()
 ahome: AsyncPath = AsyncPath(home)
@@ -111,6 +120,7 @@ You can get an asynchronous [file-like object handle](https://docs.python.org/3/
 from asynctempfile import NamedTemporaryFile
 from aiopath import AsyncPath
 
+
 text: str = 'example'
 
 async with NamedTemporaryFile() as temp:
@@ -119,8 +129,7 @@ async with NamedTemporaryFile() as temp:
   async with apath.open(mode='w') as afile:
     await afile.write(text)
 
-  result: str = await apath.read_text()
-  assert result == text
+  assert text == await apath.read_text()
 ```
 
 ### [Globbing](https://en.wikipedia.org/wiki/Glob_(programming))
@@ -129,6 +138,7 @@ async with NamedTemporaryFile() as temp:
 ```python3
 from typing import List
 from aiopath import AsyncPath
+
 
 home: AsyncPath = await AsyncPath.home()
 
