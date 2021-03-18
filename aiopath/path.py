@@ -1,9 +1,8 @@
 from __future__ import annotations
-
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
-from typing import Optional, AsyncIterable, List, Union
-from os import stat_result, DirEntry
+from typing import Optional, List, Union, AsyncIterable
+from os import stat_result
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
@@ -15,9 +14,9 @@ from aiofiles.os import wrap as method_as_method_coro, \
 
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
-from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
+from .wrap import coro_as_method_coro, func_as_method_coro
 from .handle import read_full_file
-from .scandir import DirWrapper, scandir_async
+from .scandir import EntryWrapper, scandir_async
 
 
 DEFAULT_ENCODING: str = 'utf-8'
@@ -76,14 +75,9 @@ class _AsyncAccessor(_NormalAccessor):
     except ImportError:
       raise NotImplementedError("Path.group() is unsupported on this system")
 
-  def _scandir_results(self, *args, **kwargs) -> List[DirWrapper]:
-    return list(scandir_async(*args, **kwargs))
-
-  async def scandir(self, *args, **kwargs) -> AsyncIterable[DirWrapper]:
-    results = await to_thread(self._scandir_results, *args, **kwargs)
-
-    for result in results:
-      yield result
+  async def scandir(self, *args, **kwargs) -> AsyncIterable[EntryWrapper]:
+    async for entry in scandir_async(*args, **kwargs):
+      yield entry
 
 
 _async_accessor = _AsyncAccessor()
@@ -180,7 +174,7 @@ class AsyncPath(Path, AsyncPurePath):
     # type-check for the buffer interface before truncating the file
     view = memoryview(data)
     async with self.open(mode='wb') as f:
-      return await f.write(view)
+      return await f.write(data)
 
   async def write_text(
     self,
@@ -676,6 +670,15 @@ class AsyncPath(Path, AsyncPurePath):
       return self._from_parts([homedir] + self._parts[1:])
 
     return self
+
+  async def iterdir(self) -> AsyncIterable[AsyncPath]:
+    names = await self._acessor.listdir(self)
+
+    for name in names:
+      if name in {'.', '..'}:
+        continue
+
+      yield self._make_child_relpath(name)
 
 
 class AsyncPosixPath(PosixPath, AsyncPath, PureAsyncPosixPath):
