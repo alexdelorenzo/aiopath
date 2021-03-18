@@ -56,6 +56,7 @@ All of `pathlib.Path`'s methods that perform synchronous I/O are reimplemented a
 
 ```python3
 from pathlib import Path
+
 from asynctempfile import NamedTemporaryFile
 from aiopath import AsyncPath
 
@@ -107,7 +108,6 @@ assert str(home) == str(ahome) == str(path)
 You can get an asynchronous [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers).
 
 ```python3
-import tempfile
 from asynctempfile import NamedTemporaryFile
 from aiopath import AsyncPath
 
