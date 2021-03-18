@@ -136,7 +136,7 @@ async with NamedTemporaryFile() as temp:
   async with apath.open(mode='w') as afile:
     await afile.write(text)
 
-  assert text == await apath.read_text()
+  assert await apath.read_text() == text
 ```
 
 ### [Globbing](https://en.wikipedia.org/wiki/Glob_(programming))
