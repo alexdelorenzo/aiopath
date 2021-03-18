@@ -3,7 +3,7 @@
 
 `aiopath` takes advantage of Python [type annotations](https://docs.python.org/3/library/typing.html), and it also takes advantage of [`libaio`](https://pagure.io/libaio) on Linux.
 
-### Use case
+## Use case
 If you're writing asynchronous code and want to take advantage of `pathlib`'s conveniences, but don't want to mix blocking and non-blocking I/O, then you can reach for `aiopath`.
 
 As an example, if you're writing an asynchronous scraper, you might want to make several concurrent requests to websites, and then write the results of those requests to secondary storage:
@@ -40,13 +40,13 @@ If you used `pathlib` instead of `aiopath` in the example above, tasks would blo
 
 By using `aiopath`, all I/O is non-blocking, and your script can simultaneously write to the disk and perform network operations at once.
 
-## Usage
-`aiopath.Path` has the same API as `pathlib.Path`, and `aiopath.AsyncPurePath` has the same API as `pathlib.PurePath`. 
+# Usage
+`aiopath` is a direct reimplementation of [CPython's `pathlib.py`](https://github.com/python/cpython/blob/master/Lib/pathlib.py), and `aiopath`'s class hierarchy [directly matches the one from `pathlib`](https://docs.python.org/3/library/pathlib.html), where `Path` inherits from `PurePath`, `AsyncPath` inherits from `AsyncPurePath`, and so on.
 
-With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that are overriden from `pathlib` that returned iterators now return [async generators](https://www.python.org/dev/peps/pep-0525/).
+With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that perform I/O and return iterators in `pathlib` now return [async generators](https://www.python.org/dev/peps/pep-0525/).
 
-### Examples
-#### Running
+## Examples
+### Running examples
 To run the following examples with top-level `await` expressions, [launch an asynchronous Python REPL](https://www.integralist.co.uk/posts/python-asyncio/#running-async-code-in-the-repl) using `python3 -m asyncio`.
 
 You'll also need to install `asynctempfile` via PyPI, like so `python3 -m pip install asynctempfile`
