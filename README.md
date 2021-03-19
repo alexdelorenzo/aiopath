@@ -56,6 +56,9 @@ With `aiopath`, methods that perform I/O are asynchronous and awaitable, and met
 `aiopath` is typed with Python [type annotations](https://docs.python.org/3/library/typing.html), and it takes advantage of [`libaio`](https://pagure.io/libaio) for async I/O on Linux.
 
 # Usage
+ `aiopath`'s API directly matches [`pathlib`](https://docs.python.org/3/library/pathlib.html), so check out the standard library documentation for [`PurePath`](https://docs.python.org/3/library/pathlib.html#pure-paths) and [`Path`](https://docs.python.org/3/library/pathlib.html#methods).
+ 
+### Running examples
 To run the following examples with top-level `await` expressions, [launch an asynchronous Python REPL](https://www.integralist.co.uk/posts/python-asyncio/#running-async-code-in-the-repl) using `python3 -m asyncio` or an [IPython shell](https://ipython.org/).
 
 You'll also need to install `asynctempfile` via PyPI, like so `python3 -m pip install asynctempfile`.
