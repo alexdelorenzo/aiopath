@@ -4,7 +4,7 @@
 All I/O performed by `aiopath` is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
 
 ## Use case
-If you're writing asynchronous code and want to take advantage of `pathlib`'s conveniences, but don't want to mix blocking and [non-blocking I/O](https://en.wikipedia.org/wiki/Asynchronous_I/O), then you can reach for `aiopath`.
+If you're writing asynchronous Python code and want to take advantage of `pathlib`'s conveniences, but don't want to mix blocking and [non-blocking I/O](https://en.wikipedia.org/wiki/Asynchronous_I/O), then you can reach for `aiopath`.
 
 For example, if you're writing an asynchronous [web scraping](https://en.wikipedia.org/wiki/Web_scraping) script, you might want to make several concurrent requests to websites, and then write the results of those requests to secondary storage:
 ```python3
