@@ -139,6 +139,7 @@ from aiopath import AsyncPath
 
 text: str = 'example'
 
+# you can access a file with async context managers
 async with NamedTemporaryFile() as temp:
   path = AsyncPath(temp.name)
 
@@ -149,6 +150,20 @@ async with NamedTemporaryFile() as temp:
     result: str = await file.read()
 
   assert result == text
+  
+# or you can use the read/write convenience methods
+async with NamedTemporaryFile() as temp:
+  path = AsyncPath(temp.name)
+
+  await path.write_text(text)
+  result: str = await path.read_text()
+  assert result == text
+  
+  content: bytes = text.encode()
+
+  await path.write_bytes(content)
+  result: bytes = await path.read_bytes()
+  assert result == content
 ```
 
 ## [Globbing](https://en.wikipedia.org/wiki/Glob_(programming))
