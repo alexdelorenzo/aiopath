@@ -140,12 +140,15 @@ from aiopath import AsyncPath
 text: str = 'example'
 
 async with NamedTemporaryFile() as temp:
-  apath = AsyncPath(temp.name)
+  path = AsyncPath(temp.name)
 
-  async with apath.open(mode='w') as afile:
-    await afile.write(text)
+  async with path.open(mode='w') as file:
+    await file.write(text)
+  
+  async with path.open(mode='r') as file:
+    result: str = await file.read()
 
-  assert await apath.read_text() == text
+  assert result == text
 ```
 
 ## [Globbing](https://en.wikipedia.org/wiki/Glob_(programming))
