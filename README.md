@@ -51,7 +51,7 @@ By using `aiopath`, all I/O is non-blocking, and your script can write to the di
 ## Implementation 
 `aiopath` is a direct reimplementation of [CPython's `pathlib.py`](https://github.com/python/cpython/blob/master/Lib/pathlib.py) and shares some of its code. `aiopath`'s class hierarchy [directly matches the one from `pathlib`](https://docs.python.org/3/library/pathlib.html), where `Path` inherits from `PurePath`, `AsyncPath` inherits from `AsyncPurePath`, and so on.
 
-With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that perform I/O and return iterators in `pathlib` now return [async generators](https://www.python.org/dev/peps/pep-0525/). `aiopath` goes one step further, and implements [`os.scandir()`](https://docs.python.org/3/library/os.html#os.scandir) and [`DirEntry`](https://docs.python.org/3/library/os.html#os.DirEntry) as asynchronous to make [`AsyncPath.glob()`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) completely async.
+With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that perform I/O and return iterators in `pathlib` now return [async generators](https://www.python.org/dev/peps/pep-0525/). `aiopath` goes one step further, and wraps [`os.scandir()`](https://docs.python.org/3/library/os.html#os.scandir) and [`DirEntry`](https://docs.python.org/3/library/os.html#os.DirEntry) to make [`AsyncPath.glob()`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) completely async.
 
 `aiopath` is typed with Python [type annotations](https://docs.python.org/3/library/typing.html), and it takes advantage of [`libaio`](https://pagure.io/libaio) for async I/O on Linux.
 
