@@ -35,6 +35,7 @@ async def main():
   ]
 
   scrapers = (save_page(url, f"{index}.html") for index, url in enumerate(urls))
+  
   return await gather(*scrapers)
 
 
