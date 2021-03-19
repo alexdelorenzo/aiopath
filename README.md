@@ -1,10 +1,8 @@
 # 📁 Async pathlib for Python
-`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that is compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and Python's [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). All I/O performed by `aiopath` is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
-
-`aiopath` takes advantage of Python [type annotations](https://docs.python.org/3/library/typing.html), and it also takes advantage of [`libaio`](https://pagure.io/libaio) on Linux.
+`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that is compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). All I/O performed by `aiopath` is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
 
 ## Use case
-If you're writing asynchronous code and want to take advantage of `pathlib`'s conveniences, but don't want to mix blocking and non-blocking I/O, then you can reach for `aiopath`.
+If you're writing asynchronous code and want to take advantage of `pathlib`'s conveniences, but don't want to mix blocking and [non-blocking I/O](https://en.wikipedia.org/wiki/Asynchronous_I/O), then you can reach for `aiopath`.
 
 As an example, if you're writing an asynchronous scraper, you might want to make several concurrent requests to websites, and then write the results of those requests to secondary storage:
 ```python3
@@ -30,7 +28,8 @@ async def main():
   urls: List[str] = [
     'https://example.com',
     'https://github.com/alexdelorenzo/aiopath',
-    'https://alexdelorenzo.dev'
+    'https://alexdelorenzo.dev',
+    'https://dupebot.firstbyte.dev'
   ]
 
   scrapers = (save_page(url, f"{index}.html") for index, url in enumerate(urls))
@@ -39,22 +38,23 @@ async def main():
 
 run(main())
 ```
-If you used `pathlib` instead of `aiopath` in the example above, tasks would block upon writing to the disk, and tasks that make network connections would be forced to pause while other tasks write to the disk.
+If you used `pathlib` instead of `aiopath` in the example above, tasks would block upon writing to the disk, and tasks that make network connections would be forced to pause while the other tasks write to the disk.
 
-By using `aiopath`, all I/O is non-blocking, and your script can simultaneously write to the disk and perform network operations at once.
+By using `aiopath`, all I/O is non-blocking, and your script can write to the disk and perform network operations concurrently.
+
+## Implementation 
+`aiopath` is a direct reimplementation of [CPython's `pathlib.py`](https://github.com/python/cpython/blob/master/Lib/pathlib.py) and shares some of its code. `aiopath`'s class hierarchy [directly matches the one from `pathlib`](https://docs.python.org/3/library/pathlib.html), where `Path` inherits from `PurePath`, `AsyncPath` inherits from `AsyncPurePath`, and so on.
+
+With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that perform I/O and return iterators in `pathlib` now return [async generators](https://www.python.org/dev/peps/pep-0525/). `aiopath` goes one step further, and implements [`os.scandir()`](https://docs.python.org/3/library/os.html#os.scandir) and [`DirEntry`](https://docs.python.org/3/library/os.html#os.DirEntry) as asynchronous to make [`AsyncPath.glob()`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) completely async.
+
+`aiopath` is typed with Python [type annotations](https://docs.python.org/3/library/typing.html), and it takes advantage of [`libaio`](https://pagure.io/libaio) for async I/O on Linux.
 
 # Usage
-`aiopath` is a direct reimplementation of [CPython's `pathlib.py`](https://github.com/python/cpython/blob/master/Lib/pathlib.py), and `aiopath`'s class hierarchy [directly matches the one from `pathlib`](https://docs.python.org/3/library/pathlib.html), where `Path` inherits from `PurePath`, `AsyncPath` inherits from `AsyncPurePath`, and so on.
-
-With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that perform I/O and return iterators in `pathlib` now return [async generators](https://www.python.org/dev/peps/pep-0525/). `aiopath` goes one step further, and implements [`os.scandir()`](https://docs.python.org/3/library/os.html#os.scandir) and [`DirEntry`](https://docs.python.org/3/library/os.html#os.DirEntry) as asynchronous to make [`AsyncPath.glob()`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) completely asynchronous.
-
-## Examples
-### Running examples
 To run the following examples with top-level `await` expressions, [launch an asynchronous Python REPL](https://www.integralist.co.uk/posts/python-asyncio/#running-async-code-in-the-repl) using `python3 -m asyncio` or an [IPython shell](https://ipython.org/).
 
 You'll also need to install `asynctempfile` via PyPI, like so `python3 -m pip install asynctempfile`.
 
-### Basic
+## Basic
 All of `pathlib.Path`'s methods that perform synchronous I/O are reimplemented as asynchronous methods. `PurePath` methods are not asynchronous because they don't perform I/O.
 
 ```python3
@@ -118,7 +118,7 @@ assert str(home) == str(ahome) == str(path)
 assert not home == ahome
 ```
 
-### Opening a file
+## Opening a file
 You can get an asynchronous [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers). 
 
 `AsyncPath.open()`'s async context manager yields an [`aiofile.AIOFile`](https://github.com/mosquito/aiofile) object.
@@ -139,7 +139,7 @@ async with NamedTemporaryFile() as temp:
   assert await apath.read_text() == text
 ```
 
-### [Globbing](https://en.wikipedia.org/wiki/Glob_(programming))
+## [Globbing](https://en.wikipedia.org/wiki/Glob_(programming))
 `aiopath` implements [`pathlib` globbing](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) using async I/O and async generators.
 
 ```python3
