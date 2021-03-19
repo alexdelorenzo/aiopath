@@ -39,7 +39,7 @@ async def main():
     for index, url in enumerate(urls)
   )
   
-  return await gather(*scrapers)
+  await gather(*scrapers)
 
 
 run(main())
