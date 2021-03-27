@@ -1,4 +1,5 @@
 __author__ = "Alex DeLorenzo"
+from typing import List
 from setuptools import setup
 from pathlib import Path
 
@@ -10,12 +11,12 @@ LICENSE = "LGPL-3.0"
 
 DESC = "📁 Async pathlib for Python"
 
-REQUIREMENTS = \
+REQUIREMENTS: List[str] = \
   Path('requirements.txt') \
     .read_text() \
     .splitlines()
 
-README = Path('README.md').read_text()
+README: str = Path('README.md').read_text()
 
 
 setup(
