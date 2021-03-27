@@ -16,14 +16,16 @@ from aiopath import AsyncPath
 
 
 async def save_page(url: str, name: str):
+  path = AsyncPath(name)
+  
+  if await path.exists():
+    return
+
   async with ClientSession() as session:
     response = await session.get(url)
     content: bytes = await response.read()
 
-  path = AsyncPath(name)
-
-  if not await path.exists():
-    await path.write_bytes(content)
+  await path.write_bytes(content)
 
 
 async def main():
