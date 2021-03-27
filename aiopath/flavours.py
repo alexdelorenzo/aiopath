@@ -18,7 +18,7 @@ if TYPE_CHECKING:  # keep mypy quiet
   from .path import AsyncPath
 
 
-getcwd = wrap_async(os.getcwd)
+getcwd: Callable[[], Awaitable[str]] = wrap_async(os.getcwd)
 
 
 class _AsyncPosixFlavour(_PosixFlavour):
@@ -31,14 +31,14 @@ class _AsyncPosixFlavour(_PosixFlavour):
 
   async def resolve(
     self,
-    path: 'AsyncPath',
+    path: AsyncPath,
     strict: bool = False
   ) -> Optional[str]:
     sep = self.sep
     accessor = path._accessor
-    seen: Dict['AsyncPath', 'AsyncPath'] = {}
+    seen: Dict[AsyncPath, AsyncPath] = {}
 
-    async def _resolve(path: str, rest: str):
+    async def _resolve(path: str, rest: str) -> str:
       if rest.startswith(sep):
         path = ''
 
@@ -107,7 +107,7 @@ class _AsyncWindowsFlavour(_WindowsFlavour):
     s = str(path)
 
     if not s:
-        return await getcwd()
+      return await getcwd()
 
     previous_s: Optional[str] = None
 
@@ -115,7 +115,7 @@ class _AsyncWindowsFlavour(_WindowsFlavour):
       if strict:
         return self._ext_to_normal(await _getfinalpathname(s))
       else:
-        tail_parts = []  # End of the path after the first one not found
+        tail_parts: List[str] = []  # End of the path after the first one not found
         while True:
           try:
             s = self._ext_to_normal(await _getfinalpathname(s))
