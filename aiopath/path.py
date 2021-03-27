@@ -693,7 +693,7 @@ class AsyncPath(Path, AsyncPurePath):
     return self
 
   async def iterdir(self) -> AsyncIterable[AsyncPath]:
-    names = await self._acessor.listdir(self)
+    names = await self._accessor.listdir(self)
 
     for name in names:
       if name in {'.', '..'}:
