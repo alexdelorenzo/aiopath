@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import AsyncIterable, Union, TYPE_CHECKING
+from typing import AsyncIterable, Union, Final, \
+  TYPE_CHECKING, Optional
 from pathlib import Path
 import io
 
@@ -9,16 +10,54 @@ if TYPE_CHECKING:  # keep mypy quiet
   from .path import AsyncPath
 
 
-BEGINNING: int = 0
-CHUNK_SIZE: int = 4 * 1_024
+BEGINNING: Final[int] = 0
+CHUNK_SIZE: Final[int] = 4 * 1_024
 
-SEP: str = '\n'
-ENCODING: str = 'utf-8'
-ERRORS: str = 'replace'
+SEP: Final[str] = '\n'
+ENCODING: Final[str] = 'utf-8'
+ERRORS: Final[str] = 'replace'
+
+
+Paths = Union['AsyncPath', Path, str]
+
+
+class IterableAIOFile(AIOFile):
+  def __init__(
+    self,
+    *args,
+    errors: Optional[str] = ERRORS,
+    newline: Optional[str] = SEP,
+    **kwargs
+  ):
+    super().__init__(*args, **kwargs)
+    self._errors = errors
+    self._newline = newline
+
+  def __aiter__(self):
+    newline = self._newline or SEP
+
+    return read_lines(
+      self.name,
+      line_sep=newline
+    )
+
+  async def read_text(
+    self,
+    encoding: Optional[str] = None,
+    errors: Optional[str] = None
+  ) -> str:
+    encoding = encoding or self.__encoding or ENCODING
+    errors = errors or self._errors or ERRORS
+
+    return await read_full_file(
+      self.name,
+      encoding=encoding,
+      errors=errors
+    )
 
 
 async def read_lines(
-  path: Union['AsyncPath', str],
+  path: Paths,
   line_sep: str = SEP,
   chunk_size: int = CHUNK_SIZE,
   offset: int = BEGINNING,
@@ -55,7 +94,7 @@ async def read_lines(
 
 
 async def read_full_file(
-  path: Union['AsyncPath', str],
+  path: Paths,
   line_sep: str = SEP,
   chunk_size: int = CHUNK_SIZE,
   offset: int = BEGINNING,

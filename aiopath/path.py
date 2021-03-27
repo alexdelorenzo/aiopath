@@ -1,7 +1,8 @@
 from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
-from typing import Optional, List, Union, AsyncIterable
+from typing import Optional, List, Union, AsyncIterable, \
+  Literal, Final
 from os import stat_result
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
@@ -14,13 +15,20 @@ from aiofiles.os import wrap as method_as_method_coro, \
 
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
-from .wrap import coro_as_method_coro, func_as_method_coro
-from .handle import read_full_file
+from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
+from .handle import IterableAIOFile, read_full_file
 from .scandir import EntryWrapper, scandir_async
 
 
-DEFAULT_ENCODING: str = 'utf-8'
-ON_ERRORS: str = 'ignore'
+DEFAULT_ENCODING: Final[str] = 'utf-8'
+ON_ERRORS: Final[str] = 'ignore'
+
+
+TextMode = \
+  Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+', 'x+']
+BinaryMode = \
+  Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
+FileMode = Union[TextMode, BinaryMode]
 
 
 getcwd = func_as_corofunc(os.getcwd)
@@ -89,7 +97,7 @@ class AsyncPurePath(PurePath):
 
   def __new__(cls, *args):
     if cls is AsyncPurePath:
-        cls = PureAsyncWindowsPath if os.name == 'nt' else PureAsyncPosixPath
+      cls = PureAsyncWindowsPath if os.name == 'nt' else PureAsyncPosixPath
     return cls._from_parts(args)
 
 
@@ -138,16 +146,18 @@ class AsyncPath(Path, AsyncPurePath):
 
   def open(
     self,
-    mode: str = 'r',
+    mode: FileMode = 'r',
     buffering: int = -1,
     encoding: Optional[str] = DEFAULT_ENCODING,
     errors: Optional[str] = ON_ERRORS,
-    newline: Optional[str] = None
-  ) -> AIOFile:
-    return AIOFile(
+    newline: Optional[str] = '\n'
+  ) -> IterableAIOFile:
+    return IterableAIOFile(
       self._path,
       mode,
       encoding=encoding,
+      errors=errors,
+      newline=newline,
     )
 
   async def read_text(
@@ -155,13 +165,17 @@ class AsyncPath(Path, AsyncPurePath):
     encoding: Optional[str] = DEFAULT_ENCODING,
     errors: Optional[str] = ON_ERRORS
   ) -> str:
-    path = str(await self.resolve())
 
-    return await read_full_file(
-      path,
-      encoding=encoding,
-      errors=errors
-    )
+    async with self.open('r', encoding=encoding, errors=errors) as file:
+      return await file.read_text()
+
+    #path = str(await self.resolve())
+
+    #return await read_full_file(
+      #path,
+      #encoding=encoding,
+      #errors=errors
+    #)
 
   async def read_bytes(self) -> bytes:
     async with self.open('rb') as file:
@@ -173,13 +187,14 @@ class AsyncPath(Path, AsyncPurePath):
     """
     # type-check for the buffer interface before truncating the file
     view = memoryview(data)
+
     async with self.open(mode='wb') as f:
       return await f.write(data)
 
   async def write_text(
     self,
     data: str,
-    encoding: Optional[str] = 'utf-8',
+    encoding: Optional[str] = DEFAULT_ENCODING,
     errors: Optional[str] = ON_ERRORS,
     newline: Optional[str] = None
   ) -> int:
@@ -201,7 +216,7 @@ class AsyncPath(Path, AsyncPurePath):
     """
     Return the path to which the symbolic link points.
     """
-    path = await self._accessor.readlink(self)
+    path: str = await self._accessor.readlink(self)
     obj = self._from_parts((path,), init=False)
     obj._init(template=self)
     return obj
@@ -366,7 +381,8 @@ class AsyncPath(Path, AsyncPurePath):
     """Return a new path pointing to the current working directory
     (as returned by os.getcwd()).
     """
-    return cls(await getcwd())
+    cwd: str = await getcwd()
+    return cls(cwd)
 
   @classmethod
   async def home(cls) -> AsyncPath:
@@ -374,7 +390,9 @@ class AsyncPath(Path, AsyncPurePath):
     returned by os.path.expanduser('~')).
     """
     coro = cls()._flavour.gethomedir(None)
-    return cls(await coro)
+    homedir: str = await coro
+
+    return cls(homedir)
 
   async def samefile(self, other_path: Union[AsyncPath, Path]) -> bool:
     """Return whether other_path is the same or not as this file
@@ -389,10 +407,10 @@ class AsyncPath(Path, AsyncPurePath):
 
     else:
       try:
-        other_st = other_path.stat()
+        other_st = await to_thread(other_path.stat)
 
       except AttributeError:
-        other_st = self._accessor.stat(other_path)
+        other_st = await to_thread(self._accessor.stat, other_path)
 
     return os.path.samestat(
       await self.stat(),
@@ -437,7 +455,9 @@ class AsyncPath(Path, AsyncPurePath):
     if drv or root:
       raise NotImplementedError("Non-relative patterns are unsupported")
 
-    selector = _make_selector(("**",) + tuple(pattern_parts), self._flavour)
+    #selector = _make_selector(("**",) + tuple(pattern_parts), self._flavour)
+    parts = ("**", *pattern_parts)
+    selector = _make_selector(parts, self._flavour)
 
     async for p in selector.select_from(self):
       yield p
@@ -469,7 +489,8 @@ class AsyncPath(Path, AsyncPurePath):
       # No symlink resolution => for consistency, raise an error if
       # the path doesn't exist or is forbidden
       await self.stat()
-      s = str(await self.absolute())
+      path = await self.absolute()
+      s = str(path)
 
     # Now we have no symlinks in the path, it's safe to normalize it.
     normed: str = self._flavour.pathmod.normpath(s)
