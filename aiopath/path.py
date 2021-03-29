@@ -22,6 +22,7 @@ from .scandir import EntryWrapper, scandir_async
 
 DEFAULT_ENCODING: Final[str] = 'utf-8'
 ON_ERRORS: Final[str] = 'ignore'
+NEWLINE: Final[str] = '\n'
 
 
 TextMode = \
@@ -150,7 +151,7 @@ class AsyncPath(Path, AsyncPurePath):
     buffering: int = -1,
     encoding: Optional[str] = DEFAULT_ENCODING,
     errors: Optional[str] = ON_ERRORS,
-    newline: Optional[str] = '\n'
+    newline: Optional[str] = NEWLINE,
   ) -> IterableAIOFile:
     return IterableAIOFile(
       self._path,
@@ -196,7 +197,7 @@ class AsyncPath(Path, AsyncPurePath):
     data: str,
     encoding: Optional[str] = DEFAULT_ENCODING,
     errors: Optional[str] = ON_ERRORS,
-    newline: Optional[str] = None
+    newline: Optional[str] = NEWLINE
   ) -> int:
     """
     Open the file in text mode, write to it, and close the file.
