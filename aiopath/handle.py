@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import AsyncIterable, Union, Final, \
-  TYPE_CHECKING, Optional
+  TYPE_CHECKING, Optional, cast
+from inspect import iscoroutinefunction
 from pathlib import Path
 import io
 
@@ -18,7 +19,7 @@ ENCODING: Final[str] = 'utf-8'
 ERRORS: Final[str] = 'replace'
 
 
-Paths = Union['AsyncPath', Path, str]
+Paths = Union[AsyncPath, Path, str]
 
 
 class IterableAIOFile(AIOFile):
@@ -30,11 +31,11 @@ class IterableAIOFile(AIOFile):
     **kwargs
   ):
     super().__init__(*args, **kwargs)
-    self._errors = errors
-    self._newline = newline
+    self._errors: Optional[str] = errors
+    self._newline: Optional[str] = newline
 
-  def __aiter__(self):
-    newline = self._newline or SEP
+  def __aiter__(self) -> AsyncIterable[str]:
+    newline: str = self._newline or SEP
 
     return read_lines(
       self.name,
@@ -64,13 +65,15 @@ async def read_lines(
   encoding: str = ENCODING,
   errors: str = ERRORS,
   **kwargs
-) -> AsyncIterable[str]:
+) -> AsyncIterable[str]: 
   if hasattr(path, 'resolve'):
-    try:
+    if iscoroutinefunction(path.resolve):
       path = str(await path.resolve())
 
-    except:
+    else:
       path = str(path.resolve())
+  
+  path: str = cast(str, path)
 
   async with AIOFile(path, 'rb') as handle:
     reader = LineReader(
