@@ -1,2 +1,4 @@
 aiofile==3.5.0
 aiofiles==0.6.0
+
+typing>=3.7.4.3; python_version < '3.8'
