@@ -19,7 +19,7 @@ ENCODING: Final[str] = 'utf-8'
 ERRORS: Final[str] = 'replace'
 
 
-Paths = Union[AsyncPath, Path, str]
+Paths = Union['AsyncPath', Path, str]
 
 
 class IterableAIOFile(AIOFile):
@@ -47,7 +47,7 @@ class IterableAIOFile(AIOFile):
     encoding: Optional[str] = None,
     errors: Optional[str] = None
   ) -> str:
-    encoding = encoding or self.__encoding or ENCODING
+    encoding = encoding or self.encoding or ENCODING
     errors = errors or self._errors or ERRORS
 
     return await read_full_file(

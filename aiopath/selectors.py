@@ -44,12 +44,12 @@ class _AsyncSelector:
 
 class _TerminatingSelector:
   async def _select_from(
-    self, 
+    self,
     parent_path: 'AsyncPath', 
     is_dir: CoroutineMethod, 
     exists: CoroutineMethod, 
     scandir: CoroutineMethod
-  ):
+  ) -> AsyncIterable['AsyncPath']:
     yield parent_path
 
 
@@ -64,7 +64,7 @@ class _PreciseSelector(_AsyncSelector):
     is_dir: CoroutineMethod, 
     exists: CoroutineMethod, 
     scandir: CoroutineMethod
-  ):
+  ) -> AsyncIterable['AsyncPath']:
     try:
       path = parent_path._make_child_relpath(self.name)
 
@@ -86,7 +86,7 @@ class _WildcardSelector(_AsyncSelector):
     is_dir: CoroutineMethod, 
     exists: CoroutineMethod, 
     scandir: CoroutineMethod
-  ):
+  ) -> AsyncIterable['AsyncPath']:
     try:
       async for entry in scandir(parent_path):
         if self.dironly:
@@ -121,7 +121,7 @@ class _RecursiveWildcardSelector(_AsyncSelector):
     parent_path: 'AsyncPath', 
     is_dir: CoroutineMethod, 
     scandir: CoroutineMethod
-  ):
+  ) -> AsyncIterable['AsyncPath']:
     yield parent_path
 
     try:
@@ -143,7 +143,7 @@ class _RecursiveWildcardSelector(_AsyncSelector):
     except PermissionError:
       return
 
-  async def _select_from(self, parent_path, is_dir, exists, scandir):
+  async def _select_from(self, parent_path, is_dir, exists, scandir) -> AsyncIterable['AsyncPath']:
     try:
       yielded = set()
 
