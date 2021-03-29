@@ -56,7 +56,7 @@ class _TerminatingSelector:
 class _PreciseSelector(_AsyncSelector):
   def __init__(self, name: str, child_parts: List[str], flavour: _Flavour):
     self.name: str = name
-    _AsyncSelector.__init__(self, child_parts, flavour)
+    super().__init__(self, child_parts, flavour)
 
   async def _select_from(
     self,
@@ -78,7 +78,7 @@ class _PreciseSelector(_AsyncSelector):
 class _WildcardSelector(_AsyncSelector):
   def __init__(self, pat: str, child_parts: List[str], flavour: _Flavour):
     self.match = flavour.compile_pattern(pat)
-    _AsyncSelector.__init__(self, child_parts, flavour)
+    super().__init__(self, child_parts, flavour)
 
   async def _select_from(
     self,
@@ -114,7 +114,7 @@ class _WildcardSelector(_AsyncSelector):
 
 class _RecursiveWildcardSelector(_AsyncSelector):
   def __init__(self, pat: str, child_parts: List[str], flavour):
-    _AsyncSelector.__init__(self, child_parts, flavour)
+    super().__init__(self, child_parts, flavour)
 
   async def _iterate_directories(
     self,
