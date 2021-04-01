@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import AsyncIterable, Union, Final, \
-  TYPE_CHECKING, Optional, cast
+  TYPE_CHECKING, Optional, cast, Tuple
 from inspect import iscoroutinefunction
 from pathlib import Path
 import io
@@ -35,23 +35,36 @@ class IterableAIOFile(AIOFile):
     self._newline: Optional[str] = newline
 
   def __aiter__(self) -> AsyncIterable[str]:
-    newline: str = self._newline or SEP
+    encoding, errors, line_sep = self._get_options()
 
     return read_lines(
       self.name,
-      line_sep=newline
+      line_sep=line_sep,
+      encoding=encoding,
+      errors=errors,
     )
+
+  def _get_options(
+    self,
+    encoding: Optional[str] = None,
+    errors: Optional[str] = None
+  ) -> Tuple[str, str, str]:
+    encoding = encoding or self.encoding or ENCODING
+    errors = errors or self._errors or ERRORS
+    line_sep: str = self._newline or SEP
+
+    return encoding, errors, line_sep
 
   async def read_text(
     self,
     encoding: Optional[str] = None,
     errors: Optional[str] = None
   ) -> str:
-    encoding = encoding or self.encoding or ENCODING
-    errors = errors or self._errors or ERRORS
+    encoding, errors, line_sep = self._get_options()
 
     return await read_full_file(
       self.name,
+      line_sep=line_sep,
       encoding=encoding,
       errors=errors
     )
@@ -72,8 +85,8 @@ async def read_lines(
 
     else:
       path = str(path.resolve())
-  
-  path: str = cast(str, path)
+
+  path = cast(str, path)
 
   async with AIOFile(path, 'rb') as handle:
     reader = LineReader(
