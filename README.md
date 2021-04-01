@@ -1,5 +1,5 @@
 # 📁 Async pathlib for Python
-`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that is compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). 
+`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that's compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). 
 
 All I/O performed by `aiopath` is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
 
