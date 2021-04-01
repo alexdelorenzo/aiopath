@@ -60,7 +60,7 @@ class IterableAIOFile(AIOFile):
     encoding: Optional[str] = None,
     errors: Optional[str] = None
   ) -> str:
-    encoding, errors, line_sep = self._get_options()
+    encoding, errors, line_sep = self._get_options(encoding, errors)
 
     return await read_full_file(
       self.name,
