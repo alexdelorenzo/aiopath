@@ -168,7 +168,7 @@ class AsyncPath(Path, AsyncPurePath):
   ) -> str:
 
     async with self.open('r', encoding=encoding, errors=errors) as file:
-      return await file.read_text()
+      return await file.read_text(encoding=encoding, errors=errors)
 
     #path = str(await self.resolve())
 
