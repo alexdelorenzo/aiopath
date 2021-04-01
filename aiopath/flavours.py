@@ -34,9 +34,9 @@ class _AsyncPosixFlavour(_PosixFlavour):
     path: AsyncPath,
     strict: bool = False
   ) -> Optional[str]:
-    sep = self.sep
-    accessor = path._accessor
-    seen: Dict['AsyncPath', Optional['AsyncPath']] = {}
+    sep: str = self.sep
+    accessor: '_AsyncAccessor' = path._accessor
+    seen: Dict[str, Optional[str]] = {}
 
     async def _resolve(path: str, rest: str) -> str:
       if rest.startswith(sep):
