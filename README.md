@@ -46,9 +46,9 @@ async def main():
 
 run(main())
 ```
-If you used `pathlib` instead of `aiopath` in the example above, tasks would block upon writing to the disk, and tasks that make network connections would be forced to pause while the other tasks write to the disk.
+If you used `pathlib` instead of `aiopath` in the example above, some tasks would block upon writing to the disk, and the other tasks making network connections would be forced to pause while the disk is accessed.
 
-By using `aiopath`, all I/O is non-blocking, and your script can write to the disk and perform network operations concurrently.
+By using `aiopath` in the example above, the script can access the network and disk concurrently.
 
 ## Implementation 
 `aiopath` is a direct reimplementation of [CPython's `pathlib.py`](https://github.com/python/cpython/blob/master/Lib/pathlib.py) and shares some of its code. `aiopath`'s class hierarchy [directly matches the one from `pathlib`](https://docs.python.org/3/library/pathlib.html), where `Path` inherits from `PurePath`, `AsyncPath` inherits from `AsyncPurePath`, and so on.
