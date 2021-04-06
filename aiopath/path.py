@@ -386,7 +386,7 @@ class AsyncPath(Path, AsyncPurePath):
     return cls(cwd)
 
   @classmethod
-  async def home(cls) -> AsyncPath:
+  async def home(cls: type) -> AsyncPath:
     """Return a new path pointing to the user's home directory (as
     returned by os.path.expanduser('~')).
     """
@@ -411,7 +411,7 @@ class AsyncPath(Path, AsyncPurePath):
         other_st = await to_thread(other_path.stat)
 
       except AttributeError:
-        other_st = await to_thread(self._accessor.stat, other_path)
+        other_st = await to_thread(other_path._accessor.stat, other_path)
 
     return os.path.samestat(
       await self.stat(),
@@ -463,7 +463,7 @@ class AsyncPath(Path, AsyncPurePath):
     async for p in selector.select_from(self):
       yield p
 
-  async def absolute(self):
+  async def absolute(self) -> AsyncPath:
     """Return an absolute version of this path.  This function works
     even if the path doesn't point to anything.
     No normalization is done, i.e. all '.' and '..' will be kept along.
