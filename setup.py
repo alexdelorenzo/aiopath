@@ -31,6 +31,6 @@ setup(
   packages=[NAME],
   zip_safe=True,
   install_requires=REQUIREMENTS,
-  python_requires='>=3.7',
+  python_requires='>=3.10',
   include_package_data=True
 )
