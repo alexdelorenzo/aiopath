@@ -199,7 +199,7 @@ if await downloads.exists():
 #### Linux dependencies
 If you're using a 4.18 or newer kernel and have [`libaio`](https://pagure.io/libaio) installed, `aiopath` will use it via `aiofile`. You can install `libaio` on Debian/Ubuntu like so:
 ```bash
-$ sudo apt install libaio1
+$ sudo apt install libaio1 libaio-dev
 ```
 
 ## PyPI
