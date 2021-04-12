@@ -81,6 +81,8 @@ class _AsyncAccessor(_NormalAccessor):
     async for entry in scandir_async(*args, **kwargs):
       yield entry
 
+  expanduser = staticmethod(func_as_corofunc(os.path.expanduser))
+
 
 _async_accessor = _AsyncAccessor()
 
@@ -125,7 +127,11 @@ class AsyncPath(Path, AsyncPurePath):
     if cls is AsyncPath:
       cls = AsyncWindowsPath if os.name == 'nt' else AsyncPosixPath
 
-    self = cls._from_parts(args, init=False)
+    try:
+      self = cls._from_parts(args, init=False)
+
+    except TypeError:
+      self = cls._from_parts(args)
 
     if not self._flavour.is_supported:
       name: str = cls.__name__
@@ -383,10 +389,7 @@ class AsyncPath(Path, AsyncPurePath):
     """Return a new path pointing to the user's home directory (as
     returned by os.path.expanduser('~')).
     """
-    coro = cls()._flavour.gethomedir(None)
-    homedir: str = await coro
-
-    return cls(homedir)
+    return await cls('~').expanduser()
 
   async def samefile(self, other_path: Union[AsyncPath, Path]) -> bool:
     """Return whether other_path is the same or not as this file
@@ -678,13 +681,14 @@ class AsyncPath(Path, AsyncPurePath):
     """ Return a new path with expanded ~ and ~user constructs
     (as returned by os.path.expanduser)
     """
-    if (not (self._drv or self._root) and
-      self._parts and self._parts[0][:1] == '~'
-    ):
-      homedir = await self._flavour.gethomedir(self._parts[0][1:])
-      return self._from_parts([homedir] + self._parts[1:])
+      if (not (self._drv or self._root) and
+        self._parts and self._parts[0][:1] == '~'):
+        homedir = await self._accessor.expanduser(self._parts[0])
+        if homedir[:1] == "~":
+          raise RuntimeError("Could not determine home directory.")
+        return self._from_parts([homedir] + self._parts[1:])
 
-    return self
+      return self
 
   async def iterdir(self) -> AsyncIterable[AsyncPath]:
     names = await self._accessor.listdir(self)
