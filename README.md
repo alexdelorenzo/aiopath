@@ -207,11 +207,22 @@ $ sudo apt install libaio1
 $ python3 -m pip install aiopath
 ```
 
+#### Python 3.9 and older
+`aiopath` for Python 3.9 and older is available on PyPI under versions `0.5.x` and lower.
+
+#### Python 3.10 and newer
+`aiopath` for Python 3.10 and newer is available on PyPI under versions `0.6.x` and higher.
+
 ## GitHub
 ```bash
 $ python3 -m pip install -r requirements.txt
 $ python3 setup.py install
 ```
+#### Python 3.9 and older
+`aiopath` for Python 3.9 and older is developed on the [Python-3.9 branch](https://github.com/alexdelorenzo/aiopath/tree/Python-3.9).
+
+#### Python 3.10 and newer
+`aiopath` for Python 3.10 and newer is developed on the [Python-3.10 branch](https://github.com/alexdelorenzo/aiopath/tree/Python-3.10).
 
 # Support
 Want to support this project and [other open-source projects](https://github.com/alexdelorenzo) like it?
