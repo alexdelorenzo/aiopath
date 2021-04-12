@@ -1,8 +1,7 @@
 from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
-from typing import Optional, List, Union, AsyncIterable, \
-  Literal, Final
+from typing import Optional, List, Union, AsyncIterable
 from os import stat_result
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
@@ -18,18 +17,12 @@ from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
 from .handle import IterableAIOFile, read_full_file
 from .scandir import EntryWrapper, scandir_async
+from .types import Final, Literal, FileMode
 
 
 DEFAULT_ENCODING: Final[str] = 'utf-8'
 ON_ERRORS: Final[str] = 'ignore'
 NEWLINE: Final[str] = '\n'
-
-
-TextMode = \
-  Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+', 'x+']
-BinaryMode = \
-  Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
-FileMode = Union[TextMode, BinaryMode]
 
 
 getcwd = func_as_corofunc(os.getcwd)

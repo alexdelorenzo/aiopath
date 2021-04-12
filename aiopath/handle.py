@@ -1,11 +1,13 @@
 from __future__ import annotations
-from typing import AsyncIterable, Union, Final, \
+from typing import AsyncIterable, Union, \
   TYPE_CHECKING, Optional, cast, Tuple
 from inspect import iscoroutinefunction
 from pathlib import Path
 import io
 
 from aiofile import AIOFile, LineReader
+
+from .types import Final
 
 if TYPE_CHECKING:  # keep mypy quiet
   from .path import AsyncPath
@@ -39,7 +41,7 @@ class IterableAIOFile(AIOFile):
 
     return read_lines(
       self.name,
-      line_sep=line_sep,
+      line_sep,
       encoding=encoding,
       errors=errors,
     )
@@ -64,7 +66,7 @@ class IterableAIOFile(AIOFile):
 
     return await read_full_file(
       self.name,
-      line_sep=line_sep,
+      line_sep,
       encoding=encoding,
       errors=errors
     )
