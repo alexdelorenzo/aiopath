@@ -8,7 +8,7 @@ If you're writing asynchronous Python code and want to take advantage of `pathli
 
 For example, if you're writing an asynchronous [web scraping](https://en.wikipedia.org/wiki/Web_scraping) script, you might want to make several concurrent requests to websites and write the content in the responses to secondary storage:
 ```python3
-from typing import List
+from typing import List, Iterable, Coroutine
 from asyncio import run, gather
 
 from aiohttp import ClientSession
@@ -36,7 +36,7 @@ async def main():
     'https://dupebot.firstbyte.dev'
   ]
 
-  scrapers = (
+  scrapers: Iterable[Coroutine] = (
     save_page(url, f"{index}.html")
     for index, url in enumerate(urls)
   )
@@ -199,7 +199,7 @@ if await downloads.exists():
 #### Linux dependencies
 If you're using a 4.18 or newer kernel and have [`libaio`](https://pagure.io/libaio) installed, `aiopath` will use it via `aiofile`. You can install `libaio` on Debian/Ubuntu like so:
 ```bash
-$ sudo apt install libaio1
+$ sudo apt install libaio1 libaio-dev
 ```
 
 ## PyPI
