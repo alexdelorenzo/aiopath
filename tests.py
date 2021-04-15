@@ -21,12 +21,9 @@ def get_paths(path: Paths) -> Tuple[Path, AsyncPath]:
   return Path(path), AsyncPath(path)
 
 
-async def _test_is(
+def _test_is_pure(
   path: Path,
   apath: AsyncPath,
-  test_parent: bool = True,
-  exists: bool = True,
-  resolve: bool = True,
 ):
   # PurePath & AsyncPurePath methods are not async
   assert str(path) == str(apath)
@@ -41,9 +38,11 @@ async def _test_is(
   assert path.is_reserved() == apath.is_reserved()
   assert path.as_uri() == apath.as_uri()
 
-  if test_parent:
-    await _test_is(path.parent, apath.parent, test_parent=False)
 
+async def _test_is_io(
+  path: Path,
+  apath: AsyncPath,
+):
   # AsyncPath methods are async
   assert path.exists() == await apath.exists()
   assert path.is_dir() == await apath.is_dir()
@@ -54,6 +53,21 @@ async def _test_is(
   assert path.is_mount() == await apath.is_mount()
   assert path.is_socket() == await apath.is_socket()
   assert path.is_symlink() == await apath.is_symlink()
+
+
+async def _test_is(
+  path: Path,
+  apath: AsyncPath,
+  test_parent: bool = True,
+  exists: bool = True,
+  resolve: bool = True,
+):
+  _test_is_pure(path, apath)
+
+  if test_parent:
+    await _test_is(path.parent, apath.parent, test_parent=False)
+
+  await _test_is_io(path, apath)
 
   if exists and resolve:
     await _test_is(
@@ -67,7 +81,7 @@ async def _test_is(
     assert path.lstat() == await apath.lstat()
     assert path.owner() == await apath.owner()
     assert path.group() == await apath.group()
-    assert path.samefile(str(apath)) and await apath.samefile(path)
+    assert path.samefile(str(apath)) and await apath.samefile(str(path))
 
 
 @pytest.mark.asyncio
@@ -167,5 +181,15 @@ async def test_touch():
 
 @pytest.mark.asyncio
 async def test_glob():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_open():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_unlink():
   pass
 
