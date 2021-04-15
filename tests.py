@@ -30,6 +30,7 @@ async def test_home():
 async def test_directory():
   async with TemporaryDirectory() as temp:
     path, apath = get_paths(temp)
+
     assert path.exists() == await apath.exists()
     assert path.is_dir() == await apath.is_dir()
     assert path.is_file() == await apath.is_file()
