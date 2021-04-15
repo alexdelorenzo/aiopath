@@ -1,6 +1,7 @@
 aiofile==3.5.0
 aiofiles==0.6.0
 asynctempfile==0.5.0
+pytest==6.2.3
 pytest-asyncio==0.14.0
 
 typing>=3.7.4.3; python_version < '3.8'
