@@ -2,12 +2,11 @@ from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
 from typing import Optional, List, Union, AsyncIterable
-from os import stat_result
+from os import stat_result, PathLike
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
 
-from aiofile import AIOFile
 from aiofiles import os as async_os
 from aiofiles.os import wrap as method_as_method_coro, \
   wrap as func_as_corofunc
@@ -15,7 +14,7 @@ from aiofiles.os import wrap as method_as_method_coro, \
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
-from .handle import IterableAIOFile, read_full_file
+from .handle import IterableAIOFile
 from .scandir import EntryWrapper, scandir_async
 from .types import Final, Literal, FileMode
 
@@ -23,6 +22,9 @@ from .types import Final, Literal, FileMode
 DEFAULT_ENCODING: Final[str] = 'utf-8'
 ON_ERRORS: Final[str] = 'ignore'
 NEWLINE: Final[str] = '\n'
+
+
+Paths = Union[Path, PathLike, str]
 
 
 getcwd = func_as_corofunc(os.getcwd)
@@ -388,10 +390,16 @@ class AsyncPath(Path, AsyncPurePath):
 
     return cls(homedir)
 
-  async def samefile(self, other_path: Union[AsyncPath, Path]) -> bool:
+  async def samefile(
+    self,
+    other_path: Union[AsyncPath, Paths]
+  ) -> bool:
     """Return whether other_path is the same or not as this file
     (as returned by os.path.samefile()).
     """
+    if isinstance(other_path, Paths.__args__):
+      other_path = AsyncPath(other_path)
+
     if isinstance(other_path, AsyncPath):
       try:
         other_st = await other_path.stat()
