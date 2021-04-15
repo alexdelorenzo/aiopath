@@ -38,6 +38,17 @@ async def test_directory():
 
 
 @pytest.mark.asyncio
+async def test_file():
+  async with NamedTemporaryFile() as temp:
+    path, apath = get_paths(temp.name)
+
+    assert path.exists() == await apath.exists()
+    assert path.is_dir() == await apath.is_dir()
+    assert path.is_file() == await apath.is_file()
+    assert path.is_fifo() == await apath.is_fifo()
+
+
+@pytest.mark.asyncio
 async def test_mkdir_rmdir():
   new_name = 'temp_dir_test'
 
