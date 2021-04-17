@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env pytest
 from typing import Tuple, Union
 from pathlib import Path
 import asyncio
@@ -31,8 +31,8 @@ def _test_is_pure(
   assert path.drive == apath.drive
   assert path.root == apath.root
   assert path.stem == apath.stem
-  assert path.suffixes == apath.suffixes
   assert path.suffix == apath.suffix
+  assert path.suffixes == apath.suffixes
   assert path.as_uri() == apath.as_uri()
   assert path.is_absolute() == apath.is_absolute()
   assert path.is_reserved() == apath.is_reserved()
@@ -57,15 +57,11 @@ async def _test_is_io(
 async def _test_is(
   path: Path,
   apath: AsyncPath,
-  test_parent: bool = True,
   exists: bool = True,
   resolve: bool = True,
+  test_parent: bool = True,
 ):
   _test_is_pure(path, apath)
-
-  if test_parent:
-    await _test_is(path.parent, apath.parent, test_parent=False)
-
   await _test_is_io(path, apath)
 
   if exists and resolve:
@@ -80,7 +76,17 @@ async def _test_is(
     assert path.lstat() == await apath.lstat()
     assert path.owner() == await apath.owner()
     assert path.group() == await apath.group()
-    assert path.samefile(str(apath)) and await apath.samefile(str(path))
+    aname, pname = str(apath), str(path)
+    assert path.samefile(aname) and await apath.samefile(pname)
+
+  if test_parent:
+    await _test_is(
+      path.parent,
+      apath.parent,
+      exists=exists,
+      resolve=resolve,
+      test_parent=False,
+    )
 
 
 @pytest.mark.asyncio
