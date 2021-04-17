@@ -31,12 +31,11 @@ def _test_is_pure(
   assert path.drive == apath.drive
   assert path.root == apath.root
   assert path.stem == apath.stem
-  assert path.suffix == apath.suffix
   assert path.suffixes == apath.suffixes
   assert path.suffix == apath.suffix
+  assert path.as_uri() == apath.as_uri()
   assert path.is_absolute() == apath.is_absolute()
   assert path.is_reserved() == apath.is_reserved()
-  assert path.as_uri() == apath.as_uri()
 
 
 async def _test_is_io(
@@ -48,11 +47,11 @@ async def _test_is_io(
   assert path.is_dir() == await apath.is_dir()
   assert path.is_file() == await apath.is_file()
   assert path.is_fifo() == await apath.is_fifo()
-  assert path.is_block_device() == await apath.is_block_device()
-  assert path.is_char_device() == await apath.is_char_device()
   assert path.is_mount() == await apath.is_mount()
   assert path.is_socket() == await apath.is_socket()
   assert path.is_symlink() == await apath.is_symlink()
+  assert path.is_char_device() == await apath.is_char_device()
+  assert path.is_block_device() == await apath.is_block_device()
 
 
 async def _test_is(
