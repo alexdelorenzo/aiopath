@@ -4,17 +4,7 @@ from aiofiles.os import wrap as method_as_method_coro, \
 from functools import wraps, partial
 import contextvars
 
-try:
-  from asyncio import to_thread
-
-except ImportError:
-  from asyncio import get_running_loop
-
-  async def to_thread(func: Callable, /, *args, **kwargs) -> Any:
-    loop = get_running_loop()
-    ctx = contextvars.copy_context()
-    func_call = partial(ctx.run, func, *args, **kwargs)
-    return await loop.run_in_executor(None, func_call)
+from asyncio import to_thread
 
 
 CoroutineResult = Awaitable[Any]

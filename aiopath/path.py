@@ -7,7 +7,6 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
 
-# from aiofile import AIOFile
 from aiofiles import os as async_os
 from aiofiles.os import wrap as method_as_method_coro, \
   wrap as func_as_corofunc
@@ -15,7 +14,7 @@ from aiofiles.os import wrap as method_as_method_coro, \
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
-from .handle import IterableAIOFile  #, read_full_file
+from .handle import IterableAIOFile
 from .scandir import EntryWrapper, scandir_async
 from .types import Final, Literal, FileMode
 
