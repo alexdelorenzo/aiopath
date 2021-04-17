@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "aiopath"
+version = "0.6.2"
+description = "📁 Async pathlib for Python"
+license = "LGPL-3.0"
+homepage = "https://github.com/alexdelorenzo/aiopath"
+authors = ["Alex DeLorenzo"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+aiofile = "==3.5.0"
+aiofiles = "==0.6.0"
+typing = {version = ">=3.7.4.3", python = "<3.8"}
