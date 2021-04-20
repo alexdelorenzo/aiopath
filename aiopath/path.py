@@ -168,17 +168,8 @@ class AsyncPath(Path, AsyncPurePath):
     encoding: Optional[str] = DEFAULT_ENCODING,
     errors: Optional[str] = ON_ERRORS
   ) -> str:
-
     async with self.open('r', encoding=encoding, errors=errors) as file:
-      return await file.read_text(encoding=encoding, errors=errors)
-
-    #path = str(await self.resolve())
-
-    #return await read_full_file(
-      #path,
-      #encoding=encoding,
-      #errors=errors
-    #)
+      return await file.read_text()
 
   async def read_bytes(self) -> bytes:
     async with self.open('rb') as file:
@@ -365,19 +356,6 @@ class AsyncPath(Path, AsyncPurePath):
       return False
 
     return True
-
-  #async def exists(self) -> bool:
-    #try:
-      #async with async_open(self._path, 'rb'):
-        #pass
-
-      #return True
-
-    #except IsADirectoryError:
-      #return True
-
-    #except FileNotFoundError:
-      #return False
 
   @classmethod
   async def cwd(cls: type) -> str:
