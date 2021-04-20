@@ -98,16 +98,7 @@ async def read_lines(
       offset=offset
     )
 
-#    Python 3.8+
-#    while line := await reader.readline()
-#      yield line.decode(encoding, errors=errors)
-
-    while True:
-      line: bytes = await reader.readline()
-
-      if not line:
-        break
-
+    while line := await reader.readline():
       yield line.decode(encoding, errors=errors)
 
 
