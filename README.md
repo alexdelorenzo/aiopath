@@ -64,7 +64,7 @@ To run the following examples with top-level `await` expressions, [launch an asy
 
 You'll also need to install `asynctempfile` via PyPI, like so `python3 -m pip install asynctempfile`.
 
-## Basic
+## Replacing `pathlib`
 All of `pathlib.Path`'s methods that perform synchronous I/O are reimplemented as asynchronous methods. `PurePath` methods are not asynchronous because they don't perform I/O.
 
 ```python3
@@ -127,6 +127,21 @@ assert str(home) == str(ahome) == str(path)
 # but AsyncPath and Path objects are not equivalent
 assert not home == ahome
 ```
+
+`AsyncPath` is a subclass of `Path` and `PurePath`, and a subclass of `AsyncPurePath`:
+```python3
+from pathlib import Path, PurePath
+from aiopath import AsyncPath, AsyncPurePath
+
+
+path = await AsyncPath.home()
+
+assert isinstance(path, Path)
+assert isinstance(path, PurePath)
+assert isinstance(path, AsyncPurePath) 
+```
+
+Check out [`tests.py`](https://github.com/alexdelorenzo/aiopath/blob/main/tests.py#L24) for more examples of how `aiopath` compares to `pathlib`.
 
 ## Opening a file
 You can get an asynchronous [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers). 
