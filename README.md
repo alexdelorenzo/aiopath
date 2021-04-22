@@ -134,7 +134,12 @@ from pathlib import Path, PurePath
 from aiopath import AsyncPath, AsyncPurePath
 
 
-path = await AsyncPath.home()
+assert issubclass(AsyncPath, Path)
+assert issubclass(AsyncPath, PurePath)
+assert issubclass(AsyncPath, AsyncPurePath)
+assert issubclass(AsyncPurePath, PurePath)
+
+path: AsyncPath = await AsyncPath.home()
 
 assert isinstance(path, Path)
 assert isinstance(path, PurePath)
