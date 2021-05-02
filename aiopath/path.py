@@ -150,9 +150,9 @@ class AsyncPath(Path, AsyncPurePath):
     self,
     mode: FileMode = 'r',
     buffering: int = -1,
-    encoding: str| None = DEFAULT_ENCODING,
-    errors: str| None = ON_ERRORS,
-    newline: str | None= NEWLINE,
+    encoding: str | None = DEFAULT_ENCODING,
+    errors: str | None = ON_ERRORS,
+    newline: str | None = NEWLINE,
   ) -> IterableAIOFile:
     return IterableAIOFile(
       self._path,
@@ -164,7 +164,7 @@ class AsyncPath(Path, AsyncPurePath):
 
   async def read_text(
     self,
-    encoding: str| None = DEFAULT_ENCODING,
+    encoding: str | None = DEFAULT_ENCODING,
     errors: str | None = ON_ERRORS
   ) -> str:
     async with self.open('r', encoding=encoding, errors=errors) as file:
