@@ -25,7 +25,7 @@ ON_ERRORS: Final[str] = 'ignore'
 NEWLINE: Final[str] = '\n'
 
 
-Paths = Union[Path, PathLike, str]
+Paths = Path | PathLike | str
 
 
 getcwd = func_as_corofunc(os.getcwd)
@@ -309,7 +309,7 @@ class AsyncPath(Path, AsyncPurePath):
     """
     await self._accessor.link_to(self, target)
 
-  async def rename(self, target: Union[str, AsyncPath]) -> AsyncPath:
+  async def rename(self, target: str | AsyncPath) -> AsyncPath:
     """
     Rename this path to the target path.
     The target path may be absolute or relative. Relative paths are
@@ -374,12 +374,12 @@ class AsyncPath(Path, AsyncPurePath):
 
   async def samefile(
     self,
-    other_path: Union[AsyncPath, Paths]
+    other_path: AsyncPath | Paths
   ) -> bool:
     """Return whether other_path is the same or not as this file
     (as returned by os.path.samefile()).
     """
-    if isinstance(other_path, Paths.__args__):
+    if isinstance(other_path, Paths):
       other_path = AsyncPath(other_path)
 
     if isinstance(other_path, AsyncPath):
