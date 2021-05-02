@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
-from typing import AsyncIterable
+from typing import AsyncIterable, Final
 from os import stat_result, PathLike
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
@@ -17,7 +17,7 @@ from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
 from .handle import IterableAIOFile  #, read_full_file
 from .scandir import EntryWrapper, scandir_async
-from .types import Final, Literal, FileMode
+from .types import FileMode
 
 
 DEFAULT_ENCODING: Final[str] = 'utf-8'
