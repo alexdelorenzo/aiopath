@@ -96,11 +96,11 @@ class AsyncPurePath(PurePath):
 
   def __new__(cls, *args):
     if cls is AsyncPurePath:
-      cls = PureAsyncWindowsPath if os.name == 'nt' else PureAsyncPosixPath
+      cls = AsyncPureWindowsPath if os.name == 'nt' else AsyncPurePosixPath
     return cls._from_parts(args)
 
 
-class PureAsyncPosixPath(AsyncPurePath):
+class AsyncPurePosixPath(AsyncPurePath):
   """PurePath subclass for non-Windows systems.
   On a POSIX system, instantiating a PurePath should return this object.
   However, you can also instantiate it directly on any system.
@@ -109,7 +109,7 @@ class PureAsyncPosixPath(AsyncPurePath):
   __slots__ = ()
 
 
-class PureAsyncWindowsPath(AsyncPurePath):
+class AsyncPureWindowsPath(AsyncPurePath):
   """PurePath subclass for Windows systems.
   On a Windows system, instantiating a PurePath should return this object.
   However, you can also instantiate it directly on any system.
@@ -687,11 +687,11 @@ class AsyncPath(Path, AsyncPurePath):
       yield self._make_child_relpath(name)
 
 
-class AsyncPosixPath(PosixPath, AsyncPath, PureAsyncPosixPath):
+class AsyncPosixPath(PosixPath, AsyncPath, AsyncPurePosixPath):
   __slots__ = ()
 
 
-class AsyncWindowsPath(WindowsPath, AsyncPath, PureAsyncWindowsPath):
+class AsyncWindowsPath(WindowsPath, AsyncPath, AsyncPureWindowsPath):
   __slots__ = ()
 
   async def is_mount(self) -> int:
