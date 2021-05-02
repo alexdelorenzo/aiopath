@@ -358,7 +358,7 @@ class AsyncPath(Path, AsyncPurePath):
     return True
 
   @classmethod
-  async def cwd(cls: type) -> str:
+  async def cwd(cls: type) -> AsyncPath:
     """Return a new path pointing to the current working directory
     (as returned by os.getcwd()).
     """
