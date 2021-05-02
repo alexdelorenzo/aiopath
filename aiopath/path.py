@@ -1,4 +1,3 @@
-from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
 from typing import AsyncIterable, Final
