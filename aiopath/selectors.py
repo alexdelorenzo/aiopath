@@ -1,8 +1,7 @@
 from __future__ import annotations
 from pathlib import Path, PosixPath, WindowsPath, _NormalAccessor, \
   _Selector,_is_wildcard_pattern, _ignore_error, _Flavour
-from typing import AsyncIterable, Callable, List
-from os import DirEntry
+from typing import AsyncIterable, Callable
 import functools
 
 from .wrap import CoroutineMethod
@@ -13,8 +12,8 @@ class _AsyncSelector:
       of a given path.
   """
 
-  def __init__(self, child_parts: List[str], flavour: _Flavour):
-    self.child_parts: List[str] = child_parts
+  def __init__(self, child_parts: list[str], flavour: _Flavour):
+    self.child_parts: list[str] = child_parts
 
     if child_parts:
       self.successor = _make_selector(child_parts, flavour)
@@ -45,24 +44,24 @@ class _AsyncSelector:
 class _TerminatingSelector:
   async def _select_from(
     self,
-    parent_path: 'AsyncPath', 
-    is_dir: CoroutineMethod, 
-    exists: CoroutineMethod, 
+    parent_path: 'AsyncPath',
+    is_dir: CoroutineMethod,
+    exists: CoroutineMethod,
     scandir: CoroutineMethod
   ) -> AsyncIterable['AsyncPath']:
     yield parent_path
 
 
 class _PreciseSelector(_AsyncSelector):
-  def __init__(self, name: str, child_parts: List[str], flavour: _Flavour):
+  def __init__(self, name: str, child_parts: list[str], flavour: _Flavour):
     self.name: str = name
     super().__init__(child_parts, flavour)
 
   async def _select_from(
     self,
-    parent_path: 'AsyncPath', 
-    is_dir: CoroutineMethod, 
-    exists: CoroutineMethod, 
+    parent_path: 'AsyncPath',
+    is_dir: CoroutineMethod,
+    exists: CoroutineMethod,
     scandir: CoroutineMethod
   ) -> AsyncIterable['AsyncPath']:
     try:
@@ -76,15 +75,15 @@ class _PreciseSelector(_AsyncSelector):
 
 
 class _WildcardSelector(_AsyncSelector):
-  def __init__(self, pat: str, child_parts: List[str], flavour: _Flavour):
+  def __init__(self, pat: str, child_parts: list[str], flavour: _Flavour):
     self.match = flavour.compile_pattern(pat)
     super().__init__(child_parts, flavour)
 
   async def _select_from(
     self,
-    parent_path: 'AsyncPath', 
-    is_dir: CoroutineMethod, 
-    exists: CoroutineMethod, 
+    parent_path: 'AsyncPath',
+    is_dir: CoroutineMethod,
+    exists: CoroutineMethod,
     scandir: CoroutineMethod
   ) -> AsyncIterable['AsyncPath']:
     try:
@@ -113,13 +112,13 @@ class _WildcardSelector(_AsyncSelector):
 
 
 class _RecursiveWildcardSelector(_AsyncSelector):
-  def __init__(self, pat: str, child_parts: List[str], flavour):
+  def __init__(self, pat: str, child_parts: list[str], flavour):
     super().__init__(child_parts, flavour)
 
   async def _iterate_directories(
     self,
-    parent_path: 'AsyncPath', 
-    is_dir: CoroutineMethod, 
+    parent_path: 'AsyncPath',
+    is_dir: CoroutineMethod,
     scandir: CoroutineMethod
   ) -> AsyncIterable['AsyncPath']:
     yield parent_path
@@ -162,9 +161,9 @@ class _RecursiveWildcardSelector(_AsyncSelector):
       return
 
 
-def _make_selector(pattern_parts: List[str], flavour: _Flavour) -> _AsyncSelector:
+def _make_selector(pattern_parts: list[str], flavour: _Flavour) -> _AsyncSelector:
   pat: str = pattern_parts[0]
-  child_parts: List[str] = pattern_parts[1:]
+  child_parts: list[str] = pattern_parts[1:]
 
   if pat == '**':
     cls = _RecursiveWildcardSelector

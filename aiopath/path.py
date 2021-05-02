@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
-from typing import Optional, List, Union, AsyncIterable
+from typing import Optional, AsyncIterable
 from os import stat_result, PathLike
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO

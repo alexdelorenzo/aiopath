@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import AsyncIterable, Union, \
-  TYPE_CHECKING, Optional, cast, Tuple
+  TYPE_CHECKING, Optional, cast
 from inspect import iscoroutinefunction
 from pathlib import Path
 import io
@@ -50,7 +50,7 @@ class IterableAIOFile(AIOFile):
     self,
     encoding: Optional[str] = None,
     errors: Optional[str] = None
-  ) -> Tuple[str, str, str]:
+  ) -> tuple[str, str, str]:
     encoding = encoding or self.encoding or ENCODING
     errors = errors or self._errors or ERRORS
     line_sep: str = self._newline or SEP

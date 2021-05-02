@@ -1,5 +1,5 @@
 from typing import Callable, Awaitable, AsyncIterable, Iterable, \
-  Any, List
+  Any
 from os import scandir, DirEntry, stat_result
 from dataclasses import dataclass
 
@@ -46,7 +46,7 @@ def wrapped_scandir(*args, **kwargs) -> Iterable[EntryWrapper]:
   yield from map(EntryWrapper, entries)
 
 
-def _scandir_results(*args, **kwargs) -> List[EntryWrapper]:
+def _scandir_results(*args, **kwargs) -> list[EntryWrapper]:
   return list(wrapped_scandir(*args, **kwargs))
 
 

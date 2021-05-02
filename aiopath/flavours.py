@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import _PosixFlavour, _WindowsFlavour, PurePath
-from typing import Optional, Callable, Awaitable, Dict, TYPE_CHECKING
+from typing import Optional, Callable, Awaitable, TYPE_CHECKING
 from errno import EINVAL
 import os
 
@@ -36,7 +36,7 @@ class _AsyncPosixFlavour(_PosixFlavour):
   ) -> Optional[str]:
     sep: str = self.sep
     accessor: '_AsyncAccessor' = path._accessor
-    seen: Dict[str, Optional[str]] = {}
+    seen: dict[str, Optional[str]] = {}
 
     async def _resolve(path: str, rest: str) -> str:
       if rest.startswith(sep):
