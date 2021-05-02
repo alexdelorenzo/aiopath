@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
-from typing import Optional, AsyncIterable
+from typing import AsyncIterable
 from os import stat_result, PathLike
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
@@ -91,7 +91,7 @@ _async_accessor = _AsyncAccessor()
 
 
 class AsyncPurePath(PurePath):
-  def _init(self, template: Optional[PurePath] = None):
+  def _init(self, template: PurePath | None = None):
     self._accessor = _async_accessor
 
   def __new__(cls, *args):
@@ -123,7 +123,7 @@ class AsyncPath(Path, AsyncPurePath):
     _async_windows_flavour if os.name == 'nt' else _async_posix_flavour
   _accessor = _async_accessor
 
-  def _init(self, template: Optional[AsyncPath] = None):
+  def _init(self, template: AsyncPath | None = None):
     self._accessor = _async_accessor
 
   def __new__(cls, *args, **kwargs):
@@ -151,9 +151,9 @@ class AsyncPath(Path, AsyncPurePath):
     self,
     mode: FileMode = 'r',
     buffering: int = -1,
-    encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[str] = ON_ERRORS,
-    newline: Optional[str] = NEWLINE,
+    encoding: str| None = DEFAULT_ENCODING,
+    errors: str| None = ON_ERRORS,
+    newline: str | None= NEWLINE,
   ) -> IterableAIOFile:
     return IterableAIOFile(
       self._path,
@@ -165,8 +165,8 @@ class AsyncPath(Path, AsyncPurePath):
 
   async def read_text(
     self,
-    encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[str] = ON_ERRORS
+    encoding: str| None = DEFAULT_ENCODING,
+    errors: str | None = ON_ERRORS
   ) -> str:
     async with self.open('r', encoding=encoding, errors=errors) as file:
       return await file.read_text()
@@ -188,9 +188,9 @@ class AsyncPath(Path, AsyncPurePath):
   async def write_text(
     self,
     data: str,
-    encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[str] = ON_ERRORS,
-    newline: Optional[str] = NEWLINE
+    encoding: str | None = DEFAULT_ENCODING,
+    errors: str | None = ON_ERRORS,
+    newline: str | None = NEWLINE
   ) -> int:
     """
     Open the file in text mode, write to it, and close the file.
@@ -467,7 +467,7 @@ class AsyncPath(Path, AsyncPurePath):
     normalizing it (for example turning slashes into backslashes under
     Windows).
     """
-    s: Optional[str] = await self._flavour.resolve(self, strict=strict)
+    s: str | None = await self._flavour.resolve(self, strict=strict)
 
     if s is None:
       # No symlink resolution => for consistency, raise an error if

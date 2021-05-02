@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import _PosixFlavour, _WindowsFlavour, PurePath
-from typing import Optional, Callable, Awaitable, TYPE_CHECKING
+from typing import Callable, Awaitable, TYPE_CHECKING
 from errno import EINVAL
 import os
 
@@ -33,10 +33,10 @@ class _AsyncPosixFlavour(_PosixFlavour):
     self,
     path: AsyncPath,
     strict: bool = False
-  ) -> Optional[str]:
+  ) -> str | None:
     sep: str = self.sep
     accessor: '_AsyncAccessor' = path._accessor
-    seen: dict[str, Optional[str]] = {}
+    seen: dict[str, str | None] = {}
 
     async def _resolve(path: str, rest: str) -> str:
       if rest.startswith(sep):
@@ -103,13 +103,13 @@ class _AsyncWindowsFlavour(_WindowsFlavour):
     self,
     path: 'AsyncPath',
     strict: bool = False
-  ) -> Optional[str]:
+  ) -> str | None:
     s = str(path)
 
     if not s:
       return await getcwd()
 
-    previous_s: Optional[str] = None
+    previous_s: str | None = None
 
     if _getfinalpathname is not None:
       if strict:
