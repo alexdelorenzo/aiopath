@@ -93,7 +93,7 @@ class AsyncPurePath(PurePath):
   def _init(self, template: PurePath | None = None):
     self._accessor = _async_accessor
 
-  def __new__(cls, *args):
+  def __new__(cls: type, *args):
     if cls is AsyncPurePath:
       cls = AsyncPureWindowsPath if os.name == 'nt' else AsyncPurePosixPath
     return cls._from_parts(args)
@@ -125,7 +125,7 @@ class AsyncPath(Path, AsyncPurePath):
   def _init(self, template: AsyncPath | None = None):
     self._accessor = _async_accessor
 
-  def __new__(cls, *args, **kwargs):
+  def __new__(cls: type, *args, **kwargs):
     if cls is AsyncPath:
       cls = AsyncWindowsPath if os.name == 'nt' else AsyncPosixPath
 
