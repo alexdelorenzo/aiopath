@@ -15,7 +15,7 @@ CoroutineFunction = Callable[..., CoroutineResult]
 CoroutineMethod = Callable[..., CoroutineResult]
 
 
-class CallableCls(Protocol):
+class CallableObj(Protocol):
   def __call__(self, *args, **kwargs) -> Any:
     ...
 
@@ -41,7 +41,7 @@ def to_async_method(func: Callable) -> CoroutineMethod:
     return coro_as_method_coro(func)
 
   match func:
-    case FunctionType() | BuiltinFunctionType() | BuiltinMethodType() | CallableCls():
+    case FunctionType() | BuiltinFunctionType() | BuiltinMethodType() | CallableObj():
       return func_as_method_coro(func)
 
     case MethodType():
