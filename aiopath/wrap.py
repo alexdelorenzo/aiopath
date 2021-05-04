@@ -6,7 +6,7 @@ from asyncio import to_thread
 import contextvars
 
 from aiofiles.os import \
-  wrap as method_as_method_coro, \
+  wrap as method_to_async_method, \
   wrap as func_to_async_func
 
 
@@ -20,7 +20,7 @@ class CallableObj(Protocol):
     ...
 
 
-def func_as_method_coro(func: Callable) -> CoroutineMethod:
+def func_to_async_method(func: Callable) -> CoroutineMethod:
   @wraps(func)
   async def method(self, *args, **kwargs) -> Any:
     return await to_thread(func, *args, **kwargs)
@@ -28,7 +28,7 @@ def func_as_method_coro(func: Callable) -> CoroutineMethod:
   return method
 
 
-def coro_as_method_coro(coro: CoroutineFunction) -> CoroutineMethod:
+def coro_to_async_method(coro: CoroutineFunction) -> CoroutineMethod:
   @wraps(coro)
   async def method(self, *args, **kwargs) -> Any:
     return await coro(*args, **kwargs)
@@ -38,13 +38,13 @@ def coro_as_method_coro(coro: CoroutineFunction) -> CoroutineMethod:
 
 def to_async_method(func: Callable) -> CoroutineMethod:
   if iscoroutinefunction(func):
-    return coro_as_method_coro(func)
+    return coro_to_async_method(func)
 
   match func:
     case FunctionType() | BuiltinFunctionType() | BuiltinMethodType() | CallableObj():
-      return func_as_method_coro(func)
+      return func_to_async_method(func)
 
     case MethodType():
-      return method_as_method_coro(func)
+      return method_to_async_method(func)
 
   raise TypeError(f'{type(func).__name__} is not a callable.')
