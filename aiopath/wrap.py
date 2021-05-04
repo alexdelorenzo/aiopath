@@ -1,8 +1,8 @@
-from typing import Callable, Any, Awaitable
-from functools import wraps, partial
-from inspect import ismethod, isfunction, iscoroutinefunction
-from asyncio import to_thread
 from types import MethodType, FunctionType, BuiltinFunctionType, BuiltinMethodType
+from typing import Callable, Any, Awaitable, Protocol
+from inspect import ismethod, isfunction, iscoroutinefunction
+from functools import wraps, partial
+from asyncio import to_thread
 import contextvars
 
 from aiofiles.os import \
@@ -13,6 +13,11 @@ from aiofiles.os import \
 CoroutineResult = Awaitable[Any]
 CoroutineFunction = Callable[..., CoroutineResult]
 CoroutineMethod = Callable[..., CoroutineResult]
+
+
+class CallableCls(Protocol):
+  def __call__(self, *args, **kwargs) -> Any:
+    ...
 
 
 def func_as_method_coro(func: Callable) -> CoroutineMethod:
@@ -36,14 +41,10 @@ def to_async_method(func: Callable) -> CoroutineMethod:
     return coro_as_method_coro(func)
 
   match func:
-    case FunctionType() | BuiltinFunctionType() | BuiltinMethodType():
+    case FunctionType() | BuiltinFunctionType() | BuiltinMethodType() | CallableCls():
       return func_as_method_coro(func)
 
     case MethodType():
       return method_as_method_coro(func)
 
-  if callable(func):
-    return func_as_method_coro(func)
-
-  else:
-    raise TypeError(f'{type(func).__name__} is not callable.')
+  raise TypeError(f'{type(func).__name__} is not a callable.')
