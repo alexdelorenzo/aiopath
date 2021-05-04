@@ -6,15 +6,12 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
 
-# from aiofile import AIOFile
 from aiofiles import os as async_os
-from aiofiles.os import wrap as method_as_method_coro, \
-  wrap as func_as_corofunc
 
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
-from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
-from .handle import IterableAIOFile  #, read_full_file
+from .wrap import to_async_method, to_thread, func_to_async_func
+from .handle import IterableAIOFile
 from .scandir import EntryWrapper, scandir_async
 from .types import FileMode
 
@@ -27,37 +24,37 @@ NEWLINE: Final[str] = '\n'
 Paths = Path | PathLike | str
 
 
-getcwd = func_as_corofunc(os.getcwd)
-close = func_as_corofunc(os.close)
+getcwd = func_to_async_func(os.getcwd)
+close = func_to_async_func(os.close)
 
 
 class _AsyncAccessor(_NormalAccessor):
-  stat = coro_as_method_coro(async_os.stat)
-  lstat = func_as_method_coro(os.lstat)
-  open = func_as_method_coro(os.open)
-  listdir = func_as_method_coro(os.listdir)
-  chmod = func_as_method_coro(os.chmod)
+  stat = to_async_method(async_os.stat)
+  lstat = to_async_method(os.lstat)
+  open = to_async_method(os.open)
+  listdir = to_async_method(os.listdir)
+  chmod = to_async_method(os.chmod)
 
   if hasattr(_NormalAccessor, 'lchmod'):
-    lchmod = method_as_method_coro(_NormalAccessor.lchmod)
+    lchmod = to_async_method(_NormalAccessor.lchmod)
 
-  mkdir = coro_as_method_coro(async_os.mkdir)
-  unlink = func_as_method_coro(os.unlink)
+  mkdir = to_async_method(async_os.mkdir)
+  unlink = to_async_method(os.unlink)
 
   if hasattr(_NormalAccessor, 'link'):
-    link = method_as_method_coro(_NormalAccessor.link)
+    link = to_async_method(_NormalAccessor.link)
 
-  rmdir = coro_as_method_coro(async_os.rmdir)
-  rename = coro_as_method_coro(async_os.rename)
-  replace = func_as_method_coro(os.replace)
+  rmdir = to_async_method(async_os.rmdir)
+  rename = to_async_method(async_os.rename)
+  replace = to_async_method(os.replace)
 
   symlink = staticmethod(
-    method_as_method_coro(_NormalAccessor.symlink)
+    to_async_method(_NormalAccessor.symlink)
   )
 
-  utime = func_as_method_coro(os.utime)
-  readlink = method_as_method_coro(_NormalAccessor.readlink)
-  remove = coro_as_method_coro(async_os.remove)
+  utime = to_async_method(os.utime)
+  readlink = to_async_method(_NormalAccessor.readlink)
+  remove = to_async_method(async_os.remove)
 
   async def owner(self, path: str) -> str:
     try:
@@ -83,7 +80,9 @@ class _AsyncAccessor(_NormalAccessor):
     async for entry in scandir_async(*args, **kwargs):
       yield entry
 
-  expanduser = staticmethod(func_as_corofunc(os.path.expanduser))
+  expanduser = staticmethod(
+    func_to_async_func(os.path.expanduser)
+  )
 
 
 _async_accessor = _AsyncAccessor()

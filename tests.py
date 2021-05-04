@@ -57,7 +57,7 @@ async def _test_is(
   path: Path,
   apath: AsyncPath,
   exists: bool = True,
-  resolve: bool = True,
+  resolve: bool = False,
   test_parent: bool = True,
 ):
   _test_is_pure(path, apath)
