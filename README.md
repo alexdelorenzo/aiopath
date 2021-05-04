@@ -36,7 +36,7 @@ async def main():
   ]
 
   scrapers = (
-    save_page(url, f"{index}.html")
+    save_page(url, f'{index}.html')
     for index, url in enumerate(urls)
   )
   
@@ -99,7 +99,7 @@ async with NamedTemporaryFile() as temp:
   assert path.as_uri() == apath.as_uri()
 
   # read and write text
-  text: str = "example"
+  text: str = 'example'
   await apath.write_text(text)
   assert await apath.read_text() == text
 
