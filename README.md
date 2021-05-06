@@ -166,12 +166,12 @@ async with NamedTemporaryFile() as temp:
 
   async with path.open(mode='w') as file:
     await file.write(text)
-  
+
   async with path.open(mode='r') as file:
     result: str = await file.read()
 
   assert result == text
-  
+
 # or you can use the read/write convenience methods
 async with NamedTemporaryFile() as temp:
   path = AsyncPath(temp.name)
@@ -179,7 +179,7 @@ async with NamedTemporaryFile() as temp:
   await path.write_text(text)
   result: str = await path.read_text()
   assert result == text
-  
+
   content: bytes = text.encode()
 
   await path.write_bytes(content)
@@ -191,7 +191,6 @@ async with NamedTemporaryFile() as temp:
 `aiopath` implements [`pathlib` globbing](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) using async I/O and async generators.
 
 ```python3
-from typing import List
 from aiopath import AsyncPath
 
 
@@ -205,7 +204,7 @@ downloads: AsyncPath = home / 'Downloads'
 
 if await downloads.exists():
   # this might take a while
-  paths: List[AsyncPath] = \
+  paths: list[AsyncPath] = \
     [path async for path in downloads.glob('**/*')]
 ```
 
