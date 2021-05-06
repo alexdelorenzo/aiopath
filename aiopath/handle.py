@@ -23,7 +23,6 @@ ERRORS: Final[str] = 'replace'
 
 
 Paths = Union['AsyncPath', Path, str]
-Handle = TextFileWrapper | BinaryFileWrapper
 FileData = bytes | str
 
 
@@ -104,6 +103,9 @@ class IterableAIOFile(AIOFile):
     self._set_offset(offset, data)
 
 
+Handle = TextFileWrapper | BinaryFileWrapper | IterableAIOFile
+
+
 async def read_lines(
   path: Paths,
   line_sep: str = SEP,
@@ -175,7 +177,9 @@ def get_handle(
     newline=newline,
   )
 
-  if 'b' in mode:
-    return BinaryFileWrapper(file)
+  return file
 
-  return TextFileWrapper(file)
+  #if 'b' in mode:
+    #return BinaryFileWrapper(file)
+
+  #return TextFileWrapper(file)
