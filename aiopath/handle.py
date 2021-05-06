@@ -1,13 +1,14 @@
 from __future__ import annotations
 from typing import AsyncIterable, Union, \
-  TYPE_CHECKING, cast
+  TYPE_CHECKING, cast, Final
 from inspect import iscoroutinefunction
 from pathlib import Path
 import io
 
-from aiofile import AIOFile, LineReader
+from aiofile import AIOFile, LineReader, \
+  TextFileWrapper, BinaryFileWrapper
 
-from .types import Final
+from .types import FileMode
 
 if TYPE_CHECKING:  # keep mypy quiet
   from .path import AsyncPath
@@ -22,6 +23,7 @@ ERRORS: Final[str] = 'replace'
 
 
 Paths = Union['AsyncPath', Path, str]
+Handle = TextFileWrapper | BinaryFileWrapper
 FileData = bytes | str
 
 
@@ -102,7 +104,6 @@ class IterableAIOFile(AIOFile):
     self._set_offset(offset, data)
 
 
-
 async def read_lines(
   path: Paths,
   line_sep: str = SEP,
@@ -111,7 +112,7 @@ async def read_lines(
   encoding: str = ENCODING,
   errors: str = ERRORS,
   **kwargs
-) -> AsyncIterable[str]: 
+) -> AsyncIterable[str]:
   if hasattr(path, 'resolve'):
     if iscoroutinefunction(path.resolve):
       path = str(await path.resolve())
@@ -156,3 +157,25 @@ async def read_full_file(
       string.write(line)
 
     return string.getvalue()
+
+
+def get_handle(
+  name: str,
+  mode: FileMode = 'r',
+  buffering: int = -1,
+  encoding: str | None = ENCODING,
+  errors: str | None = ERRORS,
+  newline: str | None = SEP,
+) -> Handle:
+  file = IterableAIOFile(
+    name,
+    mode,
+    encoding=encoding,
+    errors=errors,
+    newline=newline,
+  )
+
+  if 'b' in mode:
+    return BinaryFileWrapper(file)
+
+  return TextFileWrapper(file)

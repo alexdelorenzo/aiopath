@@ -7,11 +7,12 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
 import os
 
 from aiofiles import os as async_os
+from aiofile import TextFileWrapper, BinaryFileWrapper
 
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import to_async_method, to_thread, func_to_async_func
-from .handle import IterableAIOFile
+from .handle import IterableAIOFile, get_handle, Handle
 from .scandir import EntryWrapper, scandir_async
 from .types import FileMode
 
@@ -152,13 +153,14 @@ class AsyncPath(Path, AsyncPurePath):
     encoding: str | None = DEFAULT_ENCODING,
     errors: str | None = ON_ERRORS,
     newline: str | None = NEWLINE,
-  ) -> IterableAIOFile:
-    return IterableAIOFile(
-      self._path,
+  ) -> Handle:
+    return get_handle(
+      str(self),
       mode,
-      encoding=encoding,
-      errors=errors,
-      newline=newline,
+      buffering,
+      encoding,
+      errors,
+      newline
     )
 
   async def read_text(
@@ -167,7 +169,7 @@ class AsyncPath(Path, AsyncPurePath):
     errors: str | None = ON_ERRORS
   ) -> str:
     async with self.open('r', encoding=encoding, errors=errors) as file:
-      return await file.read_text()
+      return await file.read()
 
   async def read_bytes(self) -> bytes:
     async with self.open('rb') as file:
