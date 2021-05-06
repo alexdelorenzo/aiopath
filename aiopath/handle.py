@@ -22,6 +22,7 @@ ERRORS: Final[str] = 'replace'
 
 
 Paths = Union['AsyncPath', Path, str]
+FileData = Union[bytes, str]
 
 
 class IterableAIOFile(AIOFile):
@@ -36,6 +37,8 @@ class IterableAIOFile(AIOFile):
     self._errors: Optional[str] = errors
     self._newline: Optional[str] = newline
 
+    self._offset: int = 0
+
   def __aiter__(self) -> AsyncIterable[str]:
     encoding, errors, line_sep = self._get_options()
 
@@ -45,6 +48,9 @@ class IterableAIOFile(AIOFile):
       encoding=encoding,
       errors=errors,
     )
+
+  def _set_offset(self, offset: int, data: FileData):
+    self._offset = offset + len(data)
 
   def _get_options(
     self,
@@ -70,6 +76,30 @@ class IterableAIOFile(AIOFile):
       encoding=encoding,
       errors=errors
     )
+
+  async def read(
+    self,
+    size: int = -1,
+    offset: Optional[int] = None
+  ) -> FileData:
+    if offset is None:
+      offset = self._offset
+
+    data: FileData = await super().read(size, offset)
+    self._set_offset(offset, data)
+
+    return data
+
+  async def write(
+    self,
+    data: FileData,
+    offset: Optional[int] = None
+  ):
+    if offset is None:
+      offset = self._offset
+
+    await super().write(data, offset)
+    self._set_offset(offset, data)
 
 
 async def read_lines(
