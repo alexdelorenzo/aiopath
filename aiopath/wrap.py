@@ -1,9 +1,8 @@
 from types import MethodType, FunctionType, BuiltinFunctionType, BuiltinMethodType
 from typing import Callable, Any, Awaitable, Protocol
-from inspect import ismethod, isfunction, iscoroutinefunction
-from functools import wraps, partial
+from inspect import iscoroutinefunction
+from functools import wraps
 from asyncio import to_thread
-import contextvars
 
 from aiofiles.os import \
   wrap as method_to_async_method, \
@@ -41,10 +40,10 @@ def to_async_method(func: Callable) -> CoroutineMethod:
     return coro_to_async_method(func)
 
   match func:
-    case FunctionType() | BuiltinFunctionType() | BuiltinMethodType() | CallableObj():
+    case FunctionType() | BuiltinFunctionType() | CallableObj():
       return func_to_async_method(func)
 
-    case MethodType():
+    case MethodType() | BuiltinMethodType():
       return method_to_async_method(func)
 
   raise TypeError(f'{type(func).__name__} is not a callable.')
