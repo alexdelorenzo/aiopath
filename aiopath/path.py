@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
 from typing import AsyncIterable, Final
@@ -6,13 +7,10 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
 
-from aiofiles import os as async_os
-from aiofile import TextFileWrapper, BinaryFileWrapper
-
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import to_async_method, to_thread, func_to_async_func
-from .handle import IterableAIOFile, get_handle, Handle
+from .handle import get_handle, Handle
 from .scandir import EntryWrapper, scandir_async
 from .types import FileMode
 
@@ -25,12 +23,12 @@ NEWLINE: Final[str] = '\n'
 Paths = Path | PathLike | str
 
 
-getcwd = func_to_async_func(os.getcwd)
+getcwd = os.getcwd
 close = func_to_async_func(os.close)
 
 
 class _AsyncAccessor(_NormalAccessor):
-  stat = to_async_method(async_os.stat)
+  stat = to_async_method(os.stat)
   lstat = to_async_method(os.lstat)
   open = to_async_method(os.open)
   listdir = to_async_method(os.listdir)
@@ -39,14 +37,14 @@ class _AsyncAccessor(_NormalAccessor):
   if hasattr(_NormalAccessor, 'lchmod'):
     lchmod = to_async_method(_NormalAccessor.lchmod)
 
-  mkdir = to_async_method(async_os.mkdir)
+  mkdir = to_async_method(os.mkdir)
   unlink = to_async_method(os.unlink)
 
   if hasattr(_NormalAccessor, 'link'):
     link = to_async_method(_NormalAccessor.link)
 
-  rmdir = to_async_method(async_os.rmdir)
-  rename = to_async_method(async_os.rename)
+  rmdir = to_async_method(os.rmdir)
+  rename = to_async_method(os.rename)
   replace = to_async_method(os.replace)
 
   symlink = staticmethod(
@@ -55,7 +53,7 @@ class _AsyncAccessor(_NormalAccessor):
 
   utime = to_async_method(os.utime)
   readlink = to_async_method(_NormalAccessor.readlink)
-  remove = to_async_method(async_os.remove)
+  remove = to_async_method(os.remove)
 
   async def owner(self, path: str) -> str:
     try:
@@ -358,11 +356,11 @@ class AsyncPath(Path, AsyncPurePath):
     return True
 
   @classmethod
-  async def cwd(cls: type) -> AsyncPath:
+  def cwd(cls: type) -> AsyncPath:
     """Return a new path pointing to the current working directory
     (as returned by os.getcwd()).
     """
-    cwd: str = await getcwd()
+    cwd = getcwd()
     return cls(cwd)
 
   @classmethod
@@ -457,7 +455,8 @@ class AsyncPath(Path, AsyncPurePath):
         return self
     # FIXME this must defer to the specific flavour (and, under Windows,
     # use nt._getfullpathname())
-    obj = self._from_parts([await getcwd()] + self._parts, init=False)
+    parts: list[str] = [getcwd()] + self._parts
+    obj = self._from_parts(parts, init=False)
     obj._init(template=self)
     return obj
 

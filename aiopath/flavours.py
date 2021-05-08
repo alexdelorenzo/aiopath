@@ -4,8 +4,6 @@ from typing import Callable, Awaitable, TYPE_CHECKING
 from errno import EINVAL
 import os
 
-from aiofiles.os import wrap as wrap_async
-
 try:
   from pathlib import _getfinalpathname
   _getfinalpathname = wrap_async(_getfinalpathname)
@@ -18,7 +16,7 @@ if TYPE_CHECKING:  # keep mypy quiet
   from .path import AsyncPath
 
 
-getcwd: Callable[[], Awaitable[str]] = wrap_async(os.getcwd)
+getcwd = os.getcwd
 
 
 class _AsyncPosixFlavour(_PosixFlavour):
@@ -86,7 +84,7 @@ class _AsyncPosixFlavour(_PosixFlavour):
       return path
     # NOTE: according to POSIX, getcwd() cannot contain path components
     # which are symlinks.
-    base = '' if path.is_absolute() else await getcwd()
+    base = '' if path.is_absolute() else getcwd()
     result = await _resolve(base, str(path))
     return result or sep
 
@@ -107,7 +105,7 @@ class _AsyncWindowsFlavour(_WindowsFlavour):
     s = str(path)
 
     if not s:
-      return await getcwd()
+      return getcwd()
 
     previous_s: str | None = None
 

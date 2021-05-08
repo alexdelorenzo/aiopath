@@ -1,12 +1,13 @@
 from __future__ import annotations
-from typing import AsyncIterable, Union, \
-  TYPE_CHECKING, cast, Final
+from typing import AsyncIterable, Union, IO, \
+  TYPE_CHECKING, cast, Final, TextIO, BinaryIO
 from inspect import iscoroutinefunction
 from pathlib import Path
 import io
 
 from aiofile import AIOFile, LineReader, \
   TextFileWrapper, BinaryFileWrapper
+from anyio import AsyncFile, open_file
 
 from .types import FileMode
 
@@ -26,7 +27,46 @@ Paths = Union['AsyncPath', Path, str]
 FileData = bytes | str
 
 
-class IterableAIOFile(AIOFile):
+class FileLike(IO):
+  is_binary: bool
+
+  #@staticmethod
+  #def get_mode(fm: FileMode) -> str:
+    #mode: str = ''
+
+    #if fm.readable:
+      #mode += 'r'
+
+    #if fm.writable:
+      #mode += 'w'
+
+    #if fm.binary:
+      #mode += 'b'
+
+    #else:
+      #mode += 't'
+
+    #if fm.appending:
+      #mode += 'a'
+
+    #if fm.created:
+      #mode += 'x'
+
+    #if fm.plus:
+      #mode += '+'
+
+    #return mode
+
+
+class TextFile(FileLike, TextIO):
+  pass
+
+
+class BinaryFile(FileLike, BinaryIO):
+  pass
+
+
+class IterableAIOFile(FileLike, AIOFile):
   def __init__(
     self,
     *args,
@@ -39,6 +79,7 @@ class IterableAIOFile(AIOFile):
     self._newline: str | None = newline
 
     self._offset: int = 0
+    self._mode: str = self.__open_mode
 
   def __aiter__(self) -> AsyncIterable[str]:
     encoding, errors, line_sep = self._get_options()
@@ -169,7 +210,7 @@ def get_handle(
   errors: str | None = ERRORS,
   newline: str | None = SEP,
 ) -> Handle:
-  file = IterableAIOFile(
+  file = open_file(
     name,
     mode,
     encoding=encoding,
