@@ -221,7 +221,7 @@ async def get_handle(
     file = await open_file(
       name,
       mode,
-      encoding=None,
+      encoding=encoding,
       errors=errors,
       newline=newline,
     )
