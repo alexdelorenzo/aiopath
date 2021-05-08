@@ -1,7 +1,9 @@
 from __future__ import annotations
 from typing import AsyncIterable, Union, IO, \
-  TYPE_CHECKING, cast, Final, TextIO, BinaryIO
+  TYPE_CHECKING, cast, Final, TextIO, BinaryIO, \
+  AsyncContextManager
 from inspect import iscoroutinefunction
+from contextlib import asynccontextmanager
 from pathlib import Path
 import io
 
@@ -203,25 +205,28 @@ async def read_full_file(
     return string.getvalue()
 
 
-def get_handle(
+@asynccontextmanager
+async def get_handle(
   name: str,
   mode: FileMode = 'r',
   buffering: int = -1,
   encoding: str | None = ENCODING,
   errors: str | None = ERRORS,
   newline: str | None = SEP,
-) -> Handle:
-  file = open_file(
-    name,
-    mode,
-    encoding=encoding,
-    errors=errors,
-    newline=newline,
-  )
+) -> AsyncContextManager[Handle]:
+  if 'b' in mode.lower():
+    file = await open_file(name, mode)
 
-  return file
+  else:
+    file = await open_file(
+      name,
+      mode,
+      encoding=None,
+      errors=errors,
+      newline=newline,
+    )
 
-  #if 'b' in mode:
-    #return BinaryFileWrapper(file)
+  yield file
 
-  #return TextFileWrapper(file)
+  #await file.aclose()
+
