@@ -4,10 +4,8 @@ from typing import Callable, Any, Awaitable, \
   Protocol
 from inspect import iscoroutinefunction
 from functools import wraps
-from asyncio import to_thread
 
-from anyio import from_thread, \
-  to_thread as anyio_to_thread
+from anyio.to_thread import run_sync
 
 
 CoroutineResult = Awaitable[Any]
@@ -23,18 +21,19 @@ class CallableObj(Protocol):
 def func_to_async_func(func: Callable) -> CoroutineFunction:
   @wraps(func)
   async def new_func(*args, **kwargs) -> Any:
-    return await anyio_to_thread.run_sync(func, *args, **kwargs)
+    return await run_sync(func, *args, **kwargs)
 
   return new_func
 
 
 method_to_async_method = func_to_async_func
+to_thread = func_to_async_func
 
 
 def func_to_async_method(func: Callable) -> CoroutineMethod:
   @wraps(func)
   async def method(self, *args, **kwargs) -> Any:
-    return await anyio_to_thread.run_sync(func, *args, **kwargs)
+    return await run_sync(func, *args, **kwargs)
 
   return method
 
