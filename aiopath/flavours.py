@@ -22,13 +22,6 @@ getcwd = os.getcwd
 
 
 class _AsyncPosixFlavour(_PosixFlavour):
-  async def gethomedir(self, username: str) -> str:
-    gethomedir: Callable[[str], Awaitable[str]] = func_to_async_func(
-      super().gethomedir
-    )
-
-    return await gethomedir(username)
-
   async def resolve(
     self,
     path: AsyncPath,
@@ -92,13 +85,6 @@ class _AsyncPosixFlavour(_PosixFlavour):
 
 
 class _AsyncWindowsFlavour(_WindowsFlavour):
-  async def gethomedir(self, username: str) -> str:
-    gethomedir: Callable[[str], Awaitable[str]] = func_to_async_func(
-      super().gethomedir
-    )
-
-    return await gethomedir(username)
-
   async def resolve(
     self,
     path: 'AsyncPath',
@@ -115,7 +101,7 @@ class _AsyncWindowsFlavour(_WindowsFlavour):
       if strict:
         return self._ext_to_normal(await _getfinalpathname(s))
       else:
-        tail_parts: List[str] = []  # End of the path after the first one not found
+        tail_parts: list[str] = []  # End of the path after the first one not found
         while True:
           try:
             s = self._ext_to_normal(await _getfinalpathname(s))
