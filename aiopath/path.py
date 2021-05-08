@@ -7,6 +7,8 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
 
+from anyio import open_file
+
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread, \
@@ -144,7 +146,7 @@ class AsyncPath(Path, AsyncPurePath):
     errors: Optional[str] = ON_ERRORS,
     newline: Optional[str] = NEWLINE,
   ) -> IterableAIOFile:
-    return IterableAIOFile(
+    return open_file(
       self._path,
       mode,
       encoding=encoding,
