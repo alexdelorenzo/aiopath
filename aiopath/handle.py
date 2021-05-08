@@ -32,33 +32,6 @@ FileData = bytes | str
 class FileLike(IO):
   is_binary: bool
 
-  #@staticmethod
-  #def get_mode(fm: FileMode) -> str:
-    #mode: str = ''
-
-    #if fm.readable:
-      #mode += 'r'
-
-    #if fm.writable:
-      #mode += 'w'
-
-    #if fm.binary:
-      #mode += 'b'
-
-    #else:
-      #mode += 't'
-
-    #if fm.appending:
-      #mode += 'a'
-
-    #if fm.created:
-      #mode += 'x'
-
-    #if fm.plus:
-      #mode += '+'
-
-    #return mode
-
 
 class TextFile(FileLike, TextIO):
   pass
@@ -214,7 +187,7 @@ async def get_handle(
   errors: str | None = ERRORS,
   newline: str | None = SEP,
 ) -> AsyncContextManager[Handle]:
-  if 'b' in mode.lower():
+  if 'b' in mode:
     file = await open_file(name, mode)
 
   else:
