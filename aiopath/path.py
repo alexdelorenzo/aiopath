@@ -8,12 +8,11 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
 import os
 
 from aiofiles import os as async_os
-from aiofiles.os import wrap as method_as_method_coro, \
-  wrap as func_as_corofunc
 
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
-from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
+from .wrap import coro_as_method_coro, func_as_method_coro, to_thread, \
+  method_as_method_coro, func_to_async_func
 from .handle import IterableAIOFile
 from .scandir import EntryWrapper, scandir_async
 from .types import Final, Literal, FileMode
@@ -27,8 +26,8 @@ NEWLINE: Final[str] = '\n'
 Paths = Union[Path, PathLike, str]
 
 
-getcwd = func_as_corofunc(os.getcwd)
-close = func_as_corofunc(os.close)
+getcwd = func_to_async_func(os.getcwd)
+close = func_to_async_func(os.close)
 
 
 class _AsyncAccessor(_NormalAccessor):

@@ -4,22 +4,23 @@ from aiofiles.os import wrap as method_as_method_coro, \
 from functools import wraps, partial
 import contextvars
 
-try:
-  from asyncio import to_thread
-
-except ImportError:
-  from asyncio import get_running_loop
-
-  async def to_thread(func: Callable, *args, **kwargs) -> Any:
-    loop = get_running_loop()
-    ctx = contextvars.copy_context()
-    func_call = partial(ctx.run, func, *args, **kwargs)
-    return await loop.run_in_executor(None, func_call)
+from anyio.to_thread import run_sync as to_thread
 
 
 CoroutineResult = Awaitable[Any]
 CoroutineFunction = Callable[..., CoroutineResult]
 CoroutineMethod = Callable[..., CoroutineResult]
+
+
+def func_to_async_func(func: Callable) -> CoroutineFunction:
+  @wraps(func)
+  async def new_func(*args, **kwargs) -> Any:
+    return await to_thread(func, *args, **kwargs)
+
+  return new_func
+
+
+method_as_method_coro = func_to_async_func
 
 
 def func_as_method_coro(func: Callable) -> CoroutineMethod:
