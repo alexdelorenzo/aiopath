@@ -1,12 +1,14 @@
 from __future__ import annotations
-from pathlib import _PosixFlavour, _WindowsFlavour, PurePath
+from pathlib import _PosixFlavour, _WindowsFlavour
 from typing import Callable, Awaitable, TYPE_CHECKING
 from errno import EINVAL
 import os
 
+from .wrap import func_to_async_func
+
 try:
   from pathlib import _getfinalpathname
-  _getfinalpathname = wrap_async(_getfinalpathname)
+  _getfinalpathname = func_to_async_func(_getfinalpathname)
 
 except ImportError:
   async def _getfinalpathname(*args, **kwargs):
@@ -21,7 +23,7 @@ getcwd = os.getcwd
 
 class _AsyncPosixFlavour(_PosixFlavour):
   async def gethomedir(self, username: str) -> str:
-    gethomedir: Callable[[str], Awaitable[str]] = wrap_async(
+    gethomedir: Callable[[str], Awaitable[str]] = func_to_async_func(
       super().gethomedir
     )
 
@@ -91,7 +93,7 @@ class _AsyncPosixFlavour(_PosixFlavour):
 
 class _AsyncWindowsFlavour(_WindowsFlavour):
   async def gethomedir(self, username: str) -> str:
-    gethomedir: Callable[[str], Awaitable[str]] = wrap_async(
+    gethomedir: Callable[[str], Awaitable[str]] = func_to_async_func(
       super().gethomedir
     )
 

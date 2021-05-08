@@ -144,7 +144,8 @@ class IterableAIOFile(FileLike, AIOFile):
     self._set_offset(offset, data)
 
 
-Handle = TextFileWrapper | BinaryFileWrapper | IterableAIOFile
+Handle = \
+  TextFileWrapper | BinaryFileWrapper | IterableAIOFile | AsyncFile
 
 
 async def read_lines(
