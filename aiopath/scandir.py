@@ -1,15 +1,7 @@
-from typing import Callable, Awaitable, AsyncIterable, Iterable, \
-  Any, List
+from typing import AsyncIterable, Iterable, Any, List
 from os import scandir, DirEntry, stat_result
-from dataclasses import dataclass
 
-from .wrap import to_thread
-
-try:
-  from asyncio import to_thread
-
-except ImportError:
-  pass
+from .wrap import func_to_async_func as to_thread
 
 
 class EntryWrapper:

@@ -1,8 +1,5 @@
 from typing import Callable, Any, Awaitable
-from aiofiles.os import wrap as method_as_method_coro, \
-  wrap as func_as_corofunc
-from functools import wraps, partial
-import contextvars
+from functools import wraps
 
 from anyio.to_thread import run_sync as to_thread
 

@@ -7,8 +7,6 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
 
-from aiofiles import os as async_os
-
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread, \
@@ -26,12 +24,11 @@ NEWLINE: Final[str] = '\n'
 Paths = Union[Path, PathLike, str]
 
 
-getcwd = func_to_async_func(os.getcwd)
 close = func_to_async_func(os.close)
 
 
 class _AsyncAccessor(_NormalAccessor):
-  stat = coro_as_method_coro(async_os.stat)
+  stat = func_as_method_coro(os.stat)
   lstat = func_as_method_coro(os.lstat)
   open = func_as_method_coro(os.open)
   listdir = func_as_method_coro(os.listdir)
@@ -40,14 +37,14 @@ class _AsyncAccessor(_NormalAccessor):
   if hasattr(_NormalAccessor, 'lchmod'):
     lchmod = method_as_method_coro(_NormalAccessor.lchmod)
 
-  mkdir = coro_as_method_coro(async_os.mkdir)
+  mkdir = func_as_method_coro(os.mkdir)
   unlink = func_as_method_coro(os.unlink)
 
   if hasattr(_NormalAccessor, 'link'):
     link = method_as_method_coro(_NormalAccessor.link)
 
-  rmdir = coro_as_method_coro(async_os.rmdir)
-  rename = coro_as_method_coro(async_os.rename)
+  rmdir = func_as_method_coro(os.rmdir)
+  rename = func_as_method_coro(os.rename)
   replace = func_as_method_coro(os.replace)
 
   symlink = staticmethod(
@@ -56,7 +53,7 @@ class _AsyncAccessor(_NormalAccessor):
 
   utime = func_as_method_coro(os.utime)
   readlink = method_as_method_coro(_NormalAccessor.readlink)
-  remove = coro_as_method_coro(async_os.remove)
+  remove = func_as_method_coro(os.remove)
 
   async def owner(self, path: str) -> str:
     try:
@@ -372,11 +369,11 @@ class AsyncPath(Path, AsyncPurePath):
       #return False
 
   @classmethod
-  async def cwd(cls: type) -> str:
+  def cwd(cls: type) -> str:
     """Return a new path pointing to the current working directory
     (as returned by os.getcwd()).
     """
-    cwd: str = await getcwd()
+    cwd: str = os.getcwd()
     return cls(cwd)
 
   @classmethod
@@ -463,7 +460,7 @@ class AsyncPath(Path, AsyncPurePath):
     async for p in selector.select_from(self):
       yield p
 
-  async def absolute(self) -> AsyncPath:
+  def absolute(self) -> AsyncPath:
     """Return an absolute version of this path.  This function works
     even if the path doesn't point to anything.
     No normalization is done, i.e. all '.' and '..' will be kept along.
@@ -474,7 +471,7 @@ class AsyncPath(Path, AsyncPurePath):
         return self
     # FIXME this must defer to the specific flavour (and, under Windows,
     # use nt._getfullpathname())
-    obj = self._from_parts([await getcwd()] + self._parts, init=False)
+    obj = self._from_parts([os.getcwd()] + self._parts, init=False)
     obj._init(template=self)
     return obj
 
