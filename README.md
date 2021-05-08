@@ -1,5 +1,5 @@
 # 📁 Async pathlib for Python
-`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that's compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). 
+`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that's compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html), [`trio`](https://github.com/python-trio/trio), and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). 
 
 All I/O performed by `aiopath` is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
 
@@ -16,7 +16,7 @@ from aiopath import AsyncPath
 
 async def save_page(url: str, name: str):
   path = AsyncPath(name)
-  
+
   if await path.exists():
     return
 
@@ -39,7 +39,7 @@ async def main():
     save_page(url, f'{index}.html')
     for index, url in enumerate(urls)
   )
-  
+
   await gather(*scrapers)
 
 
