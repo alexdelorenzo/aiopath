@@ -232,10 +232,14 @@ $ python3 -m pip install aiopath
 `aiopath` for Python 3.10 and newer is available on PyPI under versions `0.6.x` and higher.
 
 ## GitHub
+Download a release archive for your Python version from [the releases page](https://github.com/alexdelorenzo/aiopath/releases).
+
+Then to install, run:
 ```bash
 $ python3 -m pip install -r requirements.txt
 $ python3 setup.py install
 ```
+
 #### Python 3.9 and older
 `aiopath` for Python 3.9 and older is developed on the [Python-3.9 branch](https://github.com/alexdelorenzo/aiopath/tree/Python-3.9).
 
