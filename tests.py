@@ -1,5 +1,4 @@
 #!/usr/bin/env pytest
-from typing import Tuple, Union
 from pathlib import Path
 import asyncio
 
@@ -14,10 +13,10 @@ TEST_NAME: str = 'TEST'
 TEST_SUFFIX: str = f'.{TEST_NAME}'
 
 
-Paths = Union[Path, AsyncPath, str]
+Paths = Path | AsyncPath | str
 
 
-def get_paths(path: Paths) -> Tuple[Path, AsyncPath]:
+def get_paths(path: Paths) -> tuple[Path, AsyncPath]:
   return Path(path), AsyncPath(path)
 
 

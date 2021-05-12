@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import AsyncIterable, Union, \
-  TYPE_CHECKING, Optional, cast, Tuple
+  TYPE_CHECKING, cast
 from inspect import iscoroutinefunction
 from pathlib import Path
 import io
@@ -28,13 +28,13 @@ class IterableAIOFile(AIOFile):
   def __init__(
     self,
     *args,
-    errors: Optional[str] = ERRORS,
-    newline: Optional[str] = SEP,
+    errors: str | None = ERRORS,
+    newline: str | None = SEP,
     **kwargs
   ):
     super().__init__(*args, **kwargs)
-    self._errors: Optional[str] = errors
-    self._newline: Optional[str] = newline
+    self._errors: str | None = errors
+    self._newline: str | None = newline
 
   def __aiter__(self) -> AsyncIterable[str]:
     encoding, errors, line_sep = self._get_options()
@@ -48,9 +48,9 @@ class IterableAIOFile(AIOFile):
 
   def _get_options(
     self,
-    encoding: Optional[str] = None,
-    errors: Optional[str] = None
-  ) -> Tuple[str, str, str]:
+    encoding: str | None = None,
+    errors: str | None = None
+  ) -> tuple[str, str, str]:
     encoding = encoding or self.encoding or ENCODING
     errors = errors or self._errors or ERRORS
     line_sep: str = self._newline or SEP
@@ -59,8 +59,8 @@ class IterableAIOFile(AIOFile):
 
   async def read_text(
     self,
-    encoding: Optional[str] = None,
-    errors: Optional[str] = None
+    encoding: str | None = None,
+    errors: str | None = None
   ) -> str:
     encoding, errors, line_sep = self._get_options(encoding, errors)
 
@@ -98,16 +98,7 @@ async def read_lines(
       offset=offset
     )
 
-#    Python 3.8+
-#    while line := await reader.readline()
-#      yield line.decode(encoding, errors=errors)
-
-    while True:
-      line: bytes = await reader.readline()
-
-      if not line:
-        break
-
+    while line := await reader.readline():
       yield line.decode(encoding, errors=errors)
 
 

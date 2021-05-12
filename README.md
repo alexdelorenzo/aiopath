@@ -8,7 +8,6 @@ If you're writing asynchronous Python code and want to take advantage of `pathli
 
 For example, if you're writing an asynchronous [web scraping](https://en.wikipedia.org/wiki/Web_scraping) script, you might want to make several concurrent requests to websites and write the content in the responses to secondary storage:
 ```python3
-from typing import List, Iterable, Coroutine
 from asyncio import run, gather
 
 from aiohttp import ClientSession
@@ -29,14 +28,14 @@ async def save_page(url: str, name: str):
 
 
 async def main():
-  urls: List[str] = [
+  urls = [
     'https://example.com',
     'https://github.com/alexdelorenzo/aiopath',
     'https://alexdelorenzo.dev',
     'https://dupebot.firstbyte.dev'
   ]
 
-  scrapers: Iterable[Coroutine] = (
+  scrapers = (
     save_page(url, f"{index}.html")
     for index, url in enumerate(urls)
   )
@@ -65,7 +64,7 @@ To run the following examples with top-level `await` expressions, [launch an asy
 
 You'll also need to install `asynctempfile` via PyPI, like so `python3 -m pip install asynctempfile`.
 
-## Basic
+## Replacing `pathlib`
 All of `pathlib.Path`'s methods that perform synchronous I/O are reimplemented as asynchronous methods. `PurePath` methods are not asynchronous because they don't perform I/O.
 
 ```python3
@@ -128,6 +127,26 @@ assert str(home) == str(ahome) == str(path)
 # but AsyncPath and Path objects are not equivalent
 assert not home == ahome
 ```
+
+`AsyncPath` is a subclass of `Path` and `PurePath`, and a subclass of `AsyncPurePath`:
+```python3
+from pathlib import Path, PurePath
+from aiopath import AsyncPath, AsyncPurePath
+
+
+assert issubclass(AsyncPath, Path)
+assert issubclass(AsyncPath, PurePath)
+assert issubclass(AsyncPath, AsyncPurePath)
+assert issubclass(AsyncPurePath, PurePath)
+
+path: AsyncPath = await AsyncPath.home()
+
+assert isinstance(path, Path)
+assert isinstance(path, PurePath)
+assert isinstance(path, AsyncPurePath) 
+```
+
+Check out [`tests.py`](https://github.com/alexdelorenzo/aiopath/blob/main/tests.py#L24) for more examples of how `aiopath` compares to `pathlib`.
 
 ## Opening a file
 You can get an asynchronous [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers). 

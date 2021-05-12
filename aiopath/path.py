@@ -1,7 +1,6 @@
-from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
-from typing import Optional, List, Union, AsyncIterable
+from typing import AsyncIterable, Final
 from os import stat_result, PathLike
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
@@ -16,7 +15,7 @@ from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
 from .handle import IterableAIOFile
 from .scandir import EntryWrapper, scandir_async
-from .types import Final, Literal, FileMode
+from .types import FileMode
 
 
 DEFAULT_ENCODING: Final[str] = 'utf-8'
@@ -24,7 +23,7 @@ ON_ERRORS: Final[str] = 'ignore'
 NEWLINE: Final[str] = '\n'
 
 
-Paths = Union[Path, PathLike, str]
+Paths = Path | PathLike | str
 
 
 getcwd = func_as_corofunc(os.getcwd)
@@ -90,16 +89,16 @@ _async_accessor = _AsyncAccessor()
 
 
 class AsyncPurePath(PurePath):
-  def _init(self, template: Optional[PurePath] = None):
+  def _init(self, template: PurePath | None = None):
     self._accessor = _async_accessor
 
-  def __new__(cls, *args):
+  def __new__(cls: type, *args):
     if cls is AsyncPurePath:
-      cls = PureAsyncWindowsPath if os.name == 'nt' else PureAsyncPosixPath
+      cls = AsyncPureWindowsPath if os.name == 'nt' else AsyncPurePosixPath
     return cls._from_parts(args)
 
 
-class PureAsyncPosixPath(AsyncPurePath):
+class AsyncPurePosixPath(AsyncPurePath):
   """PurePath subclass for non-Windows systems.
   On a POSIX system, instantiating a PurePath should return this object.
   However, you can also instantiate it directly on any system.
@@ -108,7 +107,7 @@ class PureAsyncPosixPath(AsyncPurePath):
   __slots__ = ()
 
 
-class PureAsyncWindowsPath(AsyncPurePath):
+class AsyncPureWindowsPath(AsyncPurePath):
   """PurePath subclass for Windows systems.
   On a Windows system, instantiating a PurePath should return this object.
   However, you can also instantiate it directly on any system.
@@ -122,10 +121,10 @@ class AsyncPath(Path, AsyncPurePath):
     _async_windows_flavour if os.name == 'nt' else _async_posix_flavour
   _accessor = _async_accessor
 
-  def _init(self, template: Optional[AsyncPath] = None):
+  def _init(self, template: AsyncPath | None = None):
     self._accessor = _async_accessor
 
-  def __new__(cls, *args, **kwargs):
+  def __new__(cls: type, *args, **kwargs):
     if cls is AsyncPath:
       cls = AsyncWindowsPath if os.name == 'nt' else AsyncPosixPath
 
@@ -150,9 +149,9 @@ class AsyncPath(Path, AsyncPurePath):
     self,
     mode: FileMode = 'r',
     buffering: int = -1,
-    encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[str] = ON_ERRORS,
-    newline: Optional[str] = NEWLINE,
+    encoding: str | None = DEFAULT_ENCODING,
+    errors: str | None = ON_ERRORS,
+    newline: str | None = NEWLINE,
   ) -> IterableAIOFile:
     return IterableAIOFile(
       self._path,
@@ -164,20 +163,11 @@ class AsyncPath(Path, AsyncPurePath):
 
   async def read_text(
     self,
-    encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[str] = ON_ERRORS
+    encoding: str | None = DEFAULT_ENCODING,
+    errors: str | None = ON_ERRORS
   ) -> str:
-
     async with self.open('r', encoding=encoding, errors=errors) as file:
-      return await file.read_text(encoding=encoding, errors=errors)
-
-    #path = str(await self.resolve())
-
-    #return await read_full_file(
-      #path,
-      #encoding=encoding,
-      #errors=errors
-    #)
+      return await file.read_text()
 
   async def read_bytes(self) -> bytes:
     async with self.open('rb') as file:
@@ -196,9 +186,9 @@ class AsyncPath(Path, AsyncPurePath):
   async def write_text(
     self,
     data: str,
-    encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[str] = ON_ERRORS,
-    newline: Optional[str] = NEWLINE
+    encoding: str | None = DEFAULT_ENCODING,
+    errors: str | None = ON_ERRORS,
+    newline: str | None = NEWLINE
   ) -> int:
     """
     Open the file in text mode, write to it, and close the file.
@@ -317,7 +307,7 @@ class AsyncPath(Path, AsyncPurePath):
     """
     await self._accessor.link_to(self, target)
 
-  async def rename(self, target: Union[str, AsyncPath]) -> AsyncPath:
+  async def rename(self, target: str | AsyncPath) -> AsyncPath:
     """
     Rename this path to the target path.
     The target path may be absolute or relative. Relative paths are
@@ -365,21 +355,8 @@ class AsyncPath(Path, AsyncPurePath):
 
     return True
 
-  #async def exists(self) -> bool:
-    #try:
-      #async with async_open(self._path, 'rb'):
-        #pass
-
-      #return True
-
-    #except IsADirectoryError:
-      #return True
-
-    #except FileNotFoundError:
-      #return False
-
   @classmethod
-  async def cwd(cls: type) -> str:
+  async def cwd(cls: type) -> AsyncPath:
     """Return a new path pointing to the current working directory
     (as returned by os.getcwd()).
     """
@@ -395,12 +372,12 @@ class AsyncPath(Path, AsyncPurePath):
 
   async def samefile(
     self,
-    other_path: Union[AsyncPath, Paths]
+    other_path: AsyncPath | Paths
   ) -> bool:
     """Return whether other_path is the same or not as this file
     (as returned by os.path.samefile()).
     """
-    if isinstance(other_path, Paths.__args__):
+    if isinstance(other_path, Paths):
       other_path = AsyncPath(other_path)
 
     if isinstance(other_path, AsyncPath):
@@ -460,8 +437,8 @@ class AsyncPath(Path, AsyncPurePath):
     if drv or root:
       raise NotImplementedError("Non-relative patterns are unsupported")
 
-    #selector = _make_selector(("**",) + tuple(pattern_parts), self._flavour)
-    parts = ("**", *pattern_parts)
+    # selector = _make_selector(("**",) + tuple(pattern_parts), self._flavour)
+    parts: tuple[str, ...] = ("**", *pattern_parts)
     selector = _make_selector(parts, self._flavour)
 
     async for p in selector.select_from(self):
@@ -488,7 +465,7 @@ class AsyncPath(Path, AsyncPurePath):
     normalizing it (for example turning slashes into backslashes under
     Windows).
     """
-    s: Optional[str] = await self._flavour.resolve(self, strict=strict)
+    s: str | None = await self._flavour.resolve(self, strict=strict)
 
     if s is None:
       # No symlink resolution => for consistency, raise an error if
@@ -708,11 +685,11 @@ class AsyncPath(Path, AsyncPurePath):
       yield self._make_child_relpath(name)
 
 
-class AsyncPosixPath(PosixPath, AsyncPath, PureAsyncPosixPath):
+class AsyncPosixPath(PosixPath, AsyncPath, AsyncPurePosixPath):
   __slots__ = ()
 
 
-class AsyncWindowsPath(WindowsPath, AsyncPath, PureAsyncWindowsPath):
+class AsyncWindowsPath(WindowsPath, AsyncPath, AsyncPureWindowsPath):
   __slots__ = ()
 
   async def is_mount(self) -> int:

@@ -1,10 +1,10 @@
 from typing import Callable, Any, Awaitable
-from aiofiles.os import wrap as method_as_method_coro, \
-  wrap as func_as_corofunc
 from functools import wraps, partial
+from asyncio import to_thread
 import contextvars
 
-from asyncio import to_thread
+from aiofiles.os import wrap as method_as_method_coro, \
+  wrap as func_as_corofunc
 
 
 CoroutineResult = Awaitable[Any]
