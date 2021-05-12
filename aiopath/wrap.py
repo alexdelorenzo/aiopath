@@ -27,7 +27,7 @@ def func_to_async_func(func: Callable) -> CoroutineFunction:
 
 
 method_to_async_method = func_to_async_func
-to_thread = func_to_async_func
+to_thread = run_sync
 
 
 def func_to_async_method(func: Callable) -> CoroutineMethod:
