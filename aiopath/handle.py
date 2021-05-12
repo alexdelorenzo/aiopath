@@ -187,6 +187,8 @@ async def get_handle(
   errors: str | None = ERRORS,
   newline: str | None = SEP,
 ) -> AsyncContextManager[Handle]:
+  file: AsyncFile
+
   if 'b' in mode:
     file = await open_file(name, mode)
 
