@@ -29,10 +29,10 @@ class _AsyncSelector:
   ) -> AsyncIterable['AsyncPath']:
     """Iterate over all child paths of `parent_path` matched by this
     selector.  This can contain parent_path itself."""
-    path_cls = type(parent_path)
-    is_dir = path_cls.is_dir
-    exists = path_cls.exists
-    scandir = parent_path._accessor.scandir
+    path_cls: type = type(parent_path)
+    is_dir: CoroutineMethod = path_cls.is_dir
+    exists: CoroutineMethod = path_cls.exists
+    scandir: CoroutineMethod = parent_path._accessor.scandir
 
     if not await is_dir(parent_path):
       return
@@ -142,12 +142,18 @@ class _RecursiveWildcardSelector(_AsyncSelector):
     except PermissionError:
       return
 
-  async def _select_from(self, parent_path, is_dir, exists, scandir) -> AsyncIterable['AsyncPath']:
+  async def _select_from(
+    self,
+    parent_path: 'AsyncPath',
+    is_dir: CoroutineMethod,
+    exists: CoroutineMethod,
+    scandir: CoroutineMethod
+  ) -> AsyncIterable['AsyncPath']:
     try:
-      yielded = set()
+      yielded: set['AsyncPath'] = set()
 
       try:
-        successor_select = self.successor._select_from
+        successor_select: CoroutineMethod = self.successor._select_from
 
         async for starting_point in self._iterate_directories(parent_path, is_dir, scandir):
           async for p in successor_select(starting_point, is_dir, exists, scandir):
@@ -157,6 +163,7 @@ class _RecursiveWildcardSelector(_AsyncSelector):
 
       finally:
         yielded.clear()
+
     except PermissionError:
       return
 
