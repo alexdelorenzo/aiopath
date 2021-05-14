@@ -45,7 +45,7 @@ async def main():
 
 run(main())
 ```
-If you used `pathlib` instead of `aiopath` in the example above, some tasks would block upon writing to the disk, and the other tasks making network connections would be forced to pause while the disk is accessed.
+If you used `pathlib` instead of `aiopath` in the example above, some tasks would block upon accessing the disk, and the other tasks accessing the network would be forced to pause while the disk is used.
 
 By using `aiopath` in the example above, the script can access the network and disk concurrently.
 
