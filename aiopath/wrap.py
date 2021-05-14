@@ -3,9 +3,9 @@ from types import MethodType, FunctionType, \
 from typing import Callable, Any, Awaitable, \
   Protocol
 from inspect import iscoroutinefunction
-from functools import wraps
+from functools import wraps, partial
 
-from anyio.to_thread import run_sync as to_thread
+from anyio.to_thread import run_sync
 
 
 CoroutineResult = Awaitable[Any]
@@ -16,6 +16,12 @@ CoroutineMethod = Callable[..., CoroutineResult]
 class CallableObj(Protocol):
   def __call__(self, *args, **kwargs) -> Any:
     ...
+
+
+async def to_thread(func: Callable, *args, **kwargs) -> Any:
+  # anyio's run_sync() doesn't support passing kwargs
+  func_kwargs = partial(func, **kwargs)
+  return await run_sync(func_kwargs, *args)
 
 
 def func_to_async_func(func: Callable) -> CoroutineFunction:
