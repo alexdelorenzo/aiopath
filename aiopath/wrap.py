@@ -47,10 +47,10 @@ def coro_to_async_method(coro: CoroutineFunction) -> CoroutineMethod:
 
 
 def to_async_method(func: Callable) -> CoroutineMethod:
-  if iscoroutinefunction(func):
-    return coro_to_async_method(func)
-
   match func:
+    case f if iscoroutinefunction(f):
+      return coro_to_async_method(func)
+
     case FunctionType() | BuiltinFunctionType() | CallableObj():
       return func_to_async_method(func)
 
