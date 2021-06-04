@@ -1,14 +1,14 @@
 from __future__ import annotations
-from pathlib import _PosixFlavour, _WindowsFlavour, PurePath
+from pathlib import _PosixFlavour, _WindowsFlavour
 from typing import Callable, Awaitable, TYPE_CHECKING
 from errno import EINVAL
 import os
 
-from aiofiles.os import wrap as wrap_async
+from .wrap import func_to_async_func
 
 try:
   from pathlib import _getfinalpathname
-  _getfinalpathname = wrap_async(_getfinalpathname)
+  _getfinalpathname = func_to_async_func(_getfinalpathname)
 
 except ImportError:
   async def _getfinalpathname(*args, **kwargs):
@@ -18,17 +18,10 @@ if TYPE_CHECKING:  # keep mypy quiet
   from .path import AsyncPath
 
 
-getcwd: Callable[[], Awaitable[str]] = wrap_async(os.getcwd)
+getcwd = os.getcwd
 
 
 class _AsyncPosixFlavour(_PosixFlavour):
-  async def gethomedir(self, username: str) -> str:
-    gethomedir: Callable[[str], Awaitable[str]] = wrap_async(
-      super().gethomedir
-    )
-
-    return await gethomedir(username)
-
   async def resolve(
     self,
     path: AsyncPath,
@@ -86,19 +79,12 @@ class _AsyncPosixFlavour(_PosixFlavour):
       return path
     # NOTE: according to POSIX, getcwd() cannot contain path components
     # which are symlinks.
-    base = '' if path.is_absolute() else await getcwd()
+    base = '' if path.is_absolute() else getcwd()
     result = await _resolve(base, str(path))
     return result or sep
 
 
 class _AsyncWindowsFlavour(_WindowsFlavour):
-  async def gethomedir(self, username: str) -> str:
-    gethomedir: Callable[[str], Awaitable[str]] = wrap_async(
-      super().gethomedir
-    )
-
-    return await gethomedir(username)
-
   async def resolve(
     self,
     path: 'AsyncPath',
@@ -107,7 +93,7 @@ class _AsyncWindowsFlavour(_WindowsFlavour):
     s = str(path)
 
     if not s:
-      return await getcwd()
+      return getcwd()
 
     previous_s: str | None = None
 
@@ -115,7 +101,7 @@ class _AsyncWindowsFlavour(_WindowsFlavour):
       if strict:
         return self._ext_to_normal(await _getfinalpathname(s))
       else:
-        tail_parts: List[str] = []  # End of the path after the first one not found
+        tail_parts: list[str] = []  # End of the path after the first one not found
         while True:
           try:
             s = self._ext_to_normal(await _getfinalpathname(s))

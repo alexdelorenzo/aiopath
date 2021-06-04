@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pathlib import Path, PosixPath, WindowsPath, _NormalAccessor, \
-  _Selector,_is_wildcard_pattern, _ignore_error, _Flavour
+  _Selector, _is_wildcard_pattern, _ignore_error, _Flavour
 from typing import AsyncIterable, Callable
 import functools
 

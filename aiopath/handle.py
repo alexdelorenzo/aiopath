@@ -1,13 +1,17 @@
 from __future__ import annotations
-from typing import AsyncIterable, Union, \
-  TYPE_CHECKING, cast
+from typing import AsyncIterable, Union, IO, \
+  TYPE_CHECKING, cast, Final, TextIO, BinaryIO, \
+  AsyncContextManager
 from inspect import iscoroutinefunction
+from contextlib import asynccontextmanager
 from pathlib import Path
 import io
 
-from aiofile import AIOFile, LineReader
+from aiofile import AIOFile, LineReader, \
+  TextFileWrapper, BinaryFileWrapper
+from anyio import AsyncFile, open_file
 
-from .types import Final
+from .types import FileMode
 
 if TYPE_CHECKING:  # keep mypy quiet
   from .path import AsyncPath
@@ -22,9 +26,22 @@ ERRORS: Final[str] = 'replace'
 
 
 Paths = Union['AsyncPath', Path, str]
+FileData = bytes | str
 
 
-class IterableAIOFile(AIOFile):
+class FileLike(IO):
+  is_binary: bool
+
+
+class TextFile(FileLike, TextIO):
+  pass
+
+
+class BinaryFile(FileLike, BinaryIO):
+  pass
+
+
+class IterableAIOFile(FileLike, AIOFile):
   def __init__(
     self,
     *args,
@@ -36,6 +53,9 @@ class IterableAIOFile(AIOFile):
     self._errors: str | None = errors
     self._newline: str | None = newline
 
+    self._offset: int = 0
+    self._mode: str = self.__open_mode
+
   def __aiter__(self) -> AsyncIterable[str]:
     encoding, errors, line_sep = self._get_options()
 
@@ -45,6 +65,9 @@ class IterableAIOFile(AIOFile):
       encoding=encoding,
       errors=errors,
     )
+
+  def _set_offset(self, offset: int, data: FileData):
+    self._offset = offset + len(data)
 
   def _get_options(
     self,
@@ -71,6 +94,34 @@ class IterableAIOFile(AIOFile):
       errors=errors
     )
 
+  async def read(
+    self,
+    size: int = -1,
+    offset: int | None = None
+  ) -> FileData:
+    if offset is None:
+      offset = self._offset
+
+    data: FileData = await super().read(size, offset)
+    self._set_offset(offset, data)
+
+    return data
+
+  async def write(
+    self,
+    data: FileData,
+    offset: int | None = None
+  ):
+    if offset is None:
+      offset = self._offset
+
+    await super().write(data, offset)
+    self._set_offset(offset, data)
+
+
+Handle = \
+  TextFileWrapper | BinaryFileWrapper | IterableAIOFile | AsyncFile
+
 
 async def read_lines(
   path: Paths,
@@ -80,7 +131,7 @@ async def read_lines(
   encoding: str = ENCODING,
   errors: str = ERRORS,
   **kwargs
-) -> AsyncIterable[str]: 
+) -> AsyncIterable[str]:
   if hasattr(path, 'resolve'):
     if iscoroutinefunction(path.resolve):
       path = str(await path.resolve())
@@ -125,3 +176,31 @@ async def read_full_file(
       string.write(line)
 
     return string.getvalue()
+
+
+@asynccontextmanager
+async def get_handle(
+  name: str,
+  mode: FileMode = 'r',
+  buffering: int = -1,
+  encoding: str | None = ENCODING,
+  errors: str | None = ERRORS,
+  newline: str | None = SEP,
+) -> AsyncContextManager[Handle]:
+  file: AsyncFile
+
+  if 'b' in mode:
+    file = await open_file(name, mode)
+
+  else:
+    file = await open_file(
+      name,
+      mode,
+      encoding=encoding,
+      errors=errors,
+      newline=newline,
+    )
+
+  yield file
+  await file.aclose()
+

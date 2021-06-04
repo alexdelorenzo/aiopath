@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, _NormalAccessor, \
   Path, PurePath, _ignore_error
 from typing import AsyncIterable, Final
@@ -6,14 +7,10 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
 
-from aiofiles import os as async_os
-from aiofiles.os import wrap as method_as_method_coro, \
-  wrap as func_as_corofunc
-
 from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
-from .wrap import coro_as_method_coro, func_as_method_coro, to_thread
-from .handle import IterableAIOFile
+from .wrap import to_async_method, to_thread, func_to_async_func
+from .handle import get_handle, Handle
 from .scandir import EntryWrapper, scandir_async
 from .types import FileMode
 
@@ -26,37 +23,37 @@ NEWLINE: Final[str] = '\n'
 Paths = Path | PathLike | str
 
 
-getcwd = func_as_corofunc(os.getcwd)
-close = func_as_corofunc(os.close)
+getcwd = os.getcwd
+close = func_to_async_func(os.close)
 
 
 class _AsyncAccessor(_NormalAccessor):
-  stat = coro_as_method_coro(async_os.stat)
-  lstat = func_as_method_coro(os.lstat)
-  open = func_as_method_coro(os.open)
-  listdir = func_as_method_coro(os.listdir)
-  chmod = func_as_method_coro(os.chmod)
+  stat = to_async_method(os.stat)
+  lstat = to_async_method(os.lstat)
+  open = to_async_method(os.open)
+  listdir = to_async_method(os.listdir)
+  chmod = to_async_method(os.chmod)
 
   if hasattr(_NormalAccessor, 'lchmod'):
-    lchmod = method_as_method_coro(_NormalAccessor.lchmod)
+    lchmod = to_async_method(_NormalAccessor.lchmod)
 
-  mkdir = coro_as_method_coro(async_os.mkdir)
-  unlink = func_as_method_coro(os.unlink)
+  mkdir = to_async_method(os.mkdir)
+  unlink = to_async_method(os.unlink)
 
   if hasattr(_NormalAccessor, 'link'):
-    link = method_as_method_coro(_NormalAccessor.link)
+    link = to_async_method(_NormalAccessor.link)
 
-  rmdir = coro_as_method_coro(async_os.rmdir)
-  rename = coro_as_method_coro(async_os.rename)
-  replace = func_as_method_coro(os.replace)
+  rmdir = to_async_method(os.rmdir)
+  rename = to_async_method(os.rename)
+  replace = to_async_method(os.replace)
 
   symlink = staticmethod(
-    method_as_method_coro(_NormalAccessor.symlink)
+    to_async_method(_NormalAccessor.symlink)
   )
 
-  utime = func_as_method_coro(os.utime)
-  readlink = method_as_method_coro(_NormalAccessor.readlink)
-  remove = coro_as_method_coro(async_os.remove)
+  utime = to_async_method(os.utime)
+  readlink = to_async_method(_NormalAccessor.readlink)
+  remove = to_async_method(os.remove)
 
   async def owner(self, path: str) -> str:
     try:
@@ -82,7 +79,9 @@ class _AsyncAccessor(_NormalAccessor):
     async for entry in scandir_async(*args, **kwargs):
       yield entry
 
-  expanduser = staticmethod(func_as_corofunc(os.path.expanduser))
+  expanduser = staticmethod(
+    func_to_async_func(os.path.expanduser)
+  )
 
 
 _async_accessor = _AsyncAccessor()
@@ -152,13 +151,14 @@ class AsyncPath(Path, AsyncPurePath):
     encoding: str | None = DEFAULT_ENCODING,
     errors: str | None = ON_ERRORS,
     newline: str | None = NEWLINE,
-  ) -> IterableAIOFile:
-    return IterableAIOFile(
-      self._path,
+  ) -> Handle:
+    return get_handle(
+      str(self),
       mode,
-      encoding=encoding,
-      errors=errors,
-      newline=newline,
+      buffering,
+      encoding,
+      errors,
+      newline
     )
 
   async def read_text(
@@ -167,7 +167,7 @@ class AsyncPath(Path, AsyncPurePath):
     errors: str | None = ON_ERRORS
   ) -> str:
     async with self.open('r', encoding=encoding, errors=errors) as file:
-      return await file.read_text()
+      return await file.read()
 
   async def read_bytes(self) -> bytes:
     async with self.open('rb') as file:
@@ -356,11 +356,11 @@ class AsyncPath(Path, AsyncPurePath):
     return True
 
   @classmethod
-  async def cwd(cls: type) -> AsyncPath:
+  def cwd(cls: type) -> AsyncPath:
     """Return a new path pointing to the current working directory
     (as returned by os.getcwd()).
     """
-    cwd: str = await getcwd()
+    cwd = getcwd()
     return cls(cwd)
 
   @classmethod
@@ -455,7 +455,8 @@ class AsyncPath(Path, AsyncPurePath):
         return self
     # FIXME this must defer to the specific flavour (and, under Windows,
     # use nt._getfullpathname())
-    obj = self._from_parts([await getcwd()] + self._parts, init=False)
+    parts: list[str] = [getcwd()] + self._parts
+    obj = self._from_parts(parts, init=False)
     obj._init(template=self)
     return obj
 

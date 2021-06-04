@@ -1,17 +1,16 @@
 __author__ = "Alex DeLorenzo"
-from typing import List
 from setuptools import setup
 from pathlib import Path
 
 
-PKG_NAME = "aiopath"
-NAME = 'aiopath'
-VERSION = "0.6.4"
-LICENSE = "LGPL-3.0"
+PKG_NAME: str = "aiopath"
+NAME: str = 'aiopath'
+VERSION: str = "0.6.7"
+LICENSE: str = "LGPL-3.0"
 
-DESC = "📁 Async pathlib for Python"
+DESC: str = "📁 Async pathlib for Python"
 
-REQUIREMENTS: List[str] = \
+REQUIREMENTS: list[str] = \
   Path('requirements.txt') \
     .read_text() \
     .splitlines()

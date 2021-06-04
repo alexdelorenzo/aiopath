@@ -1,5 +1,5 @@
 # 📁 Async pathlib for Python
-`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that's compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html) and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). 
+`aiopath` is a complete implementation of Python's [`pathlib`](https://docs.python.org/3/library/pathlib.html) that's compatible with [`asyncio`](https://docs.python.org/3/library/asyncio.html), [`trio`](https://github.com/python-trio/trio), and the [`async/await` syntax](https://www.python.org/dev/peps/pep-0492/). 
 
 All I/O performed by `aiopath` is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
 
@@ -16,7 +16,7 @@ from aiopath import AsyncPath
 
 async def save_page(url: str, name: str):
   path = AsyncPath(name)
-  
+
   if await path.exists():
     return
 
@@ -36,16 +36,16 @@ async def main():
   ]
 
   scrapers = (
-    save_page(url, f"{index}.html")
+    save_page(url, f'{index}.html')
     for index, url in enumerate(urls)
   )
-  
+
   await gather(*scrapers)
 
 
 run(main())
 ```
-If you used `pathlib` instead of `aiopath` in the example above, some tasks would block upon writing to the disk, and the other tasks making network connections would be forced to pause while the disk is accessed.
+If you used `pathlib` instead of `aiopath` in the example above, some tasks would block upon accessing the disk, and the other tasks accessing the network would be forced to pause while the disk is used.
 
 By using `aiopath` in the example above, the script can access the network and disk concurrently.
 
@@ -99,7 +99,7 @@ async with NamedTemporaryFile() as temp:
   assert path.as_uri() == apath.as_uri()
 
   # read and write text
-  text: str = "example"
+  text: str = 'example'
   await apath.write_text(text)
   assert await apath.read_text() == text
 
@@ -166,12 +166,12 @@ async with NamedTemporaryFile() as temp:
 
   async with path.open(mode='w') as file:
     await file.write(text)
-  
+
   async with path.open(mode='r') as file:
     result: str = await file.read()
 
   assert result == text
-  
+
 # or you can use the read/write convenience methods
 async with NamedTemporaryFile() as temp:
   path = AsyncPath(temp.name)
@@ -179,7 +179,7 @@ async with NamedTemporaryFile() as temp:
   await path.write_text(text)
   result: str = await path.read_text()
   assert result == text
-  
+
   content: bytes = text.encode()
 
   await path.write_bytes(content)
@@ -191,7 +191,6 @@ async with NamedTemporaryFile() as temp:
 `aiopath` implements [`pathlib` globbing](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) using async I/O and async generators.
 
 ```python3
-from typing import List
 from aiopath import AsyncPath
 
 
@@ -205,7 +204,7 @@ downloads: AsyncPath = home / 'Downloads'
 
 if await downloads.exists():
   # this might take a while
-  paths: List[AsyncPath] = \
+  paths: list[AsyncPath] = \
     [path async for path in downloads.glob('**/*')]
 ```
 
@@ -233,10 +232,14 @@ $ python3 -m pip install aiopath
 `aiopath` for Python 3.10 and newer is available on PyPI under versions `0.6.x` and higher.
 
 ## GitHub
+Download a release archive for your Python version from [the releases page](https://github.com/alexdelorenzo/aiopath/releases).
+
+Then to install, run:
 ```bash
 $ python3 -m pip install -r requirements.txt
 $ python3 setup.py install
 ```
+
 #### Python 3.9 and older
 `aiopath` for Python 3.9 and older is developed on the [Python-3.9 branch](https://github.com/alexdelorenzo/aiopath/tree/Python-3.9).
 
