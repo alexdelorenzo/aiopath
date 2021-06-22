@@ -1,5 +1,5 @@
-aiofile==3.5.0
-anyio==3.1.0
+aiofile==3.5.1
+anyio==3.2.0
 
 asynctempfile==0.5.0
 pytest==6.2.4
