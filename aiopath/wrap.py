@@ -1,7 +1,7 @@
 from types import MethodType, FunctionType, \
   BuiltinFunctionType, BuiltinMethodType
 from typing import Callable, Any, Awaitable, \
-  Protocol
+  Protocol, runtime_checkable
 from inspect import iscoroutinefunction
 from functools import wraps, partial
 
@@ -13,7 +13,8 @@ CoroutineFunction = Callable[..., CoroutineResult]
 CoroutineMethod = Callable[..., CoroutineResult]
 
 
-class CallableObj(Protocol):
+@runtime_checkable
+class IsCallable(Protocol):
   def __call__(self, *args, **kwargs) -> Any:
     ...
 
@@ -56,10 +57,10 @@ def to_async_method(func: Callable) -> CoroutineMethod:
     case f if iscoroutinefunction(f):
       return coro_to_async_method(func)
 
-    case FunctionType() | BuiltinFunctionType() | CallableObj():
-      return func_to_async_method(func)
-
     case MethodType() | BuiltinMethodType():
       return method_to_async_method(func)
+
+    case FunctionType() | BuiltinFunctionType() | CallableObj():
+      return func_to_async_method(func)
 
   raise TypeError(f'{type(func).__name__} is not a callable.')
