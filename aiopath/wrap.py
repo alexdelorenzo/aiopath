@@ -10,7 +10,7 @@ from anyio.to_thread import run_sync
 
 CoroutineResult = Awaitable[Any]
 CoroutineFunction = Callable[..., CoroutineResult]
-CoroutineMethod = Callable[..., CoroutineResult]
+CoroutineMethod = Callable[[Any, ...], CoroutineResult]
 
 
 @runtime_checkable
@@ -60,7 +60,7 @@ def to_async_method(func: Callable) -> CoroutineMethod:
     case MethodType() | BuiltinMethodType():
       return method_to_async_method(func)
 
-    case FunctionType() | BuiltinFunctionType() | CallableObj():
+    case FunctionType() | BuiltinFunctionType() | IsCallable() | f if callable(f):
       return func_to_async_method(func)
 
-  raise TypeError(f'{type(func).__name__} is not a callable.')
+  raise TypeError(f'{type(func).__name__} is not callable.')
