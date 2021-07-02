@@ -60,7 +60,10 @@ def to_async_method(func: Callable) -> CoroutineMethod:
     case MethodType() | BuiltinMethodType():
       return method_to_async_method(func)
 
-    case FunctionType() | BuiltinFunctionType() | IsCallable() | f if callable(f):
+    case FunctionType() | BuiltinFunctionType() | IsCallable():
+      return func_to_async_method(func)
+
+    case f if callable(f):
       return func_to_async_method(func)
 
   raise TypeError(f'{type(func).__name__} is not callable.')
