@@ -1,12 +1,12 @@
 #!/usr/bin/env pytest
-from pathlib import Path
+from pathlib import Path, PurePath
 import asyncio
 
 from asynctempfile import NamedTemporaryFile, \
   TemporaryDirectory
 import pytest
 
-from aiopath import AsyncPath
+from aiopath import AsyncPath, AsyncPurePath
 
 
 TEST_NAME: str = 'TEST'
@@ -333,10 +333,7 @@ async def test_readme_example5_glob():
     assert isinstance(path, AsyncPath)
 
   src_dir = AsyncPath(__file__).parent
-
   assert await src_dir.exists()
 
-  paths: list[AsyncPath] = \
-    [path async for path in src_dir.glob(RECURSIVE_GLOB)]
-
+  paths = [path async for path in src_dir.glob(RECURSIVE_GLOB)]
   assert len(paths) > 0
