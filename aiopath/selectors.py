@@ -170,7 +170,7 @@ class _RecursiveWildcardSelector(_AsyncSelector):
 
 def _make_selector(pattern_parts: list[str], flavour: _Flavour) -> _AsyncSelector:
   pat: str
-  child_parts: tuple[str]
+  child_parts: tuple[str]  # needs to be hashable
   cls: type
 
   pat, *child_parts = pattern_parts
