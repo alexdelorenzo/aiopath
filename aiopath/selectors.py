@@ -169,8 +169,11 @@ class _RecursiveWildcardSelector(_AsyncSelector):
 
 
 def _make_selector(pattern_parts: list[str], flavour: _Flavour) -> _AsyncSelector:
-  pat: str = pattern_parts[0]
-  child_parts: list[str] = pattern_parts[1:]
+  pat: str
+  child_parts: list[str]
+  cls: type
+
+  pat, *child_parts = pattern_parts
 
   if pat == '**':
     cls = _RecursiveWildcardSelector

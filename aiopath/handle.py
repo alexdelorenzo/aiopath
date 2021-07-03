@@ -203,4 +203,3 @@ async def get_handle(
 
   yield file
   await file.aclose()
-

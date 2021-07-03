@@ -7,11 +7,11 @@ from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
 
-from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import to_async_method, to_thread, func_to_async_func
-from .handle import get_handle, Handle
 from .scandir import EntryWrapper, scandir_async
+from .handle import get_handle, Handle
+from .selectors import _make_selector
 from .types import FileMode
 
 
@@ -63,7 +63,7 @@ class _AsyncAccessor(_NormalAccessor):
       return pwd.getpwuid(stat.st_uid).pw_name
 
     except ImportError:
-      raise NotImplementedError("Path.owner() is unsupported on this system")
+      raise NotImplementedError("AsyncPath.owner() is unsupported on this system")
 
   async def group(self, path: str) -> str:
     try:
@@ -73,7 +73,7 @@ class _AsyncAccessor(_NormalAccessor):
       return grp.getgrgid(stat.st_gid).gr_name
 
     except ImportError:
-      raise NotImplementedError("Path.group() is unsupported on this system")
+      raise NotImplementedError("AsyncPath.group() is unsupported on this system")
 
   async def scandir(self, *args, **kwargs) -> AsyncIterable[EntryWrapper]:
     async for entry in scandir_async(*args, **kwargs):
@@ -327,7 +327,8 @@ class AsyncPath(Path, AsyncPurePath):
     Returns the new Path instance pointing to the target path.
     """
     await self._accessor.replace(self, target)
-    return type(self)(target)
+    cls = type(self)
+    return cls(target)
 
   async def symlink_to(self, target: str, target_is_directory: bool = False):
     """
@@ -693,5 +694,5 @@ class AsyncPosixPath(PosixPath, AsyncPath, AsyncPurePosixPath):
 class AsyncWindowsPath(WindowsPath, AsyncPath, AsyncPureWindowsPath):
   __slots__ = ()
 
-  async def is_mount(self) -> int:
+  async def is_mount(self) -> bool:
     raise NotImplementedError("AsyncPath.is_mount() is unsupported on this system")

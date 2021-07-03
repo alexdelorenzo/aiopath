@@ -57,11 +57,11 @@ def to_async_method(func: Callable) -> CoroutineMethod:
     case _ if iscoroutinefunction(func):
       return coro_to_async_method(func)
 
-    case MethodType() | BuiltinMethodType():
-      return method_to_async_method(func)
-
     case FunctionType() | BuiltinFunctionType() | IsCallable():
       return func_to_async_method(func)
+
+    case MethodType() | BuiltinMethodType():
+      return method_to_async_method(func)
 
     case _ if callable(func):
       return func_to_async_method(func)
