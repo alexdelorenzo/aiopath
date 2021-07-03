@@ -116,7 +116,7 @@ async def test_file():
 
 @pytest.mark.asyncio
 async def test_mkdir_rmdir():
-  new_name = 'temp_dir_test'
+  new_name: str = 'temp_dir_test'
 
   async with TemporaryDirectory() as temp:
     path, apath = get_paths(temp)
@@ -159,28 +159,41 @@ async def test_symlink():
 
 
 @pytest.mark.asyncio
-async def test_write_text():
-  pass
+async def test_write_read_text():
+  text: str = 'example'
+
+  async with NamedTemporaryFile() as temp:
+    path, apath = get_paths(temp.name)
+
+    await apath.write_text(text)
+    result: str = await apath.read_text()
+    assert result == text
 
 
 @pytest.mark.asyncio
-async def test_write_bytes():
-  pass
+async def test_write_read_bytes():
+  content: bytes = b'example'
+
+  async with NamedTemporaryFile() as temp:
+    path, apath = get_paths(temp.name)
+
+    await apath.write_bytes(content)
+    result: bytes = await apath.read_bytes()
+    assert result == content
 
 
 @pytest.mark.asyncio
-async def test_read_text():
-  pass
+async def test_touch_stat():
+  new_file: str = 'new_file'
 
+  async with TemporaryDirectory() as temp:
+    path, apath = get_paths(temp)
+    file = path / new_file
+    afile = apath / new_file
 
-@pytest.mark.asyncio
-async def test_read_bytes():
-  pass
-
-
-@pytest.mark.asyncio
-async def test_touch():
-  pass
+    assert not await afile.exists()
+    await afile.touch()
+    assert await afile.exists()
 
 
 @pytest.mark.asyncio
