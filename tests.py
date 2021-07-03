@@ -14,6 +14,7 @@ TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
 RECURSIVE_GLOB: str = '**/*'
 WILDCARD_GLOB: str = '*'
+NO_PATHS: int = 0
 
 
 Paths = Path | AsyncPath | str
@@ -137,7 +138,7 @@ async def test_mkdir_rmdir():
 
 
 @pytest.mark.asyncio
-async def test_name_suffix():
+async def test_with_name_with_suffix():
   async with NamedTemporaryFile() as temp:
     path, apath = get_paths(temp.name)
 
@@ -187,12 +188,10 @@ async def test_write_read_bytes():
 
 @pytest.mark.asyncio
 async def test_touch():
-  new_file: str = 'new_file'
-
   async with TemporaryDirectory() as temp:
     path, apath = get_paths(temp)
-    file = path / new_file
-    afile = apath / new_file
+    file = path / TEST_NAME
+    afile = apath / TEST_NAME
 
     assert not await afile.exists()
     await afile.touch()
@@ -205,8 +204,10 @@ async def test_stat():
     path, apath = get_paths(temp.name)
 
     stat = await apath.stat()
+
     await asyncio.sleep(TOUCH_SLEEP)
     await apath.touch()
+
     new_stat = await apath.stat()
 
     # stat.st_ctime should be different
@@ -214,7 +215,7 @@ async def test_stat():
 
 
 @pytest.mark.asyncio
-async def test_glob():
+async def test_rglob():
   pass
 
 
@@ -291,14 +292,13 @@ async def test_readme_example3_class_hierarchy():
 
   assert isinstance(path, Path)
   assert isinstance(path, PurePath)
-  assert isinstance(path, AsyncPurePath) 
+  assert isinstance(path, AsyncPurePath)
 
 
 @pytest.mark.asyncio
 async def test_readme_example4_read_write():
   text: str = 'example'
 
-  # you can access a file with async context managers
   async with NamedTemporaryFile() as temp:
     path = AsyncPath(temp.name)
 
@@ -310,7 +310,6 @@ async def test_readme_example4_read_write():
 
     assert result == text
 
-  # or you can use the read/write convenience methods
   async with NamedTemporaryFile() as temp:
     path = AsyncPath(temp.name)
 
@@ -336,4 +335,4 @@ async def test_readme_example5_glob():
   assert await src_dir.exists()
 
   paths = [path async for path in src_dir.glob(RECURSIVE_GLOB)]
-  assert len(paths) > 0
+  assert len(paths) > NO_PATHS
