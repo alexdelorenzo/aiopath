@@ -18,10 +18,23 @@ NO_PATHS: int = 0
 
 
 Paths = Path | AsyncPath | str
+Handles = tuple[Path, AsyncPath]
 
 
-def get_paths(path: Paths) -> tuple[Path, AsyncPath]:
+def get_paths(path: Paths) -> Handles:
   return Path(path), AsyncPath(path)
+
+
+@pytest.fixture
+async def file_paths() -> Handles:
+  async with NamedTemporaryFile() as temp:
+    yield get_paths(temp.name)
+
+
+@pytest.fixture
+async def dir_paths() -> Handles:
+  async with TemporaryDirectory() as temp:
+    yield get_paths(temp)
 
 
 def _test_is_pure(
@@ -101,132 +114,101 @@ async def test_home():
 
 
 @pytest.mark.asyncio
-async def test_directory():
-  async with TemporaryDirectory() as temp:
-    path, apath = get_paths(temp)
+async def test_directory(dir_paths: Handles):
+  path, apath = dir_paths
 
-    await _test_is(path, apath)
-    await apath.touch()
-
-
-@pytest.mark.asyncio
-async def test_file():
-  async with NamedTemporaryFile() as temp:
-    path, apath = get_paths(temp.name)
-
-    await _test_is(path, apath)
-    await apath.touch()
+  await _test_is(path, apath)
+  await apath.touch()
 
 
 @pytest.mark.asyncio
-async def test_mkdir_rmdir():
+async def test_file(file_paths: Handles):
+  path, apath = file_paths
+
+  await _test_is(path, apath)
+  await apath.touch()
+
+
+@pytest.mark.asyncio
+async def test_mkdir_rmdir(dir_paths: Handles):
+  path, apath = dir_paths
   new_name: str = 'temp_dir_test'
 
-  async with TemporaryDirectory() as temp:
-    path, apath = get_paths(temp)
-    new_apath = apath / new_name
-    new_path = path / new_name
+  new_apath = apath / new_name
+  new_path = path / new_name
 
-    await new_apath.mkdir()
-    assert await new_apath.exists()
-    await _test_is(new_path, new_apath)
+  await new_apath.mkdir()
+  assert await new_apath.exists()
+  await _test_is(new_path, new_apath)
 
-    await new_apath.rmdir()
-    assert not await new_apath.exists()
-    assert not new_path.exists()
-    await _test_is(new_path, new_apath, exists=False)
+  await new_apath.rmdir()
+  assert not await new_apath.exists()
+  assert not new_path.exists()
+  await _test_is(new_path, new_apath, exists=False)
 
 
 @pytest.mark.asyncio
-async def test_with_name_with_suffix():
-  async with NamedTemporaryFile() as temp:
-    path, apath = get_paths(temp.name)
+async def test_with_name_with_suffix(file_paths: Handles):
+  path, apath = file_paths
 
-    await _test_is(
-      path.with_suffix(TEST_SUFFIX),
-      apath.with_suffix(TEST_SUFFIX),
-      test_parent=False,
-      exists=False
-    )
+  await _test_is(
+    path.with_suffix(TEST_SUFFIX),
+    apath.with_suffix(TEST_SUFFIX),
+    test_parent=False,
+    exists=False
+  )
 
-    await _test_is(
-      path.with_name(TEST_NAME),
-      apath.with_name(TEST_NAME),
-      test_parent=False,
-      exists=False
-    )
-
-
-@pytest.mark.asyncio
-async def test_symlink():
-  pass
+  await _test_is(
+    path.with_name(TEST_NAME),
+    apath.with_name(TEST_NAME),
+    test_parent=False,
+    exists=False
+  )
 
 
 @pytest.mark.asyncio
-async def test_write_read_text():
+async def test_write_read_text(file_paths: Handles):
+  path, apath = file_paths
   text: str = 'example'
 
-  async with NamedTemporaryFile() as temp:
-    path, apath = get_paths(temp.name)
-
-    await apath.write_text(text)
-    result: str = await apath.read_text()
-    assert result == text
+  await apath.write_text(text)
+  result: str = await apath.read_text()
+  assert result == text
 
 
 @pytest.mark.asyncio
-async def test_write_read_bytes():
+async def test_write_read_bytes(file_paths: Handles):
+  path, apath = file_paths
   content: bytes = b'example'
 
-  async with NamedTemporaryFile() as temp:
-    path, apath = get_paths(temp.name)
-
-    await apath.write_bytes(content)
-    result: bytes = await apath.read_bytes()
-    assert result == content
+  await apath.write_bytes(content)
+  result: bytes = await apath.read_bytes()
+  assert result == content
 
 
 @pytest.mark.asyncio
-async def test_touch():
-  async with TemporaryDirectory() as temp:
-    path, apath = get_paths(temp)
-    file = path / TEST_NAME
-    afile = apath / TEST_NAME
+async def test_touch(dir_paths: Handles):
+  path, apath = dir_paths
+  file = path / TEST_NAME
+  afile = apath / TEST_NAME
 
-    assert not await afile.exists()
-    await afile.touch()
-    assert await afile.exists()
-
-
-@pytest.mark.asyncio
-async def test_stat():
-  async with NamedTemporaryFile() as temp:
-    path, apath = get_paths(temp.name)
-
-    stat = await apath.stat()
-
-    await asyncio.sleep(TOUCH_SLEEP)
-    await apath.touch()
-
-    new_stat = await apath.stat()
-
-    # stat.st_ctime should be different
-    assert not new_stat == stat
+  assert not await afile.exists()
+  await afile.touch()
+  assert await afile.exists()
 
 
 @pytest.mark.asyncio
-async def test_rglob():
-  pass
+async def test_stat(file_paths: Handles):
+  path, apath = file_paths
+  stat = await apath.stat()
 
+  await asyncio.sleep(TOUCH_SLEEP)
+  await apath.touch()
 
-@pytest.mark.asyncio
-async def test_open():
-  pass
+  new_stat = await apath.stat()
 
-
-@pytest.mark.asyncio
-async def test_unlink():
-  pass
+  # stat.st_ctime should be different
+  assert not new_stat == stat
 
 
 @pytest.mark.asyncio
@@ -336,3 +318,23 @@ async def test_readme_example5_glob():
 
   paths = [path async for path in src_dir.glob(RECURSIVE_GLOB)]
   assert len(paths) > NO_PATHS
+
+
+@pytest.mark.asyncio
+async def test_rglob():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_open():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_unlink():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_symlink():
+  pass
