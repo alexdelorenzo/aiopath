@@ -183,7 +183,7 @@ async def test_write_read_bytes():
 
 
 @pytest.mark.asyncio
-async def test_touch_stat():
+async def test_touch():
   new_file: str = 'new_file'
 
   async with TemporaryDirectory() as temp:
@@ -194,6 +194,18 @@ async def test_touch_stat():
     assert not await afile.exists()
     await afile.touch()
     assert await afile.exists()
+
+
+@pytest.mark.asyncio
+async def test_stat():
+  async with NamedTemporaryFile() as temp:
+    path, apath = get_paths(temp.name)
+
+    stat = await apath.stat()
+    await apath.touch()
+    new_stat = await apath.stat()
+
+    assert not new_stat == stat
 
 
 @pytest.mark.asyncio
