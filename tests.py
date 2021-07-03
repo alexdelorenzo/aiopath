@@ -17,22 +17,22 @@ WILDCARD_GLOB: str = '*'
 NO_PATHS: int = 0
 
 
-Paths = Path | AsyncPath | str
-Handles = tuple[Path, AsyncPath]
+PathTypes = Path | AsyncPath | str
+Paths = tuple[Path, AsyncPath]
 
 
-def get_paths(path: Paths) -> Handles:
+def get_paths(path: PathTypes) -> Paths:
   return Path(path), AsyncPath(path)
 
 
 @pytest.fixture
-async def file_paths() -> Handles:
+async def file_paths() -> Paths:
   async with NamedTemporaryFile() as temp:
     yield get_paths(temp.name)
 
 
 @pytest.fixture
-async def dir_paths() -> Handles:
+async def dir_paths() -> Paths:
   async with TemporaryDirectory() as temp:
     yield get_paths(temp)
 
@@ -114,7 +114,7 @@ async def test_home():
 
 
 @pytest.mark.asyncio
-async def test_directory(dir_paths: Handles):
+async def test_directory(dir_paths: Paths):
   path, apath = dir_paths
 
   await _test_is(path, apath)
@@ -122,7 +122,7 @@ async def test_directory(dir_paths: Handles):
 
 
 @pytest.mark.asyncio
-async def test_file(file_paths: Handles):
+async def test_file(file_paths: Paths):
   path, apath = file_paths
 
   await _test_is(path, apath)
@@ -130,7 +130,7 @@ async def test_file(file_paths: Handles):
 
 
 @pytest.mark.asyncio
-async def test_mkdir_rmdir(dir_paths: Handles):
+async def test_mkdir_rmdir(dir_paths: Paths):
   path, apath = dir_paths
   new_name: str = 'temp_dir_test'
 
@@ -148,7 +148,7 @@ async def test_mkdir_rmdir(dir_paths: Handles):
 
 
 @pytest.mark.asyncio
-async def test_with_name_with_suffix(file_paths: Handles):
+async def test_with_name_with_suffix(file_paths: Paths):
   path, apath = file_paths
 
   await _test_is(
@@ -167,7 +167,7 @@ async def test_with_name_with_suffix(file_paths: Handles):
 
 
 @pytest.mark.asyncio
-async def test_write_read_text(file_paths: Handles):
+async def test_write_read_text(file_paths: Paths):
   path, apath = file_paths
   text: str = 'example'
 
@@ -177,7 +177,7 @@ async def test_write_read_text(file_paths: Handles):
 
 
 @pytest.mark.asyncio
-async def test_write_read_bytes(file_paths: Handles):
+async def test_write_read_bytes(file_paths: Paths):
   path, apath = file_paths
   content: bytes = b'example'
 
@@ -187,7 +187,7 @@ async def test_write_read_bytes(file_paths: Handles):
 
 
 @pytest.mark.asyncio
-async def test_touch(dir_paths: Handles):
+async def test_touch(dir_paths: Paths):
   path, apath = dir_paths
   file = path / TEST_NAME
   afile = apath / TEST_NAME
@@ -198,7 +198,7 @@ async def test_touch(dir_paths: Handles):
 
 
 @pytest.mark.asyncio
-async def test_stat(file_paths: Handles):
+async def test_stat(file_paths: Paths):
   path, apath = file_paths
   stat = await apath.stat()
 
@@ -214,8 +214,7 @@ async def test_stat(file_paths: Handles):
 @pytest.mark.asyncio
 async def test_readme_example1_basic():
   async with NamedTemporaryFile() as temp:
-    path = Path(temp.name)
-    apath = AsyncPath(temp.name)
+    path, apath = get_paths(temp.name)
 
     # check existence
     ## sync
