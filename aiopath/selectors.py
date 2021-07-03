@@ -12,8 +12,8 @@ class _AsyncSelector:
       of a given path.
   """
 
-  def __init__(self, child_parts: list[str], flavour: _Flavour):
-    self.child_parts: list[str] = child_parts
+  def __init__(self, child_parts: tuple[str], flavour: _Flavour):
+    self.child_parts: tuple[str] = child_parts
 
     if child_parts:
       self.successor = _make_selector(child_parts, flavour)
@@ -53,7 +53,7 @@ class _TerminatingSelector:
 
 
 class _PreciseSelector(_AsyncSelector):
-  def __init__(self, name: str, child_parts: list[str], flavour: _Flavour):
+  def __init__(self, name: str, child_parts: tuple[str], flavour: _Flavour):
     self.name: str = name
     super().__init__(child_parts, flavour)
 
@@ -75,7 +75,7 @@ class _PreciseSelector(_AsyncSelector):
 
 
 class _WildcardSelector(_AsyncSelector):
-  def __init__(self, pat: str, child_parts: list[str], flavour: _Flavour):
+  def __init__(self, pat: str, child_parts: tuple[str], flavour: _Flavour):
     self.match = flavour.compile_pattern(pat)
     super().__init__(child_parts, flavour)
 
@@ -112,7 +112,7 @@ class _WildcardSelector(_AsyncSelector):
 
 
 class _RecursiveWildcardSelector(_AsyncSelector):
-  def __init__(self, pat: str, child_parts: list[str], flavour):
+  def __init__(self, pat: str, child_parts: tuple[str], flavour):
     super().__init__(child_parts, flavour)
 
   async def _iterate_directories(
@@ -170,10 +170,11 @@ class _RecursiveWildcardSelector(_AsyncSelector):
 
 def _make_selector(pattern_parts: list[str], flavour: _Flavour) -> _AsyncSelector:
   pat: str
-  child_parts: list[str]
+  child_parts: tuple[str]
   cls: type
 
   pat, *child_parts = pattern_parts
+  child_parts = tuple(child_parts)
 
   if pat == '**':
     cls = _RecursiveWildcardSelector
