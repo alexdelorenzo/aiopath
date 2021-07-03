@@ -202,6 +202,7 @@ async def test_stat():
     path, apath = get_paths(temp.name)
 
     stat = await apath.stat()
+    await asyncio.sleep(1)
     await apath.touch()
     new_stat = await apath.stat()
 
@@ -222,3 +223,116 @@ async def test_open():
 async def test_unlink():
   pass
 
+
+@pytest.mark.asyncio
+async def test_readme_example1():
+  async with NamedTemporaryFile() as temp:
+    path = Path(temp.name)
+    apath = AsyncPath(temp.name)
+
+    # check existence
+    ## sync
+    assert path.exists()
+    ## async
+    assert await apath.exists()
+
+    # check if file
+    ## sync
+    assert path.is_file()
+    ## async
+    assert await apath.is_file()
+
+    # touch
+    path.touch()
+    await apath.touch()
+
+    # PurePath methods are not async
+    assert path.is_absolute() == apath.is_absolute()
+    assert path.as_uri() == apath.as_uri()
+
+    # read and write text
+    text: str = 'example'
+    await apath.write_text(text)
+    assert await apath.read_text() == text
+
+  assert not path.exists()
+  assert not await apath.exists()
+
+
+@pytest.mark.asyncio
+async def test_readme_example2():
+  home: Path = Path.home()
+  ahome: AsyncPath = AsyncPath(home)
+  path: Path = Path(ahome)
+
+  assert isinstance(home, Path)
+  assert isinstance(ahome, AsyncPath)
+  assert isinstance(path, Path)
+
+  # AsyncPath and Path objects can point to the same file
+  assert str(home) == str(ahome) == str(path)
+
+  # but AsyncPath and Path objects are not equivalent
+  assert not home == ahome
+
+
+@pytest.mark.asyncio
+async def test_readme_example3():
+  assert issubclass(AsyncPath, Path)
+  assert issubclass(AsyncPath, PurePath)
+  assert issubclass(AsyncPath, AsyncPurePath)
+  assert issubclass(AsyncPurePath, PurePath)
+
+  path: AsyncPath = await AsyncPath.home()
+
+  assert isinstance(path, Path)
+  assert isinstance(path, PurePath)
+  assert isinstance(path, AsyncPurePath) 
+
+
+@pytest.mark.asyncio
+async def test_readme_example3():
+  text: str = 'example'
+
+  # you can access a file with async context managers
+  async with NamedTemporaryFile() as temp:
+    path = AsyncPath(temp.name)
+
+    async with path.open(mode='w') as file:
+      await file.write(text)
+
+    async with path.open(mode='r') as file:
+      result: str = await file.read()
+
+    assert result == text
+
+  # or you can use the read/write convenience methods
+  async with NamedTemporaryFile() as temp:
+    path = AsyncPath(temp.name)
+
+    await path.write_text(text)
+    result: str = await path.read_text()
+    assert result == text
+
+    content: bytes = text.encode()
+
+    await path.write_bytes(content)
+    result: bytes = await path.read_bytes()
+    assert result == content
+
+
+@pytest.mark.asyncio
+async def test_readme_example4():
+  home: AsyncPath = await AsyncPath.home()
+
+  async for path in home.glob('*'):
+    assert isinstance(path, AsyncPath)
+
+  src_dir: AsyncPath = AsyncPath(__file__).parent
+
+  if await src_dir.exists():
+    # this might take a while
+    paths: list[AsyncPath] = \
+      [path async for path in src_dir.glob('**/*')]
+
+    assert len(paths) > 0
