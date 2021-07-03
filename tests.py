@@ -11,6 +11,9 @@ from aiopath import AsyncPath
 
 TEST_NAME: str = 'TEST'
 TEST_SUFFIX: str = f'.{TEST_NAME}'
+TOUCH_SLEEP: int = 1
+RECURSIVE_GLOB: str = '**/*'
+WILDCARD_GLOB: str = '*'
 
 
 Paths = Path | AsyncPath | str
@@ -202,10 +205,11 @@ async def test_stat():
     path, apath = get_paths(temp.name)
 
     stat = await apath.stat()
-    await asyncio.sleep(1)
+    await asyncio.sleep(TOUCH_SLEEP)
     await apath.touch()
     new_stat = await apath.stat()
 
+    # stat.st_ctime should be different
     assert not new_stat == stat
 
 
@@ -225,7 +229,7 @@ async def test_unlink():
 
 
 @pytest.mark.asyncio
-async def test_readme_example1():
+async def test_readme_example1_basic():
   async with NamedTemporaryFile() as temp:
     path = Path(temp.name)
     apath = AsyncPath(temp.name)
@@ -260,7 +264,7 @@ async def test_readme_example1():
 
 
 @pytest.mark.asyncio
-async def test_readme_example2():
+async def test_readme_example2_convert():
   home: Path = Path.home()
   ahome: AsyncPath = AsyncPath(home)
   path: Path = Path(ahome)
@@ -277,7 +281,7 @@ async def test_readme_example2():
 
 
 @pytest.mark.asyncio
-async def test_readme_example3():
+async def test_readme_example3_class_hierarchy():
   assert issubclass(AsyncPath, Path)
   assert issubclass(AsyncPath, PurePath)
   assert issubclass(AsyncPath, AsyncPurePath)
@@ -291,7 +295,7 @@ async def test_readme_example3():
 
 
 @pytest.mark.asyncio
-async def test_readme_example3():
+async def test_readme_example4_read_write():
   text: str = 'example'
 
   # you can access a file with async context managers
@@ -322,17 +326,17 @@ async def test_readme_example3():
 
 
 @pytest.mark.asyncio
-async def test_readme_example4():
+async def test_readme_example5_glob():
   home: AsyncPath = await AsyncPath.home()
 
-  async for path in home.glob('*'):
+  async for path in home.glob(WILDCARD_GLOB):
     assert isinstance(path, AsyncPath)
 
-  src_dir: AsyncPath = AsyncPath(__file__).parent
+  src_dir = AsyncPath(__file__).parent
 
-  if await src_dir.exists():
-    # this might take a while
-    paths: list[AsyncPath] = \
-      [path async for path in src_dir.glob('**/*')]
+  assert await src_dir.exists()
 
-    assert len(paths) > 0
+  paths: list[AsyncPath] = \
+    [path async for path in src_dir.glob(RECURSIVE_GLOB)]
+
+  assert len(paths) > 0
