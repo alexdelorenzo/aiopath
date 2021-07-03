@@ -54,7 +54,7 @@ By using `aiopath` in the example above, the script can access the network and d
 
 With `aiopath`, methods that perform I/O are asynchronous and awaitable, and methods that perform I/O and return iterators in `pathlib` now return [async generators](https://www.python.org/dev/peps/pep-0525/). `aiopath` goes one step further, and wraps [`os.scandir()`](https://docs.python.org/3/library/os.html#os.scandir) and [`DirEntry`](https://docs.python.org/3/library/os.html#os.DirEntry) to make [`AsyncPath.glob()`](https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob) completely async.
 
-`aiopath` is typed with Python [type annotations](https://docs.python.org/3/library/typing.html), and it takes advantage of [`libaio`](https://pagure.io/libaio) for async I/O on Linux.
+`aiopath` is typed with Python [type annotations](https://docs.python.org/3/library/typing.html), and if using the `aiofile` back end, it takes advantage of [`libaio`](https://pagure.io/libaio) for async I/O on Linux.
 
 # Usage
  `aiopath`'s API directly matches [`pathlib`](https://docs.python.org/3/library/pathlib.html), so check out the standard library documentation for [`PurePath`](https://docs.python.org/3/library/pathlib.html#pure-paths) and [`Path`](https://docs.python.org/3/library/pathlib.html#methods).
