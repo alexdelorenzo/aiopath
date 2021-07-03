@@ -1,4 +1,4 @@
-aiofile==3.5.1
-anyio==3.2.1
+aiofile>=3.5.0, <4
+anyio>=3.2.0, <4
 
 typing-extensions>=3.10.0.0; python_version < '3.10'
