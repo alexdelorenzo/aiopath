@@ -146,7 +146,7 @@ assert isinstance(path, PurePath)
 assert isinstance(path, AsyncPurePath) 
 ```
 
-Check out [`tests.py`](https://github.com/alexdelorenzo/aiopath/blob/main/tests.py#L24) for more examples of how `aiopath` compares to `pathlib`.
+Check out the test files in the [`tests` directory](https://github.com/alexdelorenzo/aiopath/blob/main/tests) for more examples of how `aiopath` compares to `pathlib`.
 
 ## Opening a file
 You can get an asynchronous [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers). 
