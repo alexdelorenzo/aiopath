@@ -1,6 +1,7 @@
 #!/usr/bin/env pytest
 from pathlib import Path, PurePath
-import asyncio
+from asyncio import sleep, to_thread
+from os import PathLike
 
 from asynctempfile import NamedTemporaryFile, \
   TemporaryDirectory
@@ -17,12 +18,18 @@ WILDCARD_GLOB: str = '*'
 NO_PATHS: int = 0
 
 
-PathTypes = Path | AsyncPath | str
+PathTypes = PathLike | str
 Paths = tuple[Path, AsyncPath]
 
 
 def get_paths(path: PathTypes) -> Paths:
   return Path(path), AsyncPath(path)
+
+
+@pytest.fixture
+async def file_paths() -> Paths:
+  async with NamedTemporaryFile() as temp:
+    yield get_paths(temp.name)
 
 
 @pytest.fixture
@@ -115,25 +122,19 @@ async def test_home():
 
 @pytest.mark.asyncio
 async def test_directory(dir_paths: Paths):
-  path, apath = dir_paths
-
-  await _test_is(path, apath)
-  await apath.touch()
+  await _test_is(*dir_paths)
 
 
 @pytest.mark.asyncio
 async def test_file(file_paths: Paths):
-  path, apath = file_paths
-
-  await _test_is(path, apath)
-  await apath.touch()
+  await _test_is(*file_paths)
 
 
 @pytest.mark.asyncio
 async def test_mkdir_rmdir(dir_paths: Paths):
   path, apath = dir_paths
-  new_name: str = 'temp_dir_test'
 
+  new_name: str = 'temp_dir_test'
   new_apath = apath / new_name
   new_path = path / new_name
 
@@ -142,6 +143,7 @@ async def test_mkdir_rmdir(dir_paths: Paths):
   await _test_is(new_path, new_apath)
 
   await new_apath.rmdir()
+
   assert not await new_apath.exists()
   assert not new_path.exists()
   await _test_is(new_path, new_apath, exists=False)
@@ -169,20 +171,22 @@ async def test_with_name_with_suffix(file_paths: Paths):
 @pytest.mark.asyncio
 async def test_write_read_text(file_paths: Paths):
   path, apath = file_paths
-  text: str = 'example'
 
+  text: str = 'example'
   await apath.write_text(text)
   result: str = await apath.read_text()
+
   assert result == text
 
 
 @pytest.mark.asyncio
 async def test_write_read_bytes(file_paths: Paths):
   path, apath = file_paths
-  content: bytes = b'example'
 
+  content: bytes = b'example'
   await apath.write_bytes(content)
   result: bytes = await apath.read_bytes()
+
   assert result == content
 
 
@@ -202,13 +206,37 @@ async def test_stat(file_paths: Paths):
   path, apath = file_paths
   stat = await apath.stat()
 
-  await asyncio.sleep(TOUCH_SLEEP)
+  await sleep(TOUCH_SLEEP)
   await apath.touch()
 
   new_stat = await apath.stat()
 
   # stat.st_ctime should be different
   assert not new_stat == stat
+
+
+@pytest.mark.asyncio
+async def test_unlink(file_paths: Paths, dir_paths: Paths):
+  path, apath = file_paths
+
+  assert await apath.exists()
+  assert path.exists()
+
+  await apath.unlink()
+  assert not await apath.exists()
+  assert not path.exists()
+
+  # recreate file
+  await apath.touch()
+
+  path, apath = dir_paths
+
+  assert await apath.exists() == path.exists()
+  assert await apath.exists()
+  assert path.exists()
+
+  with pytest.raises(IsADirectoryError):
+    await apath.unlink()
 
 
 @pytest.mark.asyncio
@@ -312,10 +340,10 @@ async def test_readme_example5_glob():
   async for path in home.glob(WILDCARD_GLOB):
     assert isinstance(path, AsyncPath)
 
-  src_dir = AsyncPath(__file__).parent
-  assert await src_dir.exists()
+  pkg_dir = AsyncPath(__file__).parent
+  assert await pkg_dir.exists()
 
-  paths = [path async for path in src_dir.glob(RECURSIVE_GLOB)]
+  paths = [path async for path in pkg_dir.glob(RECURSIVE_GLOB)]
   assert len(paths) > NO_PATHS
 
 
@@ -328,10 +356,6 @@ async def test_rglob():
 async def test_open():
   pass
 
-
-@pytest.mark.asyncio
-async def test_unlink():
-  pass
 
 
 @pytest.mark.asyncio
