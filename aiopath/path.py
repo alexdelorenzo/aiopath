@@ -13,7 +13,7 @@ from .selectors import _make_selector
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import coro_as_method_coro, func_as_method_coro, to_thread, \
   method_as_method_coro, func_to_async_func
-from .handle import IterableAIOFile
+from .handle import IterableAIOFile, get_handle
 from .scandir import EntryWrapper, scandir_async
 from .types import Final, Literal, FileMode
 
@@ -146,7 +146,7 @@ class AsyncPath(Path, AsyncPurePath):
     errors: Optional[str] = ON_ERRORS,
     newline: Optional[str] = NEWLINE,
   ) -> IterableAIOFile:
-    return open_file(
+    return get_handle(
       self._path,
       mode,
       encoding=encoding,
@@ -156,12 +156,11 @@ class AsyncPath(Path, AsyncPurePath):
 
   async def read_text(
     self,
-    encoding: Optional[str] = DEFAULT_ENCODING,
-    errors: Optional[str] = ON_ERRORS
+    encoding: str | None = DEFAULT_ENCODING,
+    errors: str | None = ON_ERRORS
   ) -> str:
-
     async with self.open('r', encoding=encoding, errors=errors) as file:
-      return await file.read_text(encoding=encoding, errors=errors)
+      return await file.read()
 
     #path = str(await self.resolve())
 
