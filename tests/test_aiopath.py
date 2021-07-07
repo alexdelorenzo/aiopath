@@ -135,14 +135,14 @@ async def test_unlink(file_paths: Paths, dir_paths: Paths):
   # recreate file
   await apath.touch()
 
-  # can't unlink dirs
   path, apath = dir_paths
+
+  # can't unlink dirs
+  with pytest.raises(IsADirectoryError):
+    await apath.unlink()
 
   assert await apath.exists()
   assert path.exists()
-
-  with pytest.raises(IsADirectoryError):
-    await apath.unlink()
 
 
 @pytest.mark.asyncio
