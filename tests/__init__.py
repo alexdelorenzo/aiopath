@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Union
 from pathlib import Path, PurePath
 from os import PathLike
 
@@ -13,7 +14,7 @@ RECURSIVE_GLOB: str = '**/*'
 WILDCARD_GLOB: str = '*'
 
 
-PathTypes = PathLike | str
+PathTypes = Union[PathLike, str]
 Paths = tuple[Path, AsyncPath]
 
 
