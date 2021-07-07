@@ -93,7 +93,7 @@ async with NamedTemporaryFile() as temp:
   # touch
   path.touch()
   await apath.touch()
-  
+
   # PurePath methods are not async
   assert path.is_absolute() == apath.is_absolute()
   assert path.as_uri() == apath.as_uri()
