@@ -1,7 +1,7 @@
 from typing import AsyncIterable, Iterable, Any, List
 from os import scandir, DirEntry, stat_result
 
-from .wrap import func_to_async_func as to_thread
+from .wrap import to_thread
 
 
 class EntryWrapper:
