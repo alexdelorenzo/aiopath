@@ -8,12 +8,10 @@ from asynctempfile import NamedTemporaryFile, \
 from aiopath import AsyncPath, AsyncPurePath
 import pytest
 
-from . import _test_is, _test_is_io, _test_is_pure, \
-  file_paths, dir_paths, Paths, PathTypes, get_paths
+from . import file_paths, dir_paths, Paths, PathTypes, \
+  get_paths, RECURSIVE_GLOB, WILDCARD_GLOB
 
 
-RECURSIVE_GLOB: str = '**/*'
-WILDCARD_GLOB: str = '*'
 NO_PATHS: int = 0
 
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env pytest
 from __future__ import annotations
 from pathlib import Path, PurePath
 from asyncio import sleep, to_thread
@@ -17,9 +16,6 @@ from . import _test_is, _test_is_io, _test_is_pure, \
 TEST_NAME: str = 'TEST'
 TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
-RECURSIVE_GLOB: str = '**/*'
-WILDCARD_GLOB: str = '*'
-NO_PATHS: int = 0
 
 
 @pytest.mark.asyncio
@@ -139,9 +135,9 @@ async def test_unlink(file_paths: Paths, dir_paths: Paths):
   # recreate file
   await apath.touch()
 
+  # can't unlink dirs
   path, apath = dir_paths
 
-  assert await apath.exists() == path.exists()
   assert await apath.exists()
   assert path.exists()
 

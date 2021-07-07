@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pathlib import Path, PurePath
 from os import PathLike
 
@@ -6,6 +7,10 @@ from asynctempfile import NamedTemporaryFile, \
 import pytest
 
 from aiopath import AsyncPath
+
+
+RECURSIVE_GLOB: str = '**/*'
+WILDCARD_GLOB: str = '*'
 
 
 PathTypes = PathLike | str
