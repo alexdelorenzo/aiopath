@@ -29,12 +29,6 @@ async def file_paths() -> Paths:
 
 
 @pytest.fixture
-async def file_paths() -> Paths:
-  async with NamedTemporaryFile() as temp:
-    yield get_paths(temp.name)
-
-
-@pytest.fixture
 async def dir_paths() -> Paths:
   async with TemporaryDirectory() as temp:
     yield get_paths(temp)
