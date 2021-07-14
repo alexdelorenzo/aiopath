@@ -1,22 +1,19 @@
 from __future__ import annotations
-from pathlib import Path, PurePath
-from asyncio import sleep, to_thread
+from pathlib import Path
 from string import printable
-from os import PathLike
 
 from asynctempfile import NamedTemporaryFile, \
   TemporaryDirectory
 import pytest
 
-from aiopath import AsyncPath, AsyncPurePath
+from aiopath import AsyncPath
 
-from . import _test_is, _test_is_io, _test_is_pure, \
-  file_paths, dir_paths, Paths, PathTypes
+from . import _test_is, _test_is_io, _test_is_pure
 
 
 # see https://github.com/alexdelorenzo/aiopath/issues/13
 @pytest.mark.asyncio
-async def test_issue_13(file_paths: Paths):
+async def test_issue_13_file_cursor(file_paths: Paths):
   _, apath = file_paths
 
   text: str = printable
