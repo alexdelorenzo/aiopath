@@ -19,11 +19,11 @@ from . import _test_is, _test_is_io, _test_is_pure, \
 async def test_issue_13(file_paths: Paths):
   _, apath = file_paths
 
-  chunk_size: int = 10
   text: str = printable
   data: bytes = text.encode()
 
-  first_slice = slice(0, chunk_size)
+  chunk_size: int = 10
+  first_slice = slice(chunk_size)
   next_slice = slice(chunk_size, chunk_size * 2)
 
   # test read/write text
