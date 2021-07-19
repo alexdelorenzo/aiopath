@@ -8,7 +8,8 @@ import pytest
 
 from aiopath import AsyncPath
 
-from . import _test_is, _test_is_io, _test_is_pure
+from . import _test_is, _test_is_io, _test_is_pure, \
+  file_paths, dir_paths
 
 
 # see https://github.com/alexdelorenzo/aiopath/issues/13
