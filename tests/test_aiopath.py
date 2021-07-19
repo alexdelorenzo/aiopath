@@ -146,6 +146,17 @@ async def test_unlink(file_paths: Paths, dir_paths: Paths):
 
 
 @pytest.mark.asyncio
+async def test_links():
+  # symlink
+  ## readlink()
+  ## symlink_to()
+
+  # hard link
+  ## link_to()
+  pass
+
+
+@pytest.mark.asyncio
 async def test_rglob():
   pass
 
@@ -156,5 +167,65 @@ async def test_open():
 
 
 @pytest.mark.asyncio
-async def test_symlink():
+async def test_chmod():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_rename():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_replace():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_cwd():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_samefile():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_iterdir():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_absolute():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_resolve():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_lstat():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_owner():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_group():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_is_mount():
+  pass
+
+
+@pytest.mark.asyncio
+async def test_expand_user():
   pass
