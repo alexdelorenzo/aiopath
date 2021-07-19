@@ -19,6 +19,9 @@ DEFAULT_ENCODING: Final[str] = 'utf-8'
 ON_ERRORS: Final[str] = 'ignore'
 NEWLINE: Final[str] = '\n'
 
+OS_NAME: Final[str] = os.name
+IS_WIN: Final[bool] = OS_NAME == 'nt'
+
 
 Paths = Path | PathLike | str
 
@@ -89,11 +92,12 @@ _async_accessor = _AsyncAccessor()
 
 class AsyncPurePath(PurePath):
   def _init(self, template: PurePath | None = None):
-    self._accessor = _async_accessor
+    self._accessor: _AsyncAccessor = _async_accessor
 
   def __new__(cls: type, *args):
     if cls is AsyncPurePath:
-      cls = AsyncPureWindowsPath if os.name == 'nt' else AsyncPurePosixPath
+      cls = AsyncPureWindowsPath if IS_WIN else AsyncPurePosixPath
+
     return cls._from_parts(args)
 
 
@@ -117,7 +121,7 @@ class AsyncPureWindowsPath(AsyncPurePath):
 
 class AsyncPath(Path, AsyncPurePath):
   _flavour = \
-    _async_windows_flavour if os.name == 'nt' else _async_posix_flavour
+    _async_windows_flavour if IS_WIN else _async_posix_flavour
   _accessor = _async_accessor
 
   def _init(self, template: AsyncPath | None = None):
@@ -125,7 +129,7 @@ class AsyncPath(Path, AsyncPurePath):
 
   def __new__(cls: type, *args, **kwargs):
     if cls is AsyncPath:
-      cls = AsyncWindowsPath if os.name == 'nt' else AsyncPosixPath
+      cls = AsyncWindowsPath if IS_WIN else AsyncPosixPath
 
     try:
       self = cls._from_parts(args, init=False)
@@ -404,9 +408,10 @@ class AsyncPath(Path, AsyncPurePath):
     """Iterate over the files in this directory.  Does not yield any
     result for the special paths '.' and '..'.
     """
-    for name in await self._accessor.listdir(self):
+    names = await self._accessor.listdir(self)
+
+    for name in names:
       if name in {'.', '..'}:
-        # Yielding a path object for these makes little sense
         continue
 
       yield self._make_child_relpath(name)
@@ -676,15 +681,6 @@ class AsyncPath(Path, AsyncPurePath):
       return self._from_parts([homedir] + self._parts[1:])
 
     return self
-
-  async def iterdir(self) -> AsyncIterable[AsyncPath]:
-    names = await self._accessor.listdir(self)
-
-    for name in names:
-      if name in {'.', '..'}:
-        continue
-
-      yield self._make_child_relpath(name)
 
 
 class AsyncPosixPath(PosixPath, AsyncPath, AsyncPurePosixPath):
