@@ -243,10 +243,10 @@ $ python3 setup.py install
 ```
 
 #### Python 3.9 and older
-`aiopath` for Python 3.9 and older is developed on the [Python-3.9 branch](https://github.com/alexdelorenzo/aiopath/tree/Python-3.9).
+`aiopath` for Python 3.9 and older is developed on the [`Python-3.9` branch](https://github.com/alexdelorenzo/aiopath/tree/Python-3.9).
 
 #### Python 3.10 and newer
-`aiopath` for Python 3.10 and newer is developed on the [Python-3.10 branch](https://github.com/alexdelorenzo/aiopath/tree/Python-3.10).
+`aiopath` for Python 3.10 and newer is developed on the [`Python-3.10` branch](https://github.com/alexdelorenzo/aiopath/tree/Python-3.10).
 
 # Support
 Want to support this project and [other open-source projects](https://github.com/alexdelorenzo) like it?
