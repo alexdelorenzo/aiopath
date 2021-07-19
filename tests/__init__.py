@@ -40,15 +40,19 @@ def _test_is_pure(
 ):
   # PurePath & AsyncPurePath methods are not async
   assert str(path) == str(apath)
+  assert path.anchor == apath.anchor
   assert path.name == apath.name
   assert path.drive == apath.drive
+  assert path.parts == apath.parts
   assert path.root == apath.root
   assert path.stem == apath.stem
   assert path.suffix == apath.suffix
   assert path.suffixes == apath.suffixes
   assert path.as_uri() == apath.as_uri()
+  assert path.as_posix() == apath.as_posix()
   assert path.is_absolute() == apath.is_absolute()
   assert path.is_reserved() == apath.is_reserved()
+  assert path.is_relative_to(path) == apath.is_relative_to(apath)
 
 
 async def _test_is_io(
