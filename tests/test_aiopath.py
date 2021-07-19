@@ -227,5 +227,16 @@ async def test_is_mount():
 
 
 @pytest.mark.asyncio
-async def test_expand_user():
+async def test_expanduser():
   pass
+
+
+@pytest.mark.asyncio
+async def test_match(file_paths: Paths):
+  pass
+
+
+@pytest.mark.asyncio
+async def test_joinpath(file_paths: Paths):
+  pass
+
