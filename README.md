@@ -37,12 +37,12 @@ async def main():
     'https://dupebot.firstbyte.dev'
   ]
 
-  scrapers = (
+  tasks = (
     save_page(url, f'{index}.html')
     for index, url in enumerate(urls)
   )
 
-  await gather(*scrapers)
+  await gather(*tasks)
 
 
 run(main())
