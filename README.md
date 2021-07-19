@@ -153,7 +153,7 @@ Check out the test files in the [`tests` directory](https://github.com/alexdelor
 ## Opening a file
 You can get an asynchronous [file-like object handle](https://docs.python.org/3/glossary.html#term-file-object) by using [asynchronous context managers](https://docs.python.org/3/reference/datamodel.html#asynchronous-context-managers). 
 
-`AsyncPath.open()`'s async context manager yields an [`aiofile.AIOFile`](https://github.com/mosquito/aiofile) object.
+`AsyncPath.open()`'s async context manager yields an [`anyio.AsyncFile`](https://anyio.readthedocs.io/en/stable/api.html#async-file-i-o) object.
 
 ```python3
 from asynctempfile import NamedTemporaryFile
@@ -216,11 +216,11 @@ if await downloads.exists():
  - Python 3.7+
  - `requirements.txt`
 
-#### Linux dependencies
+<!--#### Linux dependencies
 If you're using a 4.18 or newer kernel and have [`libaio`](https://pagure.io/libaio) installed, `aiopath` will use it via `aiofile`. You can install `libaio` on Debian/Ubuntu like so:
 ```bash
 $ sudo apt install libaio1 libaio-dev
-```
+```-->
 
 ## PyPI
 ```bash
