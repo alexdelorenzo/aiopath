@@ -10,8 +10,8 @@ import pytest
 from aiopath import AsyncPath
 
 
-RECURSIVE_GLOB: str = '**/*'
 WILDCARD_GLOB: str = '*'
+RECURSIVE_GLOB: str = '**/*'
 
 
 PathTypes = Union[PathLike, str]
@@ -38,7 +38,7 @@ def _test_is_pure(
   path: Path,
   apath: AsyncPath,
 ):
-  # PurePath & AsyncPurePath methods are not async
+  # AsyncPurePath methods are not async
   assert str(path) == str(apath)
   assert path.anchor == apath.anchor
   assert path.name == apath.name
