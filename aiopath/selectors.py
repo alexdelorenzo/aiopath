@@ -139,6 +139,7 @@ class _RecursiveWildcardSelector(_AsyncSelector):
 
           async for p in self._iterate_directories(path, is_dir, scandir):
             yield p
+
     except PermissionError:
       return
 
@@ -168,13 +169,10 @@ class _RecursiveWildcardSelector(_AsyncSelector):
       return
 
 
-def _make_selector(pattern_parts: list[str], flavour: _Flavour) -> _AsyncSelector:
-  pat: str
-  child_parts: tuple[str]  # needs to be hashable
+def _make_selector(pattern_parts: tuple[str], flavour: _Flavour) -> _AsyncSelector:
+  pat: str = pattern_parts[0]
+  child_parts: tuple[str] = pattern_parts[1:]
   cls: type
-
-  pat, *child_parts = pattern_parts
-  child_parts = tuple(child_parts)
 
   if pat == '**':
     cls = _RecursiveWildcardSelector
