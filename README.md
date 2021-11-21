@@ -3,7 +3,7 @@
 
 All I/O performed by `aiopath` is asynchronous and [awaitable](https://docs.python.org/3/library/asyncio-task.html#awaitables).
 
-Check out [`📂 app_paths`](https://github.com/alexdelorenzo/app_paths) for an example of an app that uses `aiopath`.
+Check out [`📂 app_paths`](https://github.com/alexdelorenzo/app_paths) for an example of an app that uses `aiopath`, as well as the [`pyclean` script here](https://alexdelorenzo.dev/notes/pyclean).
 
 ## Use case
 If you're writing asynchronous Python code and want to take advantage of `pathlib`'s conveniences, but don't want to mix blocking and [non-blocking I/O](https://en.wikipedia.org/wiki/Asynchronous_I/O), then you can reach for `aiopath`.
