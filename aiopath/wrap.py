@@ -62,7 +62,7 @@ def to_async_method(func: Callable[P, T]) -> CoroutineMethod[P, T] | NoReturn:
     case _ if iscoroutinefunction(func):
       return coro_to_async_method(func)
 
-    case FunctionType() | BuiltinFunctionType() | IsCallable[T]():
+    case FunctionType() | BuiltinFunctionType() | IsCallable():
       return func_to_async_method(func)
 
     case MethodType() | BuiltinMethodType():
