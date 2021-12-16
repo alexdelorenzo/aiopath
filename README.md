@@ -8,7 +8,7 @@ Check out [`📂 app_paths`](https://github.com/alexdelorenzo/app_paths) for an 
 ## Use case
 If you're writing asynchronous Python code and want to take advantage of `pathlib`'s conveniences, but don't want to mix blocking and [non-blocking I/O](https://en.wikipedia.org/wiki/Asynchronous_I/O), then you can reach for `aiopath`.
 
-For example, if you're writing an asynchronous [web scraping](https://en.wikipedia.org/wiki/Web_scraping) script, you might want to make several concurrent requests to websites and write the content in the responses to secondary storage:
+For example, if you're writing an async [web scraping](https://en.wikipedia.org/wiki/Web_scraping) script, you might want to make several concurrent requests to websites and save the responses to persistent storage:
 ```python3
 from asyncio import run, gather
 
@@ -47,7 +47,7 @@ async def main():
 
 run(main())
 ```
-If you used `pathlib` instead of `aiopath` in the example above, some tasks would block upon accessing the disk, and other tasks accessing the network would be forced to pause while tasks block.
+If you used `pathlib` instead of `aiopath`, tasks accessing the disk would block the event loop, and async tasks accessing the network would be suspended until the event loop was unblocked.
 
 By using `aiopath`, the script can access the network and disk concurrently.
 
