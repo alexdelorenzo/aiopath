@@ -47,7 +47,7 @@ async def main():
 
 run(main())
 ```
-If you used `pathlib` instead of `aiopath`, tasks accessing the disk would block the event loop, and async tasks accessing the network would be suspended until the event loop was unblocked.
+If you used `pathlib` instead of `aiopath`, tasks accessing the disk would block the event loop, and async tasks accessing the network would suspend until the event loop was unblocked.
 
 By using `aiopath`, the script can access the network and disk concurrently.
 
