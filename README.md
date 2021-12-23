@@ -23,8 +23,8 @@ async def save_page(url: str, name: str):
     return
 
   async with ClientSession() as session:
-    response = await session.get(url)
-    content: bytes = await response.read()
+    async with session.get(url) as response:
+      content: bytes = await response.read()
 
   await path.write_bytes(content)
 
