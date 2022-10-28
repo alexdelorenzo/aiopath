@@ -1,4 +1,5 @@
 # From Python 3.10.8's pathlib.py
+# Source: https://github.com/python/cpython/blob/3.10/Lib/pathlib.py
 
 from __future__ import annotations
 from os import stat_result
