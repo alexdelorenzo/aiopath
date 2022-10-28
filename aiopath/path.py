@@ -13,6 +13,7 @@ from .scandir import EntryWrapper, scandir_async
 from .handle import get_handle, Handle
 from .selectors import _make_selector
 from .types import FileMode
+from .compat import _NormalAccessor
 
 
 DEFAULT_ENCODING: Final[str] = 'utf-8'
@@ -28,89 +29,6 @@ Paths = Path | PathLike | str
 
 getcwd = os.getcwd
 close = func_to_async_func(os.close)
-
-# from Python 3.10.8 pathlib.py
-class _Accessor:
-    """An accessor implements a particular (system-specific or not) way of
-    accessing paths on the filesystem."""
-
-class _NormalAccessor(_Accessor):
-
-    stat = os.stat
-
-    open = io.open
-
-    listdir = os.listdir
-
-    scandir = os.scandir
-
-    chmod = os.chmod
-
-    mkdir = os.mkdir
-
-    unlink = os.unlink
-
-    if hasattr(os, "link"):
-        link = os.link
-    else:
-        def link(self, src, dst):
-            raise NotImplementedError("os.link() not available on this system")
-
-    rmdir = os.rmdir
-
-    rename = os.rename
-
-    replace = os.replace
-
-    if hasattr(os, "symlink"):
-        symlink = os.symlink
-    else:
-        def symlink(self, src, dst, target_is_directory=False):
-            raise NotImplementedError("os.symlink() not available on this system")
-
-    def touch(self, path, mode=0o666, exist_ok=True):
-        if exist_ok:
-            # First try to bump modification time
-            # Implementation note: GNU touch uses the UTIME_NOW option of
-            # the utimensat() / futimens() functions.
-            try:
-                os.utime(path, None)
-            except OSError:
-                # Avoid exception chaining
-                pass
-            else:
-                return
-        flags = os.O_CREAT | os.O_WRONLY
-        if not exist_ok:
-            flags |= os.O_EXCL
-        fd = os.open(path, flags, mode)
-        os.close(fd)
-
-    if hasattr(os, "readlink"):
-        readlink = os.readlink
-    else:
-        def readlink(self, path):
-            raise NotImplementedError("os.readlink() not available on this system")
-
-    def owner(self, path):
-        try:
-            import pwd
-            return pwd.getpwuid(self.stat(path).st_uid).pw_name
-        except ImportError:
-            raise NotImplementedError("Path.owner() is unsupported on this system")
-
-    def group(self, path):
-        try:
-            import grp
-            return grp.getgrgid(self.stat(path).st_gid).gr_name
-        except ImportError:
-            raise NotImplementedError("Path.group() is unsupported on this system")
-
-    getcwd = os.getcwd
-
-    expanduser = staticmethod(os.path.expanduser)
-
-    realpath = staticmethod(os.path.realpath)
 
 
 class _AsyncAccessor(_NormalAccessor):
@@ -139,8 +57,10 @@ class _AsyncAccessor(_NormalAccessor):
     )
 
   utime = to_async_method(os.utime)
+
   if hasattr(_NormalAccessor, 'readlink'):
     readlink = to_async_method(_NormalAccessor.readlink)
+
   remove = to_async_method(os.remove)
 
   async def owner(self, path: str) -> str:
