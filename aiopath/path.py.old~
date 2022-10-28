@@ -5,7 +5,7 @@ from typing import AsyncIterable, Final
 from os import stat_result, PathLike
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
-import os, io
+import os
 
 from .flavours import _async_windows_flavour, _async_posix_flavour
 from .wrap import to_async_method, to_thread, func_to_async_func
