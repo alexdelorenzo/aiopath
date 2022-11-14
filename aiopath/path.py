@@ -1,7 +1,7 @@
 from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, \
   Path, PurePath, _ignore_error
-from typing import AsyncIterable, Final
+from typing import AsyncIterable, Final, Self, Type
 from os import stat_result, PathLike
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
@@ -132,7 +132,7 @@ class AsyncPath(Path, AsyncPurePath):
   def _init(self, template: AsyncPath | None = None):
     self._accessor = _async_accessor
 
-  def __new__(cls: type, *args, **kwargs):
+  def __new__(cls: Type[Self], *args, **kwargs) -> Self:
     if cls is AsyncPath:
       cls = AsyncWindowsPath if IS_WIN else AsyncPosixPath
 
