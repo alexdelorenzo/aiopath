@@ -3,3 +3,4 @@ include requirements.txt
 include README.md
 include LICENSE
 include CREDIT.md
+include aiopath/py.typed
