@@ -41,7 +41,7 @@ class AsyncPurePath(PurePath):
     return tuple(AsyncPath(path) for path in super().parents)
 
 
-class AsyncPath(AsyncPurePath, Path):
+class AsyncPath(Path, AsyncPurePath):
   async def open(
     self,
     mode: str = FileMode,
