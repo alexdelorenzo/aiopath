@@ -1,10 +1,21 @@
 from __future__ import annotations
 from pathlib import Path, PosixPath, WindowsPath, \
-  _Selector, _is_wildcard_pattern, _ignore_error, _Flavour
+  _Selector, _ignore_error
 from typing import AsyncIterable, Callable
 import functools
 
 from .wrap import CoroutineMethod
+
+try:
+  from pathlib import _is_wildcard_pattern, _Flavour
+
+except ImportError:
+  class _Flavour:
+    pass
+
+
+  def _is_wildcard_pattern(pat):
+    return "*" in pat or "?" in pat or "[" in pat
 
 
 class _AsyncSelector:

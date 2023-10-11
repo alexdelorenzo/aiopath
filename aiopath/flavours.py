@@ -1,5 +1,15 @@
 from __future__ import annotations
-from pathlib import _PosixFlavour, _WindowsFlavour
+
+try:
+  from pathlib import _PosixFlavour, _WindowsFlavour
+
+except ImportError:
+  class _PosixFlavour:
+    pass
+
+  class _WindowsFlavour:
+    pass
+
 from typing import Callable, Awaitable, TYPE_CHECKING
 from errno import EINVAL
 import os
