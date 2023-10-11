@@ -18,6 +18,38 @@ TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
 
 
+@pytest.mark.asycio
+def test_asyncpath_implements_all_path_members():
+  path_dunders: set[str] = {
+    member
+    for member in dir(Path)
+    if member.startswith('__') and member.endswith('__')
+  }
+  path_public: set[str] = {
+    member
+    for member in dir(Path)
+    if not member.startswith('_')
+  }
+  path_members: set[str] = path_dunders | path_public
+
+  apath_dunders: set[str] = {
+    member
+    for member in dir(AsyncPath)
+    if member.startswith('__') and member.endswith('__')
+  }
+  apath_public: set[str] = {
+    member
+    for member in dir(AsyncPath)
+    if not member.startswith('_')
+  }
+  apath_members: set[str] = apath_dunders | apath_public
+  apath_members.discard('__annotations__')
+  apath_members.discard('__dict__')
+  apath_members.discard('__weakref__')
+
+  assert apath_members == path_members
+
+
 @pytest.mark.asyncio
 async def test_home():
   home = Path.home()
