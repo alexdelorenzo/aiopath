@@ -45,15 +45,11 @@ class AsyncPurePath(PurePath):
 
 
 class AsyncPath(Path, AsyncPurePath):
-  _cached: Path | None = None
+  __slots__ = ('__dict__',)
 
-  @property
+  @cached_property
   def _path(self) -> Path:
-    if self._cached:
-      return self._cached
-
-    self._cached = Path(self)
-    return self._cached
+    return Path(self)
 
   async def open(
     self,
