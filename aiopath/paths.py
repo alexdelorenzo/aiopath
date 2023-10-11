@@ -2,6 +2,7 @@ from os import stat_result
 from pathlib import Path, PurePath
 from typing import AsyncIterable, Self
 
+from .types import FileMode
 from .wrap import to_thread
 
 
@@ -43,7 +44,7 @@ class AsyncPurePath(PurePath):
 class AsyncPath(AsyncPurePath, Path):
   async def open(
     self,
-    mode: str = 'r',
+    mode: str = FileMode,
     buffering: int = -1,
     encoding: str | None = None,
     errors: str | None = None,
