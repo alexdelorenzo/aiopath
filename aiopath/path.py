@@ -310,11 +310,11 @@ class AsyncPath(Path, AsyncPurePath):
     """
     await self._accessor.rmdir(self)
 
-  async def link_to(self, target: str):
+  async def hardlink_to(self, target: str):
     """
     Create a hard link pointing to a path named target.
     """
-    await self._accessor.link_to(self, target)
+    await self._accessor.hardlink_to(self, target)
 
   async def rename(self, target: str | AsyncPath) -> AsyncPath:
     """
