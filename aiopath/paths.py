@@ -1,3 +1,4 @@
+from functools import cached_property
 from os import stat_result
 from pathlib import Path, PurePath
 from typing import AsyncIterable, Self
@@ -7,6 +8,8 @@ from .wrap import to_thread
 
 
 class AsyncPurePath(PurePath):
+  __slots__ = PurePath.__slots__
+
   def __truediv__(self, other: Self) -> Self:
     path: PurePath = super().__truediv__(other)
     return AsyncPath(path)
@@ -42,6 +45,16 @@ class AsyncPurePath(PurePath):
 
 
 class AsyncPath(Path, AsyncPurePath):
+  _cached: Path | None = None
+
+  @property
+  def _path(self) -> Path:
+    if self._cached:
+      return self._cached
+
+    self._cached = Path(self)
+    return self._cached
+
   async def open(
     self,
     mode: str = FileMode,
@@ -55,12 +68,12 @@ class AsyncPath(Path, AsyncPurePath):
 
   @classmethod
   async def cwd(cls) -> Self:
-    path: Path = await to_thread(super().cwd)
+    path: Path = await to_thread(Path.cwd)
     return AsyncPath(path)
 
   @classmethod
   async def home(cls) -> Self:
-    path: Path = await to_thread(super().home)
+    path: Path = await to_thread(Path.home)
     return AsyncPath(path)
 
   async def stat(self) -> stat_result:
@@ -85,7 +98,7 @@ class AsyncPath(Path, AsyncPurePath):
     return AsyncPath(path)
 
   async def exists(self) -> bool:
-    return await to_thread(super().exists)
+    return await to_thread(self._path.exists)
 
   async def expanduser(self: Self) -> Self:
     path: Path = await to_thread(super().expanduser)
@@ -96,7 +109,7 @@ class AsyncPath(Path, AsyncPurePath):
       yield AsyncPath(path)
 
   async def group(self) -> int:
-    return await to_thread(super().group)
+    return await to_thread(self._path.group)
 
   async def hardlink_to(
     self,
@@ -104,48 +117,36 @@ class AsyncPath(Path, AsyncPurePath):
   ):
     return await to_thread(super().hardlink_to, target)
 
-  async def is_absolute(self) -> bool:
-    return await to_thread(super().is_absolute)
-
   async def is_block_device(self) -> bool:
-    return await to_thread(super().is_block_device)
+    return await to_thread(self._path.is_block_device)
 
   async def is_char_device(self) -> bool:
-    return await to_thread(super().is_char_device)
+    return await to_thread(self._path.is_char_device)
 
   async def is_dir(self) -> bool:
-    return await to_thread(super().is_dir)
+    return await to_thread(self._path.is_dir)
 
   async def is_fifo(self) -> bool:
-    return await to_thread(super().is_fifo)
+    return await to_thread(self._path.is_fifo)
 
   async def is_file(self) -> bool:
-    return await to_thread(super().is_file)
+    return await to_thread(self._path.is_file)
 
   async def is_mount(self) -> bool:
-    return await to_thread(super().is_mount)
-
-  async def is_relative_to(self, *other: str | Path) -> bool:
-    return await to_thread(super().is_relative_to, *other)
-
-  async def is_reserved(self) -> bool:
-    return await to_thread(super().is_reserved)
+    return await to_thread(self._path.is_mount)
 
   async def is_socket(self) -> bool:
-    return await to_thread(super().is_socket)
+    return await to_thread(self._path.is_socket)
 
   async def is_symlink(self) -> bool:
-    return await to_thread(super().is_symlink)
+    return await to_thread(self._path.is_symlink)
 
   async def iterdir(self: Self) -> AsyncIterable[Self]:
     for path in await to_thread(super().iterdir):
       yield AsyncPath(path)
 
-  async def link_to(self, target: str | bytes):
-    return await to_thread(super().link_to, target)
-
   async def lstat(self) -> stat_result:
-    return await to_thread(super().lstat)
+    return await to_thread(self._path.lstat)
 
   async def match(self, path_pattern: str) -> bool:
     return await to_thread(super().match, path_pattern)
@@ -154,7 +155,7 @@ class AsyncPath(Path, AsyncPurePath):
     return await to_thread(super().mkdir, mode, parents, exist_ok)
 
   async def owner(self) -> str:
-    return await to_thread(super().owner)
+    return await to_thread(self._path.owner)
 
   async def read_bytes(self) -> bytes:
     return await to_thread(super().read_bytes)
@@ -184,8 +185,8 @@ class AsyncPath(Path, AsyncPurePath):
   async def rmdir(self):
     return await to_thread(super().rmdir)
 
-  async def samefile(self, other_path: str | bytes | int | Path) -> bool:
-    return await to_thread(super().samefile, other_path)
+  async def samefile(self, other_path: str | bytes | Path) -> bool:
+    return await to_thread(self._path.samefile, other_path)
 
   async def symlink_to(self, target: str | Path, target_is_directory: bool = False):
     return await to_thread(super().symlink_to, target, target_is_directory)
