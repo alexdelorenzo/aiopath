@@ -1,9 +1,9 @@
 # export class hierarchy
-from .path import AsyncPath, AsyncPurePath, AsyncWindowsPath, \
+from aiopath.old.path import AsyncPath, AsyncPurePath, AsyncWindowsPath, \
   AsyncPosixPath, AsyncPurePosixPath, AsyncPureWindowsPath
 
 # export iterable async file handle
-from .handle import IterableAIOFile
+from aiopath.old.handle import IterableAIOFile
 
 
 # convenience aliases

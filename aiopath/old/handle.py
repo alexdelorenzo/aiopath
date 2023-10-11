@@ -11,10 +11,10 @@ from aiofile import AIOFile, LineReader, \
   TextFileWrapper, BinaryFileWrapper
 from anyio import AsyncFile, open_file
 
-from .types import FileMode
+from aiopath.types import FileMode
 
 if TYPE_CHECKING:  # keep mypy quiet
-  from .path import AsyncPath
+  pass
 
 
 BEGINNING: Final[int] = 0

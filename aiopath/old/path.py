@@ -5,15 +5,15 @@ from typing import AsyncIterable, Final, Self, Type
 from os import stat_result, PathLike
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
-import os, io
+import os
 
-from .flavours import _async_windows_flavour, _async_posix_flavour
-from .wrap import to_async_method, to_thread, func_to_async_func
-from .scandir import EntryWrapper, scandir_async
-from .handle import get_handle, Handle
-from .selectors import _make_selector
-from .types import FileMode
-from .compat import _NormalAccessor
+from aiopath.old.flavours import _async_windows_flavour, _async_posix_flavour
+from aiopath.wrap import to_async_method, to_thread, func_to_async_func
+from aiopath.old.scandir import EntryWrapper, scandir_async
+from aiopath.old.handle import get_handle, Handle
+from aiopath.old.selectors import _make_selector
+from aiopath.types import FileMode
+from aiopath.old.compat import _NormalAccessor
 
 
 DEFAULT_ENCODING: Final[str] = 'utf-8'

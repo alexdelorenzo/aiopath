@@ -10,11 +10,11 @@ except ImportError:
   class _WindowsFlavour:
     pass
 
-from typing import Callable, Awaitable, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from errno import EINVAL
 import os
 
-from .wrap import func_to_async_func
+from aiopath.wrap import func_to_async_func
 
 try:
   from pathlib import _getfinalpathname
@@ -25,7 +25,7 @@ except ImportError:
     raise ImportError("_getfinalpathname() requires a Windows/NT platform")
 
 if TYPE_CHECKING:  # keep mypy quiet
-  from .path import AsyncPath
+  from aiopath.old.path import AsyncPath
 
 
 getcwd = os.getcwd

@@ -4,7 +4,7 @@ from pathlib import Path, PosixPath, WindowsPath, \
 from typing import AsyncIterable, Callable
 import functools
 
-from .wrap import CoroutineMethod
+from aiopath.wrap import CoroutineMethod
 
 try:
   from pathlib import _is_wildcard_pattern, _Flavour
