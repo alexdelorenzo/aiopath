@@ -83,21 +83,6 @@ class AsyncPath(AsyncPurePath, Path):
     path: Path = await to_thread(super().absolute)
     return AsyncPath(path)
 
-  async def anchor(self) -> str:
-    return await to_thread(super().anchor)
-
-  async def as_posix(self) -> str:
-    return await to_thread(super().as_posix)
-
-  async def as_url(self) -> str:
-    return await to_thread(super().as_url)
-
-  async def as_uri(self) -> str:
-    return await to_thread(super().as_uri)
-
-  async def drive(self) -> str:
-    return await to_thread(super().drive)
-
   async def exists(self) -> bool:
     return await to_thread(super().exists)
 
@@ -155,10 +140,6 @@ class AsyncPath(AsyncPurePath, Path):
     for path in await to_thread(super().iterdir):
       yield AsyncPath(path)
 
-  async def joinpath(self: Self, *other: str | PurePath) -> Self:
-    path: Path = await to_thread(super().joinpath, *other)
-    return AsyncPath(path)
-
   async def link_to(self, target: str | bytes):
     return await to_thread(super().link_to, target)
 
@@ -171,22 +152,8 @@ class AsyncPath(AsyncPurePath, Path):
   async def mkdir(self, mode: int = 0o777, parents: bool = False, exist_ok: bool = False):
     return await to_thread(super().mkdir, mode, parents, exist_ok)
 
-  async def name(self) -> str:
-    return await to_thread(super().name)
-
   async def owner(self) -> str:
     return await to_thread(super().owner)
-
-  async def parent(self: Self) -> Self:
-    path: Path = await to_thread(super().parent)
-    return AsyncPath(path)
-
-  async def parents(self: Self) -> AsyncIterable[Self]:
-    for path in await to_thread(super().parents):
-      yield AsyncPath(path)
-
-  async def parts(self) -> tuple[str, ...]:
-    return await to_thread(super().parts)
 
   async def read_bytes(self) -> bytes:
     return await to_thread(super().read_bytes)
@@ -196,10 +163,6 @@ class AsyncPath(AsyncPurePath, Path):
 
   async def readlink(self: Self) -> Self:
     path: Path = await to_thread(super().readlink)
-    return AsyncPath(path)
-
-  async def relative_to(self: Self, *other: str | Path) -> Self:
-    path: Path = await to_thread(super().relative_to, *other)
     return AsyncPath(path)
 
   async def rename(self, target: str | Path):
@@ -220,9 +183,6 @@ class AsyncPath(AsyncPurePath, Path):
   async def rmdir(self):
     return await to_thread(super().rmdir)
 
-  async def root(self) -> str:
-    return await to_thread(super().root)
-
   async def samefile(self, other_path: str | bytes | int | Path) -> bool:
     return await to_thread(super().samefile, other_path)
 
@@ -234,18 +194,6 @@ class AsyncPath(AsyncPurePath, Path):
 
   async def unlink(self, missing_ok: bool = False):
     return await to_thread(super().unlink, missing_ok)
-
-  def with_name(self: Self, name: str) -> Self:
-    path: Path = super().with_name(name)
-    return AsyncPath(path)
-
-  def with_suffix(self: Self, suffix: str) -> Self:
-    path: Path = super().with_suffix(suffix)
-    return AsyncPath(path)
-
-  def with_stem(self: Self, stem: str) -> Self:
-    path: Path = super().with_stem(stem)
-    return AsyncPath(path)
 
   async def write_bytes(self, data: bytes):
     return await to_thread(super().write_bytes, data)
