@@ -62,7 +62,7 @@ class AsyncPurePath(PurePath):
     return AsyncPath(path)
 
 
-class AsyncPath(Path, AsyncPurePath):
+class AsyncPath(AsyncPurePath, Path):
   """An asynchronous implementation of pathlib.Path."""
 
   __slots__ = ('__dict__',)  # required for functools.cached_property()
