@@ -48,7 +48,7 @@ class AsyncPurePath(PurePath):
 
   @docs_from(PurePath)
   def relative_to(self, other: Paths, /, *_deprecated, walk_up: bool = False) -> Self:
-    path: PurePath = super().relative_to(*other, walk_up=walk_up)
+    path: PurePath = super().relative_to(other, *_deprecated, walk_up=walk_up)
     return AsyncPath(path)
 
   @docs_from(PurePath)
