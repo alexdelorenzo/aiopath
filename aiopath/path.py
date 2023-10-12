@@ -159,7 +159,7 @@ class AsyncPath(AsyncPurePath, Path):
 
   @docs_from(Path)
   async def lchmod(self, mode: FileMode):
-    return await to_thread(super().lchmod, mode)
+    return await to_thread(self._path.lchmod, mode)
 
   @docs_from(Path)
   async def lstat(self) -> stat_result:
@@ -171,7 +171,7 @@ class AsyncPath(AsyncPurePath, Path):
 
   @docs_from(Path)
   async def mkdir(self, mode: int = 0o777, parents: bool = False, exist_ok: bool = False):
-    return await to_thread(super().mkdir, mode, parents, exist_ok)
+    return await to_thread(self._path.mkdir, mode, parents, exist_ok)
 
   @docs_from(Path)
   def open(
