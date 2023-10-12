@@ -8,12 +8,9 @@ def docs_from(obj: Any) -> Decorator:
   """Use the docs from `obj` to decorate `func()`."""
 
   def decorator(func: Decoratable) -> Decorated:
-    name: str = func.__name__
-
+    name = func.__name__
     method: Method = getattr(obj, name)
-    docs: str = getdoc(method)
-
-    func.__doc__ = docs
+    func.__doc__ = getdoc(method)
 
     return func
 
