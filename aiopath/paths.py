@@ -3,6 +3,7 @@ from os import stat_result
 from pathlib import Path, PurePath
 from typing import AsyncIterable, Self
 
+from .old.handle import get_handle
 from .types import FileMode
 from .wrap import to_thread
 
@@ -51,7 +52,7 @@ class AsyncPath(Path, AsyncPurePath):
   def _path(self) -> Path:
     return Path(self)
 
-  async def open(
+  def open(
     self,
     mode: str = FileMode,
     buffering: int = -1,
@@ -59,8 +60,14 @@ class AsyncPath(Path, AsyncPurePath):
     errors: str | None = None,
     newline: str | None = None,
   ) -> Self:
-    path: Path = await to_thread(super().open, mode, buffering, encoding, errors, newline)
-    return AsyncPath(path)
+    return get_handle(
+      str(self),
+      mode,
+      buffering,
+      encoding,
+      errors,
+      newline
+    )
 
   @classmethod
   async def cwd(cls) -> Self:
