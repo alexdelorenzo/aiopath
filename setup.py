@@ -5,7 +5,7 @@ from pathlib import Path
 
 PKG_NAME: str = "aiopath"
 NAME: str = 'aiopath'
-VERSION: str = "0.7.2"
+VERSION: str = "0.7.3"
 LICENSE: str = "LGPL-3.0"
 
 DESC: str = "📁 Async pathlib for Python"
