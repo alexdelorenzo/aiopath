@@ -21,17 +21,17 @@ class AsyncPurePath(PurePath):
   __slots__ = PurePath.__slots__
 
   @docs_from(PurePath)
-  def __truediv__(self, other: Paths) -> Self:
-    path: PurePath = super().__truediv__(other)
+  def __truediv__(self, key: Paths) -> Self:
+    path: PurePath = super().__truediv__(key)
     return AsyncPath(path)
 
   @docs_from(PurePath)
-  def __rtruediv__(self, other: Paths) -> Self:
-    path: PurePath = super().__rtruediv__(other)
+  def __rtruediv__(self, key: Paths) -> Self:
+    path: PurePath = super().__rtruediv__(key)
     return AsyncPath(path)
 
   @docs_from(PurePath)
-  def relative_to(self: Self, *other: Paths) -> Self:
+  def relative_to(self, other: Paths, /, *_deprecated, walk_up: bool = False) -> Self:
     path: PurePath = super().relative_to(*other)
     return AsyncPath(path)
 
@@ -46,8 +46,8 @@ class AsyncPurePath(PurePath):
     return AsyncPath(path)
 
   @docs_from(PurePath)
-  def joinpath(self: Self, *other: Paths) -> Self:
-    path: PurePath = super().joinpath(*other)
+  def joinpath(self: Self, *pathsegments: str) -> Self:
+    path: PurePath = super().joinpath(*pathsegments)
     return AsyncPath(path)
 
   @property
