@@ -8,7 +8,7 @@ import pytest
 
 from aiopath import AsyncPath
 from . import DUNDER, PRIVATE, Paths, _get_public_methods, \
-  _get_signature_params, _test_is, file_paths, dir_paths
+  _get_signature_params, _is_public_or_dunder, _test_is, file_paths, dir_paths
 
 
 TEST_NAME: str = 'TEST'
@@ -20,21 +20,21 @@ def test_asyncpath_implements_all_path_members():
   path_members: set[str] = {
     member
     for member in dir(Path)
-    if member.startswith(DUNDER) and member.endswith(DUNDER) or not member.startswith(PRIVATE)
+    if _is_public_or_dunder(member)
   }
 
   apath_members: set[str] = {
     member
     for member in dir(AsyncPath)
-    if member.startswith(DUNDER) and member.endswith(DUNDER) or not member.startswith(PRIVATE)
+    if _is_public_or_dunder(member)
   }
 
   assert apath_members >= path_members
 
 
 def test_asyncpath_method_signatures_match_path_method_signatures():
-  amethods: set[str] = _get_public_methods(AsyncPath)
-  pmethods: set[str] = _get_public_methods(Path)
+  amethods = _get_public_methods(AsyncPath)
+  pmethods = _get_public_methods(Path)
 
   methods = amethods & pmethods
 
@@ -42,6 +42,7 @@ def test_asyncpath_method_signatures_match_path_method_signatures():
     method: _get_signature_params(AsyncPath, method)
     for method in methods
   }
+
   sigs: dict[str, set[str]] = {
     method: _get_signature_params(Path, method)
     for method in methods
@@ -51,8 +52,8 @@ def test_asyncpath_method_signatures_match_path_method_signatures():
 
 
 def test_asyncpath_methods_inherit_docs_from_path_methods():
-  amethods: set[str] = _get_public_methods(AsyncPath)
-  pmethods: set[str] = _get_public_methods(Path)
+  amethods = _get_public_methods(AsyncPath)
+  pmethods = _get_public_methods(Path)
 
   methods = amethods & pmethods
 
