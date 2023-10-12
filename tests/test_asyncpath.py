@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 
 from aiopath import AsyncPath
-from . import DUNDER, PRIVATE, Paths, _get_public_methods, \
-  _get_signature_params, _is_public_or_dunder, _test_is, file_paths, dir_paths
+from . import Paths, _get_public_methods, _get_signature_params, \
+  _is_public_or_dunder, _test_is, file_paths, dir_paths
 
 
 TEST_NAME: str = 'TEST'
@@ -38,17 +38,17 @@ def test_asyncpath_method_signatures_match_path_method_signatures():
 
   methods = amethods & pmethods
 
-  asigs: dict[str, set[str]] = {
+  asigs: dict[str, tuple[str]] = {
     method: _get_signature_params(AsyncPath, method)
     for method in methods
   }
 
-  sigs: dict[str, set[str]] = {
+  psigs: dict[str, tuple[str]] = {
     method: _get_signature_params(Path, method)
     for method in methods
   }
 
-  assert sigs == asigs
+  assert asigs == psigs
 
 
 def test_asyncpath_methods_inherit_docs_from_path_methods():

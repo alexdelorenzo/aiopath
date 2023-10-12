@@ -54,12 +54,12 @@ def _get_public_methods(obj: Any) -> set[str]:
   }
 
 
-def _get_signature_params(obj: Any, member: str) -> set[str]:
+def _get_signature_params(obj: Any, member: str) -> tuple[str]:
   method: Callable = getattr(obj, member)
   sig = signature(method)
   params = sig.parameters.keys()
 
-  return set(params)
+  return tuple(params)
 
 
 @pytest.fixture
