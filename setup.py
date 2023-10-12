@@ -5,7 +5,7 @@ from pathlib import Path
 
 PKG_NAME: str = "aiopath"
 NAME: str = 'aiopath'
-VERSION: str = "0.6.13"
+VERSION: str = "0.7.0"
 LICENSE: str = "LGPL-3.0"
 
 DESC: str = "📁 Async pathlib for Python"
@@ -30,6 +30,6 @@ setup(
   packages=[NAME],
   zip_safe=True,
   install_requires=REQUIREMENTS,
-  python_requires='>=3.10',
+  python_requires='>=3.12',
   include_package_data=True
 )
