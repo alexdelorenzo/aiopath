@@ -65,7 +65,10 @@ class AsyncPurePath(PurePath):
 class AsyncPath(AsyncPurePath, Path):
   """An asynchronous implementation of pathlib.Path."""
 
-  __slots__ = ('__dict__',)  # required for functools.cached_property()
+  __slots__ = (
+    *Path.__slots__,
+    '__dict__',  # required for functools.cached_property()
+  )
 
   @cached_property
   def _path(self) -> Path:
@@ -247,6 +250,11 @@ class AsyncPath(AsyncPurePath, Path):
     return await to_thread(self._path.write_bytes, data)
 
   @docs_from(Path)
-  async def write_text(self, data: str, encoding: str | None = None, errors: str | None = None, newline: str | None =
-  None) -> int:
+  async def write_text(
+    self,
+    data: str,
+    encoding: str | None = None,
+    errors: str | None = None,
+    newline: str | None = None
+  ) -> int:
     return await to_thread(self._path.write_text, data, encoding, errors, newline)
