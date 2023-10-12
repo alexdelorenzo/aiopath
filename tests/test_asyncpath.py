@@ -45,8 +45,8 @@ def test_asyncpath_implements_all_path_members():
 
 
 def test_asyncpath_method_signatures_match_path_method_signatures():
-  amethods: set[str] = {name for name in _get_public_methods(AsyncPath)}
-  pmethods: set[str] = {name for name in _get_public_methods(Path)}
+  amethods: set[str] = _get_public_methods(AsyncPath)
+  pmethods: set[str] = _get_public_methods(Path)
 
   methods = amethods & pmethods
 
@@ -63,8 +63,8 @@ def test_asyncpath_method_signatures_match_path_method_signatures():
 
 
 def test_asyncpath_methods_inherit_docs_from_path_methods():
-  amethods: set[str] = {name for name in _get_public_methods(AsyncPath)}
-  pmethods: set[str] = {name for name in _get_public_methods(Path)}
+  amethods: set[str] = _get_public_methods(AsyncPath)
+  pmethods: set[str] = _get_public_methods(Path)
 
   methods = amethods & pmethods
 
