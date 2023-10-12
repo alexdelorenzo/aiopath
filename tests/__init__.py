@@ -10,6 +10,7 @@ from aiofiles.tempfile import NamedTemporaryFile, TemporaryDirectory
 
 from aiopath import AsyncPath
 from aiopath.types import Paths as PathTypes
+from aiopath.wrap import to_thread
 
 
 WILDCARD_GLOB: str = '*'
@@ -72,7 +73,6 @@ async def dir_paths() -> Paths:
   async with TemporaryDirectory() as temp:
     yield get_paths(temp)
 
-
 def _test_is_pure(
   path: Path,
   apath: AsyncPath,
@@ -99,15 +99,15 @@ async def _test_is_io(
   apath: AsyncPath,
 ):
   # AsyncPath methods are async
-  assert path.exists() == await apath.exists()
-  assert path.is_dir() == await apath.is_dir()
-  assert path.is_file() == await apath.is_file()
-  assert path.is_fifo() == await apath.is_fifo()
-  assert path.is_mount() == await apath.is_mount()
-  assert path.is_socket() == await apath.is_socket()
-  assert path.is_symlink() == await apath.is_symlink()
-  assert path.is_char_device() == await apath.is_char_device()
-  assert path.is_block_device() == await apath.is_block_device()
+  assert await to_thread(path.exists) == await apath.exists()
+  assert await to_thread(path.is_dir) == await apath.is_dir()
+  assert await to_thread(path.is_file) == await apath.is_file()
+  assert await to_thread(path.is_fifo) == await apath.is_fifo()
+  assert await to_thread(path.is_mount) == await apath.is_mount()
+  assert await to_thread(path.is_socket) == await apath.is_socket()
+  assert await to_thread(path.is_symlink) == await apath.is_symlink()
+  assert await to_thread(path.is_char_device) == await apath.is_char_device()
+  assert await to_thread(path.is_block_device) == await apath.is_block_device()
 
 
 async def _test_is(
@@ -122,18 +122,19 @@ async def _test_is(
 
   if exists and resolve:
     await _test_is(
-      path.resolve(),
+      await to_thread(path.resolve),
       await apath.resolve(),
       test_parent=False,
       resolve=False
     )
 
   if exists:
-    assert path.lstat() == await apath.lstat()
-    assert path.owner() == await apath.owner()
-    assert path.group() == await apath.group()
+    assert await to_thread(path.lstat) == await apath.lstat()
+    assert await to_thread(path.owner) == await apath.owner()
+    assert await to_thread(path.group) == await apath.group()
+
     aname, pname = str(apath), str(path)
-    assert path.samefile(aname) and await apath.samefile(pname)
+    assert await to_thread(path.samefile, aname) and await apath.samefile(pname)
 
   if test_parent:
     await _test_is(

@@ -7,6 +7,7 @@ from pathlib import Path, PurePath
 import pytest
 
 from aiopath import AsyncPath, AsyncPurePath
+from aiopath.wrap import to_thread
 from . import Paths, _get_public_methods, _get_signature_params, \
   _is_public_or_dunder, _test_is, file_paths, dir_paths
 
@@ -120,7 +121,7 @@ async def test_mkdir_rmdir(dir_paths: Paths):
 
 
 @pytest.mark.asyncio
-async def test_with_name_with_suffix(file_paths: Paths):
+async def test_with_name(file_paths: Paths):
   path, apath = file_paths
 
   await _test_is(
@@ -129,6 +130,11 @@ async def test_with_name_with_suffix(file_paths: Paths):
     test_parent=False,
     exists=False
   )
+
+
+@pytest.mark.asyncio
+async def test_with_suffix(file_paths: Paths):
+  path, apath = file_paths
 
   await _test_is(
     path.with_name(TEST_NAME),
@@ -190,11 +196,11 @@ async def test_unlink(file_paths: Paths, dir_paths: Paths):
   path, apath = file_paths
 
   assert await apath.exists()
-  assert path.exists()
+  assert await to_thread(path.exists)
 
   await apath.unlink()
   assert not await apath.exists()
-  assert not path.exists()
+  assert not await to_thread(path.exists)
 
   # recreate file
   await apath.touch()
@@ -206,7 +212,7 @@ async def test_unlink(file_paths: Paths, dir_paths: Paths):
     await apath.unlink()
 
   assert await apath.exists()
-  assert path.exists()
+  assert await to_thread(path.exists)
 
 
 @pytest.mark.asyncio
