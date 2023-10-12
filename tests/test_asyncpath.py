@@ -2,6 +2,7 @@ from __future__ import annotations
 from pathlib import Path, PurePath
 from asyncio import sleep, to_thread
 from os import PathLike
+import inspect
 
 from aiofiles.tempfile import NamedTemporaryFile, \
   TemporaryDirectory
@@ -18,7 +19,6 @@ TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
 
 
-@pytest.mark.asycio
 def test_asyncpath_implements_all_path_members():
   path_dunders: set[str] = {
     member
@@ -48,6 +48,23 @@ def test_asyncpath_implements_all_path_members():
   apath_members.discard('__weakref__')
 
   assert apath_members == path_members
+
+
+def test_asyncpath_method_signatures_match_path_method_signatures():
+  amembers = {name for name, method in inspect.getmembers(AsyncPath, inspect.ismethod)}
+  members = {name for name, method in inspect.getmembers(Path, inspect.ismethod)}
+
+  asigs = {
+    name: inspect.signature(getattr(AsyncPath, name)).parameters.keys()
+    for name in amembers
+  }
+
+  sigs = {
+    name: inspect.signature(getattr(Path, name)).parameters.keys()
+    for name in members
+  }
+
+  assert asigs == sigs
 
 
 @pytest.mark.asyncio
