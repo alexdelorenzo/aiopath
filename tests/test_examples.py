@@ -62,7 +62,7 @@ async def test_readme_example2_convert():
   # AsyncPath and Path objects can point to the same file
   assert str(home) == str(ahome) == str(path)
 
-  # but AsyncPath and Path objects are equivalent
+  # AsyncPath and Path objects are equivalent
   assert home == ahome
 
 
