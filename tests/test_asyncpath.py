@@ -1,66 +1,73 @@
 from __future__ import annotations
-from pathlib import Path, PurePath
-from asyncio import sleep, to_thread
-from os import PathLike
-import inspect
 
-from aiofiles.tempfile import NamedTemporaryFile, \
-  TemporaryDirectory
+from asyncio import sleep
+from inspect import getmembers, ismethod, signature
+from pathlib import Path
+from typing import Any
+
 import pytest
 
-from aiopath import AsyncPath, AsyncPurePath
-
-from . import _test_is, _test_is_io, _test_is_pure, \
-  file_paths, dir_paths, Paths, PathTypes
+from aiopath import AsyncPath
+from . import Paths, _test_is
 
 
 TEST_NAME: str = 'TEST'
 TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
+DISCARD_MEMBERS: tuple[str] = '__annotations__', '__dict__', '__weakref__'
+DUNDER: str = '__'
+PRIVATE: str = '_'
+
+
+def _get_signatures(obj: Any, name: str) -> set[str]:
+  member = getattr(obj, name)
+  sig = signature(member)
+  params = sig.parameters.keys()
+
+  return set(params)
 
 
 def test_asyncpath_implements_all_path_members():
   path_dunders: set[str] = {
     member
     for member in dir(Path)
-    if member.startswith('__') and member.endswith('__')
+    if member.startswith(DUNDER) and member.endswith(DUNDER)
   }
   path_public: set[str] = {
     member
     for member in dir(Path)
-    if not member.startswith('_')
+    if not member.startswith(PRIVATE)
   }
   path_members: set[str] = path_dunders | path_public
 
   apath_dunders: set[str] = {
     member
     for member in dir(AsyncPath)
-    if member.startswith('__') and member.endswith('__')
+    if member.startswith(DUNDER) and member.endswith(DUNDER)
   }
   apath_public: set[str] = {
     member
     for member in dir(AsyncPath)
-    if not member.startswith('_')
+    if not member.startswith(PRIVATE)
   }
   apath_members: set[str] = apath_dunders | apath_public
-  apath_members.discard('__annotations__')
-  apath_members.discard('__dict__')
-  apath_members.discard('__weakref__')
+
+  for member in DISCARD_MEMBERS:
+    apath_members.discard(member)
 
   assert apath_members == path_members
 
 
 def test_asyncpath_method_signatures_match_path_method_signatures():
-  amembers = {name for name, method in inspect.getmembers(AsyncPath, inspect.ismethod)}
-  members = {name for name, method in inspect.getmembers(Path, inspect.ismethod)}
+  amembers: set[str] = {name for name, _ in getmembers(AsyncPath, ismethod)}
+  members: set[str] = {name for name, _ in getmembers(Path, ismethod)}
 
-  asigs = {
-    name: inspect.signature(getattr(AsyncPath, name)).parameters.keys()
+  asigs: dict[str, set[str]] = {
+    name: _get_signatures(AsyncPath, name)
     for name in amembers
   }
-
-  sigs = {
-    name: inspect.signature(getattr(Path, name)).parameters.keys()
+  sigs: dict[str, set[str]] = {
+    name: _get_signatures(Path, name)
     for name in members
   }
 
@@ -288,4 +295,3 @@ async def test_match(file_paths: Paths):
 @pytest.mark.asyncio
 async def test_joinpath(file_paths: Paths):
   pass
-
