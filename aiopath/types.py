@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from os import PathLike
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Callable
 
 
 type Method[**P, T] = Callable[P, T]
