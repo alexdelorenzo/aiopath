@@ -107,7 +107,7 @@ class AsyncPath(Path, AsyncPurePath):
       yield AsyncPath(path)
 
   @docs_from(Path)
-  async def group(self) -> int:
+  async def group(self) -> str:
     return await to_thread(self._path.group)
 
   @docs_from(Path)
@@ -199,8 +199,9 @@ class AsyncPath(Path, AsyncPurePath):
     return AsyncPath(path)
 
   @docs_from(Path)
-  async def rename(self, target: Paths):
-    return await to_thread(super().rename, target)
+  async def rename(self: Self, target: Paths) -> Self:
+    path: Path = await to_thread(super().rename, target)
+    return AsyncPath(path)
 
   @docs_from(Path)
   async def replace(self: Self, target: Paths) -> Self:
@@ -222,7 +223,7 @@ class AsyncPath(Path, AsyncPurePath):
     return await to_thread(super().rmdir)
 
   @docs_from(Path)
-  async def samefile(self, other_path: Paths) -> bool:
+  async def samefile(self, other_path: Paths | int) -> bool:
     return await to_thread(self._path.samefile, other_path)
 
   @docs_from(Path)
@@ -242,9 +243,10 @@ class AsyncPath(Path, AsyncPurePath):
     return await to_thread(super().unlink, missing_ok)
 
   @docs_from(Path)
-  async def write_bytes(self, data: bytes):
+  async def write_bytes(self, data: bytes) -> int:
     return await to_thread(self._path.write_bytes, data)
 
   @docs_from(Path)
-  async def write_text(self, data: str, encoding: str | None = None, errors: str | None = None, newline: str | None = None):
+  async def write_text(self, data: str, encoding: str | None = None, errors: str | None = None, newline: str | None =
+  None) -> int:
     return await to_thread(self._path.write_text, data, encoding, errors, newline)
