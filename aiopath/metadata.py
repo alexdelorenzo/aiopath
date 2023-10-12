@@ -1,15 +1,7 @@
-from typing import Any, Callable, ParamSpec, TypeVar
 from inspect import getdoc
+from typing import Any
 
-
-T = TypeVar('T')
-P = ParamSpec('P')
-
-Decoratable = Callable[P, T]
-Decorated = Callable[P, T]
-Decorator = Callable[[Decoratable], Decorated]
-
-Method = Callable[P, T]
+from .types import Decoratable, Decorated, Decorator, Method
 
 
 def docs_from(obj: Any) -> Decorator:

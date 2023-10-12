@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import AsyncIterable, Union, IO, \
+from typing import AsyncIterable, IO, \
   TYPE_CHECKING, cast, Final, TextIO, BinaryIO, \
   AsyncContextManager
 from inspect import iscoroutinefunction
@@ -25,8 +25,10 @@ ENCODING: Final[str] = 'utf-8'
 ERRORS: Final[str] = 'replace'
 
 
-Paths = Union['AsyncPath', Path, str]
-FileData = bytes | str
+type Paths = AsyncPath | Path | str
+type FileData = bytes | str
+
+type Handle = TextFileWrapper | BinaryFileWrapper | IterableAIOFile | AsyncFile
 
 
 class FileLike(IO):
@@ -117,10 +119,6 @@ class IterableAIOFile(FileLike, AIOFile):
 
     await super().write(data, offset)
     self._set_offset(offset, data)
-
-
-Handle = \
-  TextFileWrapper | BinaryFileWrapper | IterableAIOFile | AsyncFile
 
 
 async def read_lines(
