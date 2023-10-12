@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from inspect import getmembers, isasyncgenfunction, iscoroutinefunction, isfunction, isgeneratorfunction, ismethod, \
   ismethodwrapper, signature
-from os import PathLike
 from pathlib import Path
-from typing import Any, Callable, Union
+from typing import Any, Callable
 
 import pytest
 from aiofiles.tempfile import NamedTemporaryFile, TemporaryDirectory
 
 from aiopath import AsyncPath
+from aiopath.types import Paths as PathTypes
 
 
 WILDCARD_GLOB: str = '*'
@@ -19,7 +19,6 @@ DUNDER: str = '__'
 PRIVATE: str = '_'
 
 
-type PathTypes = PathLike | str
 type Paths = tuple[Path, AsyncPath]
 
 
