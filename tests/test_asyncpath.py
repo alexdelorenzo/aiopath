@@ -1,30 +1,19 @@
 from __future__ import annotations
 
 from asyncio import sleep
-from inspect import getmembers, ismethod, signature
+from inspect import getdoc
 from pathlib import Path
-from typing import Any, Callable
 
 import pytest
 
 from aiopath import AsyncPath
-from . import Paths, _test_is, dir_paths, file_paths
+from . import DUNDER, PRIVATE, Paths, _get_public_methods, \
+  _get_signature_params, _test_is, file_paths, dir_paths
 
 
 TEST_NAME: str = 'TEST'
 TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
-
-DUNDER: str = '__'
-PRIVATE: str = '_'
-
-
-def _get_signature_params(obj: Any, member: str) -> set[str]:
-  method: Callable = getattr(obj, member)
-  sig = signature(method)
-  params = sig.parameters.keys()
-
-  return set(params)
 
 
 def test_asyncpath_implements_all_path_members():
@@ -56,19 +45,34 @@ def test_asyncpath_implements_all_path_members():
 
 
 def test_asyncpath_method_signatures_match_path_method_signatures():
-  amethods: set[str] = {name for name, _ in getmembers(AsyncPath, ismethod)}
-  methods: set[str] = {name for name, _ in getmembers(Path, ismethod)}
+  amethods: set[str] = {name for name in _get_public_methods(AsyncPath)}
+  pmethods: set[str] = {name for name in _get_public_methods(Path)}
+
+  methods = amethods & pmethods
 
   asigs: dict[str, set[str]] = {
     method: _get_signature_params(AsyncPath, method)
-    for method in amethods
+    for method in methods
   }
   sigs: dict[str, set[str]] = {
     method: _get_signature_params(Path, method)
     for method in methods
   }
 
-  assert asigs == sigs
+  assert sigs == asigs
+
+
+def test_asyncpath_methods_inherit_docs_from_path_methods():
+  amethods: set[str] = {name for name in _get_public_methods(AsyncPath)}
+  pmethods: set[str] = {name for name in _get_public_methods(Path)}
+
+  methods = amethods & pmethods
+
+  for method in methods:
+    amethod = getattr(AsyncPath, method)
+    pmethod = getattr(Path, method)
+
+    assert getdoc(amethod) == getdoc(pmethod)
 
 
 @pytest.mark.asyncio

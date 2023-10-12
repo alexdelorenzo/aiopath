@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from inspect import getmembers, isasyncgenfunction, iscoroutinefunction, isfunction, isgeneratorfunction, ismethod, \
+  ismethodwrapper, signature
 from os import PathLike
 from pathlib import Path
-from typing import Union
+from typing import Any, Callable, Union
 
 import pytest
 from aiofiles.tempfile import NamedTemporaryFile, TemporaryDirectory
@@ -13,13 +15,51 @@ from aiopath import AsyncPath
 WILDCARD_GLOB: str = '*'
 RECURSIVE_GLOB: str = '**/*'
 
+DUNDER: str = '__'
+PRIVATE: str = '_'
 
-PathTypes = Union[PathLike, str]
-Paths = tuple[Path, AsyncPath]
+
+type PathTypes = PathLike | str
+type Paths = tuple[Path, AsyncPath]
 
 
 def get_paths(path: PathTypes) -> Paths:
   return Path(path), AsyncPath(path)
+
+
+def _is_method(obj: Any) -> bool:
+  return (
+    ismethod(obj)
+    or isfunction(obj)
+    or iscoroutinefunction(obj)
+    or isasyncgenfunction(obj)
+    or isgeneratorfunction(obj)
+    or ismethodwrapper(obj)
+  )
+
+
+def _is_public_or_dunder(name: str) -> bool:
+  return (
+    name.startswith(DUNDER)
+    and name.endswith(DUNDER)
+    or not name.startswith(PRIVATE)
+  )
+
+
+def _get_public_methods(obj: Any) -> set[str]:
+  return {
+    name
+    for name, _ in getmembers(obj, _is_method)
+    if _is_public_or_dunder(name)
+  }
+
+
+def _get_signature_params(obj: Any, member: str) -> set[str]:
+  method: Callable = getattr(obj, member)
+  sig = signature(method)
+  params = sig.parameters.keys()
+
+  return set(params)
 
 
 @pytest.fixture
