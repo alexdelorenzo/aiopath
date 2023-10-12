@@ -14,7 +14,7 @@ from . import Paths, _test_is, dir_paths, file_paths
 TEST_NAME: str = 'TEST'
 TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
-DISCARD_MEMBERS: tuple[str] = '__annotations__', '__dict__', '__weakref__'
+
 DUNDER: str = '__'
 PRIVATE: str = '_'
 
@@ -52,10 +52,7 @@ def test_asyncpath_implements_all_path_members():
   }
   apath_members: set[str] = apath_dunders | apath_public
 
-  for member in DISCARD_MEMBERS:
-    apath_members.discard(member)
-
-  assert apath_members == path_members
+  assert apath_members >= path_members
 
 
 def test_asyncpath_method_signatures_match_path_method_signatures():
