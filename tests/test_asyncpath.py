@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from asyncio import sleep
 from inspect import getdoc
-from pathlib import Path
+from pathlib import Path, PurePath
 
 import pytest
 
-from aiopath import AsyncPath
+from aiopath import AsyncPath, AsyncPurePath
 from . import Paths, _get_public_methods, _get_signature_params, \
   _is_public_or_dunder, _test_is, file_paths, dir_paths
 
@@ -14,6 +14,24 @@ from . import Paths, _get_public_methods, _get_signature_params, \
 TEST_NAME: str = 'TEST'
 TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
+
+ASYNCPUREPATH_MRO: list[type, ...] = [
+  AsyncPurePath,
+  PurePath,
+  object,
+]
+ASYNCPATH_MRO: list[type, ...] = [
+  AsyncPath,
+  AsyncPurePath,
+  Path,
+  PurePath,
+  object,
+]
+
+
+def test_mro():
+  assert AsyncPurePath.mro() == ASYNCPUREPATH_MRO
+  assert AsyncPath.mro() == ASYNCPATH_MRO
 
 
 def test_asyncpath_implements_all_path_members():
