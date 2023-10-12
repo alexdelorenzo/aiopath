@@ -21,13 +21,29 @@ class AsyncPurePath(PurePath):
   __slots__ = PurePath.__slots__
 
   @docs_from(PurePath)
+  def __rtruediv__(self, key: Paths) -> Self:
+    path: PurePath = super().__rtruediv__(key)
+    return AsyncPath(path)
+
+  @docs_from(PurePath)
   def __truediv__(self, key: Paths) -> Self:
     path: PurePath = super().__truediv__(key)
     return AsyncPath(path)
 
+  @property
   @docs_from(PurePath)
-  def __rtruediv__(self, key: Paths) -> Self:
-    path: PurePath = super().__rtruediv__(key)
+  def parent(self: Self) -> Self:
+    path: PurePath = super().parent
+    return AsyncPath(path)
+
+  @property
+  @docs_from(PurePath)
+  def parents(self: Self) -> tuple[Self, ...]:
+    return tuple(AsyncPath(path) for path in super().parents)
+
+  @docs_from(PurePath)
+  def joinpath(self: Self, *pathsegments: str) -> Self:
+    path: PurePath = super().joinpath(*pathsegments)
     return AsyncPath(path)
 
   @docs_from(PurePath)
@@ -44,22 +60,6 @@ class AsyncPurePath(PurePath):
   def with_suffix(self: Self, suffix: str) -> Self:
     path: PurePath = super().with_suffix(suffix)
     return AsyncPath(path)
-
-  @docs_from(PurePath)
-  def joinpath(self: Self, *pathsegments: str) -> Self:
-    path: PurePath = super().joinpath(*pathsegments)
-    return AsyncPath(path)
-
-  @property
-  @docs_from(PurePath)
-  def parent(self: Self) -> Self:
-    path: PurePath = super().parent
-    return AsyncPath(path)
-
-  @property
-  @docs_from(PurePath)
-  def parents(self: Self) -> tuple[Self, ...]:
-    return tuple(AsyncPath(path) for path in super().parents)
 
 
 class AsyncPath(Path, AsyncPurePath):
@@ -84,21 +84,13 @@ class AsyncPath(Path, AsyncPurePath):
     return AsyncPath(path)
 
   @docs_from(Path)
-  async def stat(self, *, follow_symlinks: bool = True) -> stat_result:
-    return await to_thread(super().stat, follow_symlinks=follow_symlinks)
+  async def absolute(self: Self) -> Self:
+    path: Path = await to_thread(super().absolute)
+    return AsyncPath(path)
 
   @docs_from(Path)
   async def chmod(self, mode: FileMode, *, follow_symlinks: bool = True):
     return await to_thread(super().chmod, mode, follow_symlinks=follow_symlinks)
-
-  @docs_from(Path)
-  async def lchmod(self, mode: FileMode):
-    return await to_thread(super().lchmod, mode)
-
-  @docs_from(Path)
-  async def absolute(self: Self) -> Self:
-    path: Path = await to_thread(super().absolute)
-    return AsyncPath(path)
 
   @docs_from(Path)
   async def exists(self, *, follow_symlinks: bool = True) -> bool:
@@ -161,6 +153,10 @@ class AsyncPath(Path, AsyncPurePath):
   async def iterdir(self: Self) -> AsyncIterable[Self]:
     for path in await to_thread(super().iterdir):
       yield AsyncPath(path)
+
+  @docs_from(Path)
+  async def lchmod(self, mode: FileMode):
+    return await to_thread(super().lchmod, mode)
 
   @docs_from(Path)
   async def lstat(self) -> stat_result:
@@ -228,6 +224,10 @@ class AsyncPath(Path, AsyncPurePath):
   @docs_from(Path)
   async def samefile(self, other_path: Paths) -> bool:
     return await to_thread(self._path.samefile, other_path)
+
+  @docs_from(Path)
+  async def stat(self, *, follow_symlinks: bool = True) -> stat_result:
+    return await to_thread(super().stat, follow_symlinks=follow_symlinks)
 
   @docs_from(Path)
   async def symlink_to(self, target: Path, target_is_directory: bool = False):
