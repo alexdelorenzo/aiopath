@@ -1,15 +1,12 @@
 from __future__ import annotations
+
 from pathlib import Path, PurePath
-from asyncio import sleep, to_thread
-from os import PathLike
 
-from aiofiles.tempfile import NamedTemporaryFile, \
-  TemporaryDirectory
-from aiopath import AsyncPath, AsyncPurePath
 import pytest
+from aiofiles.tempfile import NamedTemporaryFile
 
-from . import file_paths, dir_paths, Paths, PathTypes, \
-  get_paths, RECURSIVE_GLOB, WILDCARD_GLOB
+from aiopath import AsyncPath, AsyncPurePath
+from . import RECURSIVE_GLOB, WILDCARD_GLOB, get_paths
 
 
 NO_PATHS: int = 0

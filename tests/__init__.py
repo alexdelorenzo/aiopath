@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import Union
-from pathlib import Path, PurePath
-from os import PathLike
 
-from aiofiles.tempfile import NamedTemporaryFile, TemporaryDirectory
+from os import PathLike
+from pathlib import Path
+from typing import Union
+
 import pytest
+from aiofiles.tempfile import NamedTemporaryFile, TemporaryDirectory
 
 from aiopath import AsyncPath
 
