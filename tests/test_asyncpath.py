@@ -17,29 +17,17 @@ TOUCH_SLEEP: int = 1
 
 
 def test_asyncpath_implements_all_path_members():
-  path_dunders: set[str] = {
+  path_members: set[str] = {
     member
     for member in dir(Path)
-    if member.startswith(DUNDER) and member.endswith(DUNDER)
+    if member.startswith(DUNDER) and member.endswith(DUNDER) or not member.startswith(PRIVATE)
   }
-  path_public: set[str] = {
-    member
-    for member in dir(Path)
-    if not member.startswith(PRIVATE)
-  }
-  path_members: set[str] = path_dunders | path_public
 
-  apath_dunders: set[str] = {
+  apath_members: set[str] = {
     member
     for member in dir(AsyncPath)
-    if member.startswith(DUNDER) and member.endswith(DUNDER)
+    if member.startswith(DUNDER) and member.endswith(DUNDER) or not member.startswith(PRIVATE)
   }
-  apath_public: set[str] = {
-    member
-    for member in dir(AsyncPath)
-    if not member.startswith(PRIVATE)
-  }
-  apath_members: set[str] = apath_dunders | apath_public
 
   assert apath_members >= path_members
 
