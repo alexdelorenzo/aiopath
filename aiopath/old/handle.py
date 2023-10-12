@@ -190,12 +190,13 @@ async def get_handle(
   file: AsyncFile
 
   if 'b' in mode:
-    file = await open_file(name, mode)
+    file = await open_file(name, mode, buffering)
 
   else:
     file = await open_file(
       name,
       mode,
+      buffering=buffering,
       encoding=encoding,
       errors=errors,
       newline=newline,
