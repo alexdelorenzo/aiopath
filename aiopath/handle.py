@@ -12,6 +12,7 @@ from aiofile import AIOFile, LineReader, \
 from anyio import AsyncFile, open_file
 
 from aiopath.types import FileMode
+from .types import Paths
 
 if TYPE_CHECKING:  # keep mypy quiet
   pass
@@ -25,7 +26,6 @@ ENCODING: Final[str] = 'utf-8'
 ERRORS: Final[str] = 'replace'
 
 
-type Paths = AsyncPath | Path | str
 type FileData = bytes | str
 
 type Handle = TextFileWrapper | BinaryFileWrapper | IterableAIOFile | AsyncFile
