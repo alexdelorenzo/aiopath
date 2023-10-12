@@ -161,10 +161,10 @@ class AsyncPath(Path, AsyncPurePath):
     return await to_thread(self._path.owner)
 
   async def read_bytes(self) -> bytes:
-    return await to_thread(super().read_bytes)
+    return await to_thread(self._path.read_bytes)
 
   async def read_text(self, encoding: str | None = None, errors: str | None = None) -> str:
-    return await to_thread(super().read_text, encoding, errors)
+    return await to_thread(self._path.read_text, encoding, errors)
 
   async def readlink(self: Self) -> Self:
     path: Path = await to_thread(super().readlink)
@@ -194,14 +194,14 @@ class AsyncPath(Path, AsyncPurePath):
   async def symlink_to(self, target: str | Path, target_is_directory: bool = False):
     return await to_thread(super().symlink_to, target, target_is_directory)
 
-  async def touch(self, mode: int | None = None, exist_ok: bool = True):
+  async def touch(self, mode: int = 0o666, exist_ok: bool = True):
     return await to_thread(super().touch, mode, exist_ok)
 
   async def unlink(self, missing_ok: bool = False):
     return await to_thread(super().unlink, missing_ok)
 
   async def write_bytes(self, data: bytes):
-    return await to_thread(super().write_bytes, data)
+    return await to_thread(self._path.write_bytes, data)
 
   async def write_text(self, data: str, encoding: str | None = None, errors: str | None = None, new_line: str | None = None):
-    return await to_thread(super().write_text, data, encoding, errors, new_line)
+    return await to_thread(self._path.write_text, data, encoding, errors, new_line)
