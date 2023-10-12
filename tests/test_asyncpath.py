@@ -3,12 +3,12 @@ from __future__ import annotations
 from asyncio import sleep
 from inspect import getmembers, ismethod, signature
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 import pytest
 
 from aiopath import AsyncPath
-from . import Paths, _test_is
+from . import Paths, _test_is, dir_paths, file_paths
 
 
 TEST_NAME: str = 'TEST'
@@ -19,9 +19,9 @@ DUNDER: str = '__'
 PRIVATE: str = '_'
 
 
-def _get_signatures(obj: Any, name: str) -> set[str]:
-  member = getattr(obj, name)
-  sig = signature(member)
+def _get_signature_params(obj: Any, member: str) -> set[str]:
+  method: Callable = getattr(obj, member)
+  sig = signature(method)
   params = sig.parameters.keys()
 
   return set(params)
@@ -59,16 +59,16 @@ def test_asyncpath_implements_all_path_members():
 
 
 def test_asyncpath_method_signatures_match_path_method_signatures():
-  amembers: set[str] = {name for name, _ in getmembers(AsyncPath, ismethod)}
-  members: set[str] = {name for name, _ in getmembers(Path, ismethod)}
+  amethods: set[str] = {name for name, _ in getmembers(AsyncPath, ismethod)}
+  methods: set[str] = {name for name, _ in getmembers(Path, ismethod)}
 
   asigs: dict[str, set[str]] = {
-    name: _get_signatures(AsyncPath, name)
-    for name in amembers
+    method: _get_signature_params(AsyncPath, method)
+    for method in amethods
   }
   sigs: dict[str, set[str]] = {
-    name: _get_signatures(Path, name)
-    for name in members
+    method: _get_signature_params(Path, method)
+    for method in methods
   }
 
   assert asigs == sigs
