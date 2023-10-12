@@ -2,7 +2,7 @@ from __future__ import annotations
 from pathlib import PosixPath, WindowsPath, \
   Path, PurePath, _ignore_error
 from typing import AsyncIterable, Final, Self, Type
-from os import stat_result, PathLike
+from os import stat_result
 from stat import S_ISDIR, S_ISLNK, S_ISREG, S_ISSOCK, S_ISBLK, \
   S_ISCHR, S_ISFIFO
 import os
@@ -12,7 +12,7 @@ from aiopath.wrap import to_async_method, to_thread, func_to_async_func
 from aiopath.old.scandir import EntryWrapper, scandir_async
 from aiopath.handle import get_handle, Handle
 from aiopath.old.selectors import _make_selector
-from aiopath.types import FileMode
+from aiopath.types import FileMode, Paths
 from aiopath.old.compat import _NormalAccessor
 
 
@@ -22,10 +22,6 @@ NEWLINE: Final[str] = '\n'
 
 OS_NAME: Final[str] = os.name
 IS_WIN: Final[bool] = OS_NAME == 'nt'
-
-
-Paths = Path | PathLike | str
-
 
 getcwd = os.getcwd
 close = func_to_async_func(os.close)

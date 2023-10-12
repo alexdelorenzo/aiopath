@@ -22,9 +22,8 @@ async def save_page(url: str, name: str):
   if await path.exists():
     return
 
-  async with ClientSession() as session:
-    async with session.get(url) as response:
-      content: bytes = await response.read()
+  async with ClientSession() as session, session.get(url) as response:
+    content: bytes = await response.read()
 
   await path.write_bytes(content)
 

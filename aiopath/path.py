@@ -1,25 +1,25 @@
 from functools import cached_property
 from os import stat_result
 from pathlib import Path, PurePath
-from typing import AsyncIterable, Self
+from typing import AsyncContextManager, AsyncIterable, Self
 
-from aiopath.handle import get_handle
-from .types import FileMode
+from .handle import Handle, get_handle
+from .types import FileMode, Paths
 from .wrap import to_thread
 
 
 class AsyncPurePath(PurePath):
   __slots__ = PurePath.__slots__
 
-  def __truediv__(self, other: Self) -> Self:
+  def __truediv__(self, other: Paths) -> Self:
     path: PurePath = super().__truediv__(other)
     return AsyncPath(path)
 
-  def __rtruediv__(self, other: Self) -> Self:
+  def __rtruediv__(self, other: Paths) -> Self:
     path: PurePath = super().__rtruediv__(other)
     return AsyncPath(path)
 
-  def relative_to(self: Self, *other: str | Path) -> Self:
+  def relative_to(self: Self, *other: Paths) -> Self:
     path: PurePath = super().relative_to(*other)
     return AsyncPath(path)
 
@@ -31,7 +31,7 @@ class AsyncPurePath(PurePath):
     path: PurePath = super().with_suffix(suffix)
     return AsyncPath(path)
 
-  def joinpath(self: Self, *other: str | Path) -> Self:
+  def joinpath(self: Self, *other: Paths) -> Self:
     path: PurePath = super().joinpath(*other)
     return AsyncPath(path)
 
@@ -59,7 +59,7 @@ class AsyncPath(Path, AsyncPurePath):
     encoding: str | None = None,
     errors: str | None = None,
     newline: str | None = None,
-  ) -> Self:
+  ) -> AsyncContextManager[Handle]:
     return get_handle(
       str(self),
       mode,
@@ -79,12 +79,12 @@ class AsyncPath(Path, AsyncPurePath):
     path: Path = await to_thread(Path.home)
     return AsyncPath(path)
 
-  async def stat(self) -> stat_result:
-    return await to_thread(super().stat)
+  async def stat(self, *, follow_symlinks: bool = True) -> stat_result:
+    return await to_thread(super().stat, follow_symlinks=follow_symlinks)
 
   async def chmod(
     self,
-    mode: int | str,
+    mode: FileMode,
     *,
     follow_symlinks: bool = True,
   ):
@@ -92,7 +92,7 @@ class AsyncPath(Path, AsyncPurePath):
 
   async def lchmod(
     self,
-    mode: int | str,
+    mode: FileMode,
   ):
     return await to_thread(super().lchmod, mode)
 
@@ -100,15 +100,15 @@ class AsyncPath(Path, AsyncPurePath):
     path: Path = await to_thread(super().absolute)
     return AsyncPath(path)
 
-  async def exists(self) -> bool:
-    return await to_thread(self._path.exists)
+  async def exists(self, *, follow_symlinks: bool = True) -> bool:
+    return await to_thread(self._path.exists, follow_symlinks=follow_symlinks)
 
   async def expanduser(self: Self) -> Self:
     path: Path = await to_thread(super().expanduser)
     return AsyncPath(path)
 
-  async def glob(self: Self, pattern: str) -> AsyncIterable[Self]:
-    for path in await to_thread(super().glob, pattern):
+  async def glob(self: Self, pattern: str, *, case_sensitive: bool | None = None) -> AsyncIterable[Self]:
+    for path in await to_thread(super().glob, pattern, case_sensitive=case_sensitive):
       yield AsyncPath(path)
 
   async def group(self) -> int:
@@ -116,7 +116,7 @@ class AsyncPath(Path, AsyncPurePath):
 
   async def hardlink_to(
     self,
-    target: Self,
+    target: Paths,
   ):
     return await to_thread(super().hardlink_to, target)
 
@@ -151,8 +151,8 @@ class AsyncPath(Path, AsyncPurePath):
   async def lstat(self) -> stat_result:
     return await to_thread(self._path.lstat)
 
-  async def match(self, path_pattern: str) -> bool:
-    return await to_thread(super().match, path_pattern)
+  async def match(self, path_pattern: str, *, case_sensitive: bool | None = None) -> bool:
+    return await to_thread(super().match, path_pattern, case_sensitive=case_sensitive)
 
   async def mkdir(self, mode: int = 0o777, parents: bool = False, exist_ok: bool = False):
     return await to_thread(super().mkdir, mode, parents, exist_ok)
@@ -170,10 +170,10 @@ class AsyncPath(Path, AsyncPurePath):
     path: Path = await to_thread(super().readlink)
     return AsyncPath(path)
 
-  async def rename(self, target: str | Path):
+  async def rename(self, target: Paths):
     return await to_thread(super().rename, target)
 
-  async def replace(self: Self, target: str | PurePath) -> Self:
+  async def replace(self: Self, target: Paths) -> Self:
     path: Path = await to_thread(super().replace, target)
     return AsyncPath(path)
 
@@ -181,17 +181,17 @@ class AsyncPath(Path, AsyncPurePath):
     path: Path = await to_thread(super().resolve, strict)
     return AsyncPath(path)
 
-  async def rglob(self: Self, pattern: str) -> AsyncIterable[Self]:
-    for path in await to_thread(super().rglob, pattern):
+  async def rglob(self: Self, pattern: str, *, case_sensitive: bool | None = None) -> AsyncIterable[Self]:
+    for path in await to_thread(super().rglob, pattern, case_sensitive=case_sensitive):
       yield AsyncPath(path)
 
   async def rmdir(self):
     return await to_thread(super().rmdir)
 
-  async def samefile(self, other_path: str | bytes | Path) -> bool:
+  async def samefile(self, other_path: Paths) -> bool:
     return await to_thread(self._path.samefile, other_path)
 
-  async def symlink_to(self, target: str | Path, target_is_directory: bool = False):
+  async def symlink_to(self, target: Path, target_is_directory: bool = False):
     return await to_thread(super().symlink_to, target, target_is_directory)
 
   async def touch(self, mode: int = 0o666, exist_ok: bool = True):
@@ -203,5 +203,5 @@ class AsyncPath(Path, AsyncPurePath):
   async def write_bytes(self, data: bytes):
     return await to_thread(self._path.write_bytes, data)
 
-  async def write_text(self, data: str, encoding: str | None = None, errors: str | None = None, new_line: str | None = None):
-    return await to_thread(self._path.write_text, data, encoding, errors, new_line)
+  async def write_text(self, data: str, encoding: str | None = None, errors: str | None = None, newline: str | None = None):
+    return await to_thread(self._path.write_text, data, encoding, errors, newline)
