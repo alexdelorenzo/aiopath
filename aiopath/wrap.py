@@ -33,7 +33,7 @@ def func_to_async_func[**P, T](func: Decoratable) -> CoroutineFunction:
   return new_func
 
 
-method_to_async_method: Callable[Decoratable, CoroutineFunction] = \
+method_to_async_method: Callable[[Decoratable], CoroutineFunction] = \
   func_to_async_func
 
 
