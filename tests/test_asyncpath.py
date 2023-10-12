@@ -3,7 +3,7 @@ from pathlib import Path, PurePath
 from asyncio import sleep, to_thread
 from os import PathLike
 
-from asynctempfile import NamedTemporaryFile, \
+from aiofiles.tempfile import NamedTemporaryFile, \
   TemporaryDirectory
 import pytest
 

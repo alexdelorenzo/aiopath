@@ -2,7 +2,7 @@ from __future__ import annotations
 from pathlib import Path
 from string import printable
 
-from asynctempfile import NamedTemporaryFile, \
+from aiofiles.tempfile import NamedTemporaryFile, \
   TemporaryDirectory
 import pytest
 
