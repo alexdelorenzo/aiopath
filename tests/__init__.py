@@ -3,8 +3,7 @@ from typing import Union
 from pathlib import Path, PurePath
 from os import PathLike
 
-from asynctempfile import NamedTemporaryFile, \
-  TemporaryDirectory
+from aiofiles.tempfile import NamedTemporaryFile, TemporaryDirectory
 import pytest
 
 from aiopath import AsyncPath
