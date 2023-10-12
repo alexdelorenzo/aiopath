@@ -3,7 +3,7 @@ from pathlib import Path, PurePath
 from asyncio import sleep, to_thread
 from os import PathLike
 
-from asynctempfile import NamedTemporaryFile, \
+from aiofiles.tempfile import NamedTemporaryFile, \
   TemporaryDirectory
 from aiopath import AsyncPath, AsyncPurePath
 import pytest
@@ -62,8 +62,8 @@ async def test_readme_example2_convert():
   # AsyncPath and Path objects can point to the same file
   assert str(home) == str(ahome) == str(path)
 
-  # but AsyncPath and Path objects are not equivalent
-  assert not home == ahome
+  # but AsyncPath and Path objects are equivalent
+  assert home == ahome
 
 
 @pytest.mark.asyncio

@@ -126,8 +126,8 @@ assert isinstance(path, Path)
 # AsyncPath and Path objects can point to the same file
 assert str(home) == str(ahome) == str(path)
 
-# but AsyncPath and Path objects are not equivalent
-assert not home == ahome
+# but AsyncPath and Path objects are equivalent
+assert home == ahome
 ```
 
 `AsyncPath` is a subclass of `Path` and `PurePath`, and a subclass of `AsyncPurePath`:
