@@ -108,7 +108,7 @@ class AsyncPath(Path, AsyncPurePath):
     return AsyncPath(path)
 
   async def glob(self: Self, pattern: str, *, case_sensitive: bool | None = None) -> AsyncIterable[Self]:
-    for path in await to_thread(super().glob, pattern, case_sensitive=case_sensitive):
+    for path in await to_thread(self._path.glob, pattern, case_sensitive=case_sensitive):
       yield AsyncPath(path)
 
   async def group(self) -> int:
