@@ -9,7 +9,7 @@ type Method[**P, T] = Callable[P, T]
 
 type Decoratable[**P, T] = Callable[P, T]
 type Decorated[**P, T] = Callable[P, T]
-type Decorator[**P, T] = Callable[[Decoratable], Decorated]
+type Decorator = Callable[[Decoratable], Decorated]
 
 type FileMode = TextMode | BinaryMode
 type TextMode = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+', 'x+']
