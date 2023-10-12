@@ -1,4 +1,4 @@
-__author__ = "Alex DeLorenzo"
+__author__ = "Alex DeLorenzo <alex@alexdelorenzo.dev>"
 from setuptools import setup
 from pathlib import Path
 
