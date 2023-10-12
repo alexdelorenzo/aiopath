@@ -3,7 +3,7 @@ from os import stat_result
 from pathlib import Path, PurePath
 from typing import AsyncIterable, Self
 
-from .old.handle import get_handle
+from aiopath.handle import get_handle
 from .types import FileMode
 from .wrap import to_thread
 

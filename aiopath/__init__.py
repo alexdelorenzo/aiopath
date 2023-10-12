@@ -2,7 +2,7 @@
 from .paths import AsyncPath, AsyncPurePath
 
 # export iterable async file handle
-from aiopath.old.handle import IterableAIOFile
+from aiopath.handle import IterableAIOFile
 
 
 # convenience aliases

@@ -10,7 +10,7 @@ import os
 from aiopath.old.flavours import _async_windows_flavour, _async_posix_flavour
 from aiopath.wrap import to_async_method, to_thread, func_to_async_func
 from aiopath.old.scandir import EntryWrapper, scandir_async
-from aiopath.old.handle import get_handle, Handle
+from aiopath.handle import get_handle, Handle
 from aiopath.old.selectors import _make_selector
 from aiopath.types import FileMode
 from aiopath.old.compat import _NormalAccessor
