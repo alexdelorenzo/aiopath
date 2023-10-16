@@ -18,7 +18,9 @@ class AsyncPurePath(PurePath):
   Instead of returning PurePath objects, AsyncPurePath returns AsyncPath objects.
   """
 
-  __slots__ = PurePath.__slots__
+  __slots__ = (
+    *PurePath.__slots__,
+  )
 
   @docs_from(PurePath)
   def __rtruediv__(self, key: Paths) -> Self:
