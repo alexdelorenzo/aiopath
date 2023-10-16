@@ -216,14 +216,23 @@ async def test_unlink(file_paths: Paths, dir_paths: Paths):
 
 
 @pytest.mark.asyncio
-async def test_links(file_paths: Paths):
-  # symlink
-  ## readlink()
-  ## symlink_to()
+async def test_links(file_paths: Paths, dir_paths: Paths):
+  path, apath = file_paths
+  pdir, adir = dir_paths
+  new_apath = apath.parent / 'link'
 
-  # hard link
-  ## link_to()
-  pass
+  for _path in (apath, adir):
+    is_dir: bool = await _path.is_dir()
+
+    await new_apath.symlink_to(apath, target_is_directory=is_dir)
+    assert await new_apath.exists()
+    assert await new_apath.is_symlink()
+
+    link = await new_apath.readlink()
+    assert link == apath
+
+    await new_apath.unlink()
+    assert not await new_apath.exists()
 
 
 @pytest.mark.asyncio
