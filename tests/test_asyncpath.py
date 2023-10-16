@@ -245,8 +245,6 @@ async def test_hardlinks(file_paths: Paths, dir_paths: Paths):
   new_apath = apath.parent / 'hardlink'
 
   for _path in (apath, adir):
-    is_dir: bool = await _path.is_dir()
-
     await new_apath.hardlink_to(apath)
     assert await new_apath.exists()
     assert not await new_apath.is_symlink()
