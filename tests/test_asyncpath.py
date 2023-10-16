@@ -57,12 +57,12 @@ def test_asyncpath_method_signatures_match_path_method_signatures():
 
   methods = amethods & pmethods
 
-  asigs: dict[str, tuple[str]] = {
+  asigs: dict[str, tuple[str, ...]] = {
     method: _get_signature_params(AsyncPath, method)
     for method in methods
   }
 
-  psigs: dict[str, tuple[str]] = {
+  psigs: dict[str, tuple[str, ...]] = {
     method: _get_signature_params(Path, method)
     for method in methods
   }

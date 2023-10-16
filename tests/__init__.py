@@ -54,7 +54,7 @@ def _get_public_methods(obj: Any) -> set[str]:
   }
 
 
-def _get_signature_params(obj: Any, member: str) -> tuple[str]:
+def _get_signature_params(obj: Any, member: str) -> tuple[str, ...]:
   method: Callable = getattr(obj, member)
   sig = signature(method)
   params = sig.parameters.keys()
@@ -72,6 +72,7 @@ async def file_paths() -> Paths:
 async def dir_paths() -> Paths:
   async with TemporaryDirectory() as temp:
     yield get_paths(temp)
+
 
 def _test_is_pure(
   path: Path,
