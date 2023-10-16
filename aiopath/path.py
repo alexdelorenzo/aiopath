@@ -184,7 +184,7 @@ class AsyncPath(AsyncPurePath, Path):
     errors: str | None = None,
     newline: str | None = None,
   ) -> AsyncContextManager[Handle]:
-    return get_handle(str(self), mode, buffering, encoding, errors, newline)
+    return get_handle(self, mode, buffering, encoding, errors, newline)
 
   @docs_from(Path)
   async def owner(self) -> str:

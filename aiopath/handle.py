@@ -178,7 +178,7 @@ async def read_full_file(
 
 @asynccontextmanager
 async def get_handle(
-  name: str,
+  name: Paths,
   mode: FileMode = 'r',
   buffering: int = -1,
   encoding: str | None = ENCODING,
