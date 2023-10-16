@@ -226,7 +226,7 @@ class AsyncPath(AsyncPurePath, Path):
     return await to_thread(super().rmdir)
 
   @docs_from(Path)
-  async def samefile(self, other_path: Paths | int) -> bool:
+  async def samefile(self, other_path: Paths) -> bool:
     return await to_thread(self._path.samefile, other_path)
 
   @docs_from(Path)
@@ -234,7 +234,7 @@ class AsyncPath(AsyncPurePath, Path):
     return await to_thread(super().stat, follow_symlinks=follow_symlinks)
 
   @docs_from(Path)
-  async def symlink_to(self, target: Path, target_is_directory: bool = False):
+  async def symlink_to(self, target: Paths, target_is_directory: bool = False):
     return await to_thread(super().symlink_to, target, target_is_directory)
 
   @docs_from(Path)
