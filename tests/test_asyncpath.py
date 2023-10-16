@@ -16,12 +16,12 @@ TEST_NAME: str = 'TEST'
 TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
 
-ASYNCPUREPATH_MRO: list[type, ...] = [
+ASYNCPUREPATH_MRO: list[type] = [
   AsyncPurePath,
   PurePath,
   object,
 ]
-ASYNCPATH_MRO: list[type, ...] = [
+ASYNCPATH_MRO: list[type] = [
   AsyncPath,
   AsyncPurePath,
   Path,
