@@ -216,20 +216,43 @@ async def test_unlink(file_paths: Paths, dir_paths: Paths):
 
 
 @pytest.mark.asyncio
-async def test_links(file_paths: Paths, dir_paths: Paths):
+async def test_symlinks(file_paths: Paths, dir_paths: Paths):
   path, apath = file_paths
   pdir, adir = dir_paths
-  new_apath = apath.parent / 'link'
+  new_apath = apath.parent / 'symlink'
 
   for _path in (apath, adir):
     is_dir: bool = await _path.is_dir()
 
-    await new_apath.symlink_to(apath, target_is_directory=is_dir)
+    await new_apath.symlink_to(_path, target_is_directory=is_dir)
     assert await new_apath.exists()
     assert await new_apath.is_symlink()
 
     link = await new_apath.readlink()
-    assert link == apath
+    assert link == _path
+
+    assert await link.is_dir() == is_dir
+    assert await link.is_file() != is_dir
+
+    await new_apath.unlink()
+    assert not await new_apath.exists()
+
+
+@pytest.mark.asyncio
+async def test_hardlinks(file_paths: Paths, dir_paths: Paths):
+  apath = AsyncPath(__file__)
+  adir = apath.parent
+  new_apath = apath.parent / 'hardlink'
+
+  for _path in (apath, adir):
+    is_dir: bool = await _path.is_dir()
+
+    await new_apath.hardlink_to(apath)
+    assert await new_apath.exists()
+    assert not await new_apath.is_symlink()
+
+    with pytest.raises(OSError):
+      await new_apath.readlink()
 
     await new_apath.unlink()
     assert not await new_apath.exists()
