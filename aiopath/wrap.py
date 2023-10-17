@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from functools import partial, wraps
 from inspect import iscoroutinefunction
 from types import BuiltinFunctionType, BuiltinMethodType, FunctionType, MethodType
