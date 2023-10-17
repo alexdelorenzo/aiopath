@@ -195,12 +195,11 @@ async def test_stat(file_paths: Paths):
 async def test_unlink(file_paths: Paths, dir_paths: Paths):
   path, apath = file_paths
 
-  assert await apath.exists()
-  assert await to_thread(path.exists)
+  assert await apath.exists() and await to_thread(path.exists)
 
   await apath.unlink()
-  assert not await apath.exists()
-  assert not await to_thread(path.exists)
+  assert not await apath.exists() and not await to_thread(path.exists)
+  await _test_is(path, apath, exists=False)
 
   # recreate file
   await apath.touch()
@@ -211,8 +210,8 @@ async def test_unlink(file_paths: Paths, dir_paths: Paths):
   with pytest.raises(IsADirectoryError):
     await apath.unlink()
 
-  assert await apath.exists()
-  assert await to_thread(path.exists)
+  assert await apath.exists() and await to_thread(path.exists)
+  await _test_is(path, apath, exists=True)
 
 
 @pytest.mark.asyncio
@@ -221,7 +220,7 @@ async def test_symlinks(file_paths: Paths, dir_paths: Paths):
   pdir, adir = dir_paths
   new_apath = apath.parent / 'symlink'
 
-  for _path in (apath, adir):
+  for _path in apath, adir:
     is_dir: bool = await _path.is_dir()
 
     await new_apath.symlink_to(_path, target_is_directory=is_dir)
@@ -244,7 +243,7 @@ async def test_hardlinks(file_paths: Paths, dir_paths: Paths):
   adir = apath.parent
   new_apath = apath.parent / 'hardlink'
 
-  for _path in (apath, adir):
+  for _path in apath, adir:
     await new_apath.hardlink_to(apath)
     assert await new_apath.exists()
     assert not await new_apath.is_symlink()
@@ -267,8 +266,11 @@ async def test_open(file_paths: Paths):
 
 
 @pytest.mark.asyncio
-async def test_chmod(file_paths: Paths):
-  pass
+async def test_chmod(file_paths: Paths, dir_paths: Paths):
+  path, apath = file_paths
+  pdir, adir = dir_paths
+
+  mode = 0o777
 
 
 @pytest.mark.asyncio

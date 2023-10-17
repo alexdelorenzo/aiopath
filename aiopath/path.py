@@ -94,7 +94,7 @@ class AsyncPath(AsyncPurePath, Path):
     return AsyncPath(path)
 
   @docs_from(Path)
-  async def chmod(self, mode: FileMode, *, follow_symlinks: bool = True):
+  async def chmod(self, mode: int, *, follow_symlinks: bool = True):
     return await to_thread(super().chmod, mode, follow_symlinks=follow_symlinks)
 
   @docs_from(Path)
@@ -160,7 +160,7 @@ class AsyncPath(AsyncPurePath, Path):
       yield AsyncPath(path)
 
   @docs_from(Path)
-  async def lchmod(self, mode: FileMode):
+  async def lchmod(self, mode: int):
     return await to_thread(self._path.lchmod, mode)
 
   @docs_from(Path)
