@@ -3,6 +3,7 @@ from __future__ import annotations
 from asyncio import sleep
 from inspect import getdoc
 from pathlib import Path, PurePath
+from typing import cast
 
 import pytest
 
@@ -15,6 +16,8 @@ from . import Paths, _get_public_methods, _get_signature_params, \
 TEST_NAME: str = 'TEST'
 TEST_SUFFIX: str = f'.{TEST_NAME}'
 TOUCH_SLEEP: int = 1
+MODE_DIGITS: slice = slice(-3, None)
+MODE_BASE: int = 8
 
 ASYNCPUREPATH_MRO: list[type] = [
   AsyncPurePath,
@@ -28,6 +31,28 @@ ASYNCPATH_MRO: list[type] = [
   PurePath,
   object,
 ]
+
+
+def _to_mode(st_mode: int) -> int:
+  mode: str = oct(st_mode)[MODE_DIGITS]
+  return int(mode, base=MODE_BASE)
+
+
+async def _get_mode(path: Path | AsyncPath) -> int:
+  mode: int
+
+  match path:
+    case AsyncPath():
+      stat = await path.stat()
+      mode = stat.st_mode
+
+    case Path():
+      mode = path.stat().st_mode
+
+    case int():
+      mode = cast(path, int)
+
+  return _to_mode(mode)
 
 
 def test_mro():
@@ -270,7 +295,17 @@ async def test_chmod(file_paths: Paths, dir_paths: Paths):
   path, apath = file_paths
   pdir, adir = dir_paths
 
-  mode = 0o777
+  new_mode: int = 0o777
+
+  for _path in apath, adir:
+    original_mode: int = await _get_mode(_path)
+    assert original_mode != new_mode
+
+    await _path.chmod(new_mode)
+    mode = await _get_mode(_path)
+
+    assert mode != original_mode
+    assert mode == new_mode
 
 
 @pytest.mark.asyncio
