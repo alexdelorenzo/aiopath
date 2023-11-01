@@ -137,7 +137,7 @@ class AsyncPath(Path, AsyncPurePath):
       cls = AsyncWindowsPath if IS_WIN else AsyncPosixPath
 
     try:
-      self = cls._from_parts(args, init=False)
+      self = cls._from_parts(args)
 
     except TypeError:
       self = cls._from_parts(args)
@@ -218,7 +218,7 @@ class AsyncPath(Path, AsyncPurePath):
     Return the path to which the symbolic link points.
     """
     path: str = await self._accessor.readlink(self)
-    obj = self._from_parts((path,), init=False)
+    obj = self._from_parts((path,))
     obj._init(template=self)
     return obj
 
@@ -467,7 +467,7 @@ class AsyncPath(Path, AsyncPurePath):
     # FIXME this must defer to the specific flavour (and, under Windows,
     # use nt._getfullpathname())
     parts: list[str] = [getcwd()] + self._parts
-    obj = self._from_parts(parts, init=False)
+    obj = self._from_parts(parts)
     obj._init(template=self)
     return obj
 
@@ -488,7 +488,7 @@ class AsyncPath(Path, AsyncPurePath):
 
     # Now we have no symlinks in the path, it's safe to normalize it.
     normed: str = self._flavour.pathmod.normpath(s)
-    obj = self._from_parts((normed,), init=False)
+    obj = self._from_parts((normed,))
     obj._init(template=self)
     return obj
 
