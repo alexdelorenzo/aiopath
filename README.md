@@ -214,6 +214,7 @@ if await downloads.exists():
  - A POSIX compliant OS, or Windows
  - Python 3.7+
  - `requirements.txt`
+ - [Rye](https://rye.astral.sh) (for building)
 
 <!--#### Linux dependencies
 If you're using a 4.18 or newer kernel and have [`libaio`](https://pagure.io/libaio) installed, `aiopath` will use it via `aiofile`. You can install `libaio` on Debian/Ubuntu like so:
@@ -235,11 +236,14 @@ $ python3 -m pip install aiopath
 ## GitHub
 Download a release archive for your Python version from [the releases page](https://github.com/alexdelorenzo/aiopath/releases).
 
-Then to install, run:
+Then to build, run:
+
 ```bash
-$ python3 -m pip install -r requirements.txt
-$ python3 setup.py install
+$ rye sync
+$ rye build
 ```
+
+A wheel will be compiled in `dist/`.
 
 #### Python 3.9 and older
 `aiopath` for Python 3.9 and older is developed on the [`Python-3.9` branch](https://github.com/alexdelorenzo/aiopath/tree/Python-3.9).
