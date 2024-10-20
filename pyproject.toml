@@ -36,7 +36,7 @@ allow-direct-references = true
 root = "src"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/cast_convert"]
+packages = ["src/aiopath"]
 
 [tool.hatch.build]
 include = ["src/aiopath/**/*"]
