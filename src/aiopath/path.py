@@ -17,7 +17,6 @@ class AsyncPurePath(PurePath):
 
   Instead of returning PurePath objects, AsyncPurePath returns AsyncPath objects.
   """
-
   __slots__ = (
     *PurePath.__slots__,
   )
@@ -116,10 +115,7 @@ class AsyncPath(AsyncPurePath, Path):
     return await to_thread(self._path.group)
 
   @docs_from(Path)
-  async def hardlink_to(
-    self,
-    target: Paths,
-  ):
+  async def hardlink_to(self, target: Paths):
     return await to_thread(super().hardlink_to, target)
 
   @docs_from(Path)
