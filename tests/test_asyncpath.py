@@ -49,8 +49,11 @@ async def _get_mode(path: Path | AsyncPath) -> int:
     case Path():
       mode = path.stat().st_mode
 
-    case int():
-      mode = cast(path, int)
+    case int() as handle:
+      mode = cast(handle, int)
+
+    case _:
+      raise ValueError("Not a path or file handle.")
 
   return _to_mode(mode)
 
